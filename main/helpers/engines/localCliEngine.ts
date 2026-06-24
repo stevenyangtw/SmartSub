@@ -14,19 +14,19 @@ function cancelLocalCliTranscription(): void {
   if (!child || child.pid == null) return;
   try {
     if (process.platform === 'win32') {
-      // 杀整棵进程树（whisper CLI 常 fork 子进程）
+      // 殺整棵進程樹（whisper CLI 常 fork 子進程）
       spawn('taskkill', ['/pid', String(child.pid), '/T', '/F']);
     } else {
       child.kill('SIGTERM');
     }
   } catch {
-    // 进程可能已退出
+    // 進程可能已退出
   }
   activeLocalCliChild = null;
 }
 
 /**
- * 使用本地 Whisper 命令行工具生成字幕。取消时 kill 子进程树。
+ * 使用本地 Whisper 命令行工具生成字幕。取消時 kill 子進程樹。
  */
 function transcribeLocalCli(ctx: TranscribeContext): Promise<string> {
   const { event, file, formData } = ctx;

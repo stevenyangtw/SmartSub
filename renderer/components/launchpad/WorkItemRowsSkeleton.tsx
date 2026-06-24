@@ -2,8 +2,8 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * 与 `WorkItemList` 行布局同构的骨架占位，用于工程列表加载中（home / recent-tasks），
- * 避免「先闪空态再跳出列表」。纯展示，aria-hidden。
+ * 與 `WorkItemList` 行佈局同構的骨架佔位，用於工程列表加載中（home / recent-tasks），
+ * 避免「先閃空態再跳出列表」。純展示，aria-hidden。
  */
 export default function WorkItemRowsSkeleton({ rows = 5 }: { rows?: number }) {
   return (

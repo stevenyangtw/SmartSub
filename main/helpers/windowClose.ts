@@ -3,11 +3,11 @@ import { store } from './store';
 import { getTranscriptionBusyCount } from './taskProcessor';
 import { decideCloseIntent, type CloseAction } from './windowCloseDecision';
 
-type DialogLanguage = 'zh' | 'en';
+type DialogLanguage = 'zh' | 'zh-TW' | 'en';
 
-/** Cmd+Q / 菜单退出 / 我们主动退出时置位：区分「关窗」与「真退出」 */
+/** Cmd+Q / 菜單退出 / 我們主動退出時置位：區分「關窗」與「真退出」 */
 let isQuitting = false;
-/** 防止连点红叉时叠加多个对话框 */
+/** 防止連點紅叉時疊加多個對話框 */
 let closePromptOpen = false;
 
 export function getIsQuitting(): boolean {
@@ -20,16 +20,30 @@ export function markQuitting(): void {
 
 const LABELS: Record<DialogLanguage, Record<string, string>> = {
   zh: {
-    bgTitle: '应用仍在后台运行',
+    bgTitle: '應用仍在後臺運行',
     bgDetailBusy:
-      '仍在后台处理 %d 个任务。要彻底退出，请用 Cmd+Q 或右键 Dock 图标 → 退出。',
+      '仍在後臺處理 %d 個任務。要徹底退出，請用 Cmd+Q 或右鍵 Dock 圖標 → 退出。',
     bgDetailIdle:
-      '应用将继续在后台运行。要彻底退出，请用 Cmd+Q 或右键 Dock 图标 → 退出。',
-    bgBackground: '转入后台',
+      '應用將繼續在後臺運行。要徹底退出，請用 Cmd+Q 或右鍵 Dock 圖標 → 退出。',
+    bgBackground: '轉入後臺',
     bgQuitNow: '立即退出',
     dontShowAgain: '不再提示',
-    quitTitle: '仍有任务在运行',
-    quitDetailBusy: '当前还有 %d 个任务正在处理，退出会中断它们。确定退出吗？',
+    quitTitle: '仍有任務在運行',
+    quitDetailBusy: '當前還有 %d 個任務正在處理，退出會中斷它們。確定退出嗎？',
+    quitConfirm: '退出',
+    cancel: '取消',
+  },
+  'zh-TW': {
+    bgTitle: '應用仍在後臺運行',
+    bgDetailBusy:
+      '仍在後臺處理 %d 個任務。要徹底退出，請用 Cmd+Q 或右鍵 Dock 圖示 → 退出。',
+    bgDetailIdle:
+      '應用將繼續在後臺運行。要徹底退出，請用 Cmd+Q 或右鍵 Dock 圖示 → 退出。',
+    bgBackground: '轉入後臺',
+    bgQuitNow: '立即退出',
+    dontShowAgain: '不再提示',
+    quitTitle: '仍有任務在運行',
+    quitDetailBusy: '目前還有 %d 個任務正在處理，退出會中斷它們。確定退出嗎？',
     quitConfirm: '退出',
     cancel: '取消',
   },
@@ -52,7 +66,11 @@ const LABELS: Record<DialogLanguage, Record<string, string>> = {
 
 function resolveLanguage(): DialogLanguage {
   const settings = store.get('settings') as { language?: string } | undefined;
-  if (settings?.language === 'zh' || settings?.language === 'en') {
+  if (
+    settings?.language === 'zh' ||
+    settings?.language === 'zh-TW' ||
+    settings?.language === 'en'
+  ) {
     return settings.language;
   }
   return app.getLocale().toLowerCase().startsWith('zh') ? 'zh' : 'en';
@@ -64,7 +82,7 @@ function resolveCloseAction(): CloseAction {
   return a === 'background' || a === 'quit' ? a : 'smart';
 }
 
-/** 二次确认退出：返回 true=用户确认退出 */
+/** 二次確認退出：返回 true=用戶確認退出 */
 function confirmQuit(win: BrowserWindow, count: number): boolean {
   const l = LABELS[resolveLanguage()];
   const choice = dialog.showMessageBoxSync(win, {
@@ -81,8 +99,8 @@ function confirmQuit(win: BrowserWindow, count: number): boolean {
 }
 
 /**
- * 转入后台：首次弹一次性提示（带「不再提示」+「立即退出」），之后静默隐藏。
- * 返回前已执行 hide 或 app.quit。
+ * 轉入後臺：首次彈一次性提示（帶「不再提示」+「立即退出」），之後靜默隱藏。
+ * 返回前已執行 hide 或 app.quit。
  */
 async function goBackground(win: BrowserWindow, count: number): Promise<void> {
   const settings = store.get('settings');
@@ -136,15 +154,15 @@ async function handleWindowClose(win: BrowserWindow): Promise<void> {
   }
 }
 
-/** 装配窗口关闭行为 + Dock 激活恢复（取代 background.ts 内联逻辑） */
+/** 裝配窗口關閉行為 + Dock 激活恢復（取代 background.ts 內聯邏輯） */
 export function setupWindowCloseBehavior(mainWindow: BrowserWindow): void {
   mainWindow.on('close', (e) => {
-    if (isQuitting) return; // 真退出进行中：放行
+    if (isQuitting) return; // 真退出進行中：放行
     e.preventDefault();
     void handleWindowClose(mainWindow);
   });
 
-  // macOS：点击 Dock 图标恢复窗口
+  // macOS：點擊 Dock 圖標恢復窗口
   app.on('activate', () => {
     if (!mainWindow.isDestroyed()) {
       mainWindow.show();

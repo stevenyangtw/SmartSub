@@ -14,7 +14,7 @@ interface ShortcutsHelpDialogProps {
 }
 
 interface ShortcutItem {
-  /** 'mod' 渲染为 ⌘ 或 Ctrl */
+  /** 'mod' 渲染為 ⌘ 或 Ctrl */
   keys: string[];
   labelKey: string;
 }

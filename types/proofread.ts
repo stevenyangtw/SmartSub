@@ -1,15 +1,15 @@
 /**
- * 字幕校对相关类型定义
+ * 字幕校對相關類型定義
  */
 
-// 检测到的字幕类型
+// 檢測到的字幕類型
 export type DetectedSubtitleType =
   | 'source'
   | 'translated'
   | 'bilingual'
   | 'unknown';
 
-// 检测到的字幕信息
+// 檢測到的字幕信息
 export interface DetectedSubtitle {
   type: DetectedSubtitleType;
   filePath: string;
@@ -17,13 +17,13 @@ export interface DetectedSubtitle {
   confidence: number; // 匹配置信度 0-100
 }
 
-// 字幕检测结果
+// 字幕檢測結果
 export interface SubtitleDetectionResult {
   videoFile: string;
   detectedSubtitles: DetectedSubtitle[];
 }
 
-// 字幕匹配规则
+// 字幕匹配規則
 export interface SubtitleMatchRule {
   id: string;
   name: string;
@@ -33,7 +33,7 @@ export interface SubtitleMatchRule {
   isDefault?: boolean;
 }
 
-// 字幕匹配结果
+// 字幕匹配結果
 export interface SubtitleMatchResult {
   baseName: string;
   source?: string;
@@ -42,36 +42,36 @@ export interface SubtitleMatchResult {
   targetLanguage?: string;
 }
 
-// ============ 批量校对任务相关 ============
+// ============ 批量校對任務相關 ============
 
-// 单个校对项目（一个视频/字幕对）
+// 單個校對項目（一個視頻/字幕對）
 export interface ProofreadItem {
   id: string;
   videoPath?: string;
   sourceSubtitlePath: string;
   targetSubtitlePath?: string;
-  sourceLanguage?: string; // 自动检测的语言
+  sourceLanguage?: string; // 自動檢測的語言
   targetLanguage?: string;
-  lastPosition: number; // 上次校对到的字幕索引
-  totalCount: number; // 总字幕数
-  modifiedCount: number; // 修改次数
+  lastPosition: number; // 上次校對到的字幕索引
+  totalCount: number; // 總字幕數
+  modifiedCount: number; // 修改次數
   status: 'pending' | 'in_progress' | 'completed';
-  // 可选字幕列表（包含检测到的和用户上传的）
+  // 可選字幕列表（包含檢測到的和用戶上傳的）
   detectedSubtitles?: DetectedSubtitle[];
 }
 
-// 校对任务（包含多个项目）
+// 校對任務（包含多個項目）
 export interface ProofreadTask {
   id: string;
-  name: string; // 任务名称，默认取第一个文件名
+  name: string; // 任務名稱，默認取第一個文件名
   createdAt: number;
   updatedAt: number;
-  items: ProofreadItem[]; // 包含的校对项目
-  currentItemIndex: number; // 当前正在校对的项目索引
+  items: ProofreadItem[]; // 包含的校對項目
+  currentItemIndex: number; // 當前正在校對的項目索引
   status: 'in_progress' | 'completed';
 }
 
-// 兼容旧版本的历史记录（将被迁移）
+// 兼容舊版本的歷史記錄（將被遷移）
 export interface ProofreadHistory {
   id: string;
   createdAt: number;
@@ -88,7 +88,7 @@ export interface ProofreadHistory {
   displayName?: string;
 }
 
-// 独立校对模式的字幕配置
+// 獨立校對模式的字幕配置
 export interface StandaloneSubtitleConfig {
   videoPath?: string;
   sourceSubtitlePath: string;
@@ -97,9 +97,9 @@ export interface StandaloneSubtitleConfig {
   targetLanguage?: string;
 }
 
-// 语言检测结果
+// 語言檢測結果
 export interface LanguageDetectionResult {
-  code: string; // ISO 639-1 代码
-  name: string; // 语言名称
+  code: string; // ISO 639-1 代碼
+  name: string; // 語言名稱
   confidence: number; // 置信度
 }

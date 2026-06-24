@@ -73,8 +73,8 @@ import {
 } from '../../../types/downloadConfig';
 import { invalidateDownloadEndpointsCache } from 'hooks/useDownloadEndpoints';
 
-// 三档 VAD 环境预设。数值依据：标准=whisper.cpp 官方默认；
-// 安静=silero 0.3-0.4 灵敏区+短语保留；嘈杂=whisper.rn noisyEnv 推荐
+// 三檔 VAD 環境預設。數值依據：標準=whisper.cpp 官方預設；
+// 安靜=silero 0.3-0.4 靈敏區+短語保留；嘈雜=whisper.rn noisyEnv 推薦
 interface VadPreset {
   id: 'Quiet' | 'Standard' | 'Noisy';
   values: {
@@ -124,8 +124,8 @@ const VAD_PRESETS: VadPreset[] = [
 ];
 const STANDARD_PRESET = VAD_PRESETS[1];
 
-// 常见代理软件的默认 HTTP 代理端口，供「自定义代理」一键填入。
-// 仅列 HTTP(S) 代理（底层用 http(s)-proxy-agent，不支持 socks），免去用户记端口。
+// 常見代理軟體的預設 HTTP 代理端口，供「自定義代理」一鍵填入。
+// 僅列 HTTP(S) 代理（底層用 http(s)-proxy-agent，不支持 socks），免去用戶記端口。
 const PROXY_PRESETS: { label: string; url: string }[] = [
   { label: 'Clash', url: 'http://127.0.0.1:7890' },
   { label: 'V2Ray', url: 'http://127.0.0.1:10809' },
@@ -160,7 +160,7 @@ const Settings = () => {
   const [closeAction, setCloseAction] = useState<
     'smart' | 'background' | 'quit'
   >('smart');
-  // 关闭行为设置仅 macOS 有意义；用 useEffect 设置避免 SSR/CSR 水合不一致
+  // 關閉行為設置僅 macOS 有意義；用 useEffect 設置避免 SSR/CSR 水合不一致
   const [isMac, setIsMac] = useState(false);
   useEffect(() => {
     setIsMac(window?.ipc?.platform === 'darwin');
@@ -197,7 +197,7 @@ const Settings = () => {
         setCloseAction(settings.closeAction || 'smart');
       }
 
-      // 获取临时目录路径
+      // 獲取臨時目錄路徑
       const tempDirPath = await window?.ipc?.invoke('getTempDir');
       setTempDir(tempDirPath || '');
     };
@@ -225,7 +225,7 @@ const Settings = () => {
     }
   };
 
-  // 选择自定义临时目录
+  // 選擇自定義臨時目錄
   const handleSelectCustomTempDir = async () => {
     const result = await window?.ipc?.invoke('selectDirectory');
     if (result.canceled) return;
@@ -245,7 +245,7 @@ const Settings = () => {
     }
   };
 
-  // 切换是否使用自定义临时目录
+  // 切換是否使用自定義臨時目錄
   const handleCustomTempDirChange = async (checked: boolean) => {
     setUseCustomTempDir(checked);
     try {
@@ -258,7 +258,7 @@ const Settings = () => {
     }
   };
 
-  // 切换启动时检查更新
+  // 切換啟動時檢查更新
   const handleCheckUpdateOnStartupChange = async (checked: boolean) => {
     setCheckUpdateOnStartup(checked);
     try {
@@ -291,7 +291,7 @@ const Settings = () => {
     }
   };
 
-  // 添加清除缓存函数
+  // 添加清除緩存函數
   const handleClearCache = async () => {
     try {
       const result = await window?.ipc?.invoke('clearCache');
@@ -327,7 +327,7 @@ const Settings = () => {
     }
   };
 
-  // VAD 数字输入降噪：本地即时生效，500ms 静默期后批量持久化；成功静默，失败才打扰
+  // VAD 數字輸入降噪：本地即時生效，500ms 靜默期後批量持久化；成功靜默，失敗才打擾
   const pendingVadRef = useRef<Record<string, number>>({});
   const vadSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -357,7 +357,7 @@ const Settings = () => {
     }, 500);
   };
 
-  // 应用预设：逐键走 handleVADSettingChange，复用本地更新 + debounce 持久化
+  // 應用預設：逐鍵走 handleVADSettingChange，複用本地更新 + debounce 持久化
   const applyVadPreset = (preset: VadPreset) => {
     Object.entries(preset.values).forEach(([key, value]) => {
       handleVADSettingChange(key, value);
@@ -404,7 +404,7 @@ const Settings = () => {
   const handleProxyTest = async () => {
     setProxyTesting(true);
     try {
-      // 先持久化当前输入，确保测试用的是最新代理
+      // 先持久化當前輸入，確保測試用的是最新代理
       await window?.ipc?.invoke('setSettings', {
         proxyMode,
         proxyUrl,
@@ -425,7 +425,7 @@ const Settings = () => {
     }
   };
 
-  // 下载源端点：onChange 仅更新本地原始值，onBlur 规范化后持久化（仅存可编辑字段）。
+  // 下載源端點：onChange 僅更新本地原始值，onBlur 規範化後持久化（僅存可編輯字段）。
   const handleEndpointChange = (
     key: keyof DownloadEndpointConfig,
     value: string,
@@ -554,7 +554,8 @@ const Settings = () => {
                   <SelectValue placeholder={t('selectLanguage')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="zh">{t('chinese')}</SelectItem>
+                  <SelectItem value="zh">簡體中文</SelectItem>
+                  <SelectItem value="zh-TW">繁體中文</SelectItem>
                   <SelectItem value="en">{t('english')}</SelectItem>
                 </SelectContent>
               </Select>
@@ -844,7 +845,7 @@ const Settings = () => {
 
                 {useVAD && (
                   <>
-                    {/* 三档环境预设：与手动微调共存，当前值与某档全等时高亮 */}
+                    {/* 三檔環境預設：與手動微調共存，當前值與某檔全等時高亮 */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs text-muted-foreground">
                         {t('vadPresets')}

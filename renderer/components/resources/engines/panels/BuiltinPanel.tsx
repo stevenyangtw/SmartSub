@@ -5,9 +5,9 @@ import { GpuAccelerationCard } from '@/components/settings';
 /**
  * builtin（whisper.cpp）引擎面板。
  *
- * GPU 加速（whisper.cpp 的 CUDA/Vulkan addon）只服务本引擎，故折叠进此面板内联呈现
- * （`variant="embedded"`：紧凑状态摘要常驻 + 「管理/高级」默认收起；CUDA 下载抽屉从页面内
- * 打开，绝不出现弹窗内再开抽屉的嵌套）。
+ * GPU 加速（whisper.cpp 的 CUDA/Vulkan addon）只服務本引擎，故摺疊進此面板內聯呈現
+ * （`variant="embedded"`：緊湊狀態摘要常駐 + 「管理/高級」預設收起；CUDA 下載抽屜從頁面內
+ * 打開，絕不出現彈窗內再開抽屜的嵌套）。
  */
 const BuiltinPanel: React.FC = () => {
   const { t } = useTranslation('resources');

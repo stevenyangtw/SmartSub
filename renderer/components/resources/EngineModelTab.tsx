@@ -44,12 +44,12 @@ type EngineStatuses = Partial<Record<TranscriptionEngine, EngineStatus>>;
 type StatusTone = 'ready' | 'pending' | 'downloading' | 'error';
 
 /**
- * 左栏「视图」单位：多数与真实引擎 id 一一对应；'sherpa' 是把同源（共用 sherpa-onnx
- * 运行库）的 FunASR · Qwen · FireRed 合并为一项展示（仅 UI 合并，后端引擎 id 不变）。
+ * 左欄「視圖」單位：多數與真實引擎 id 一一對應；'sherpa' 是把同源（共用 sherpa-onnx
+ * 運行庫）的 FunASR · Qwen · FireRed 合併為一項展示（僅 UI 合併，後端引擎 id 不變）。
  */
 type EngineView = TranscriptionEngine | 'sherpa';
 
-/** sherpa 展示组覆盖的真实引擎 id（顺序即组内分区顺序）。 */
+/** sherpa 展示組覆蓋的真實引擎 id（順序即組內分區順序）。 */
 const SHERPA_FAMILIES: SherpaFamilyKey[] = ['funasr', 'qwen', 'fireRedAsr'];
 
 const ENGINE_VIEWS: EngineView[] = [
@@ -80,39 +80,39 @@ function StatusDot({ tone, label }: { tone: StatusTone; label?: string }) {
 }
 
 /**
- * 统一「引擎与模型」主从双栏视图：左栏引擎列表（状态点，无启用开关），
- * 右栏 = 选中引擎的运行时管理（内联各引擎面板，无弹窗）+ 该引擎模型清单。
- * 选中态为本地 state，不写全局；不提供"设为当前/启用"。
+ * 統一「引擎與模型」主從雙欄視圖：左欄引擎列表（狀態點，無啟用開關），
+ * 右欄 = 選中引擎的運行時管理（內聯各引擎面板，無彈窗）+ 該引擎模型清單。
+ * 選中態為本地 state，不寫全局；不提供"設為當前/啟用"。
  */
 const EngineModelTab: React.FC = () => {
   const { t } = useTranslation('resources');
   const { t: commonT } = useTranslation('common');
 
-  // 记住上次选中的视图，避免每次进入页面都跳回 builtin。
-  // 用新 key（engineModelSelectedView）：旧 key 可能存了 funasr/qwen/fireRedAsr，
-  // 现已并入 'sherpa' 组，换 key 自然回落默认，避免读到失效选项。
+  // 記住上次選中的視圖，避免每次進入頁面都跳回 builtin。
+  // 用新 key（engineModelSelectedView）：舊 key 可能存了 funasr/qwen/fireRedAsr，
+  // 現已併入 'sherpa' 組，換 key 自然回落預設，避免讀到失效選項。
   const [selectedView, setSelectedView] = useLocalStorageState<EngineView>(
     'engineModelSelectedView',
     'builtin',
     (v) => (ENGINE_VIEWS as string[]).includes(v as string),
   );
 
-  // FunASR 与 Qwen 共用的 sherpa-onnx 运行库状态（上提到此常驻组件，切换引擎不丢进度）。
+  // FunASR 與 Qwen 共用的 sherpa-onnx 運行庫狀態（上提到此常駐組件，切換引擎不丟進度）。
   const sherpa = useSherpaRuntime();
 
-  // 引擎运行时状态
+  // 引擎運行時狀態
   const [engineStatuses, setEngineStatuses] = useState<EngineStatuses>({});
   const [device, setDevice] = useState<'auto' | 'cpu' | 'cuda'>('auto');
   const [computeType, setComputeType] = useState('auto');
   const [whisperCommand, setWhisperCommand] = useState('');
   const [localCliEnabled, setLocalCliEnabled] = useState(false);
   const [platform, setPlatform] = useState('');
-  // 运行时变体：cpu=默认包（所有平台），cuda=Full GPU 包（仅 Win/Linux，捆绑 cuBLAS/cuDNN）。
-  // 下载前的选择记忆在本地；已安装变体以引擎状态(manifest)为准。
+  // 運行時變體：cpu=預設包（所有平臺），cuda=Full GPU 包（僅 Win/Linux，捆綁 cuBLAS/cuDNN）。
+  // 下載前的選擇記憶在本地；已安裝變體以引擎狀態(manifest)為準。
   const [selectedVariant, setSelectedVariant] = useLocalStorageState<
     'cpu' | 'cuda'
   >('fasterWhisperVariant', 'cpu', (v) => v === 'cpu' || v === 'cuda');
-  // 是否检测到可用的 NVIDIA(CUDA) 显卡（用于 GPU 选项的「推荐」标记/提示）。
+  // 是否檢測到可用的 NVIDIA(CUDA) 顯卡（用於 GPU 選項的「推薦」標記/提示）。
   const [nvidiaSupported, setNvidiaSupported] = useState(false);
   const [downloadProgress, setDownloadProgress] =
     useState<PyEngineDownloadProgress | null>(null);
@@ -122,7 +122,7 @@ const EngineModelTab: React.FC = () => {
   const taskBusyRef = useRef(false);
   const [updateInfo, setUpdateInfo] = useState<PyEngineUpdateInfo | null>(null);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
-  // 运行库（sherpa-onnx）随包内置，不再做安装检测；三族状态只看「是否已下载模型」。
+  // 運行庫（sherpa-onnx）隨包內置，不再做安裝檢測；三族狀態只看「是否已下載模型」。
   const [funasrModelsReady, setFunasrModelsReady] = useState(false);
   const [qwenModelsReady, setQwenModelsReady] = useState(false);
   const [fireRedModelsReady, setFireRedModelsReady] = useState(false);
@@ -130,7 +130,7 @@ const EngineModelTab: React.FC = () => {
     typeof window === 'undefined' ? 'github' : readPersistedDownloadSource(),
   );
 
-  // 模型清单数据（供右栏 ModelLibrarySection 与左栏 builtin 就绪点）
+  // 模型清單數據（供右欄 ModelLibrarySection 與左欄 builtin 就緒點）
   const [systemInfo, setSystemInfo] = useState<ISystemInfo>({
     modelsInstalled: [],
     downloadingModels: [],
@@ -151,8 +151,8 @@ const EngineModelTab: React.FC = () => {
   }, []);
 
   const refresh = useCallback(async () => {
-    // GPU 环境探测（首次含 nvidia-smi）较慢，独立异步加载、不进首屏 Promise.all，
-    // 避免拖慢引擎/模型状态渲染；platform 就绪后再补设（仅用于平台相关展示）。
+    // GPU 環境探測（首次含 nvidia-smi）較慢，獨立異步加載、不進首屏 Promise.all，
+    // 避免拖慢引擎/模型狀態渲染；platform 就緒後再補設（僅用於平臺相關展示）。
     void Promise.resolve(window?.ipc?.invoke('get-gpu-environment'))
       .then((env) => {
         if (env?.platform) setPlatform(env.platform);
@@ -204,13 +204,13 @@ const EngineModelTab: React.FC = () => {
     const unsubProgress = window?.ipc?.on(
       'py-engine-download-progress',
       (_progress: PyEngineDownloadProgress) => {
-        // 仅反映 faster-whisper 引擎包进度；sherpa 运行库已内置无下载进度。
+        // 僅反映 faster-whisper 引擎包進度；sherpa 運行庫已內置無下載進度。
         if (_progress.engineId && _progress.engineId !== 'faster-whisper') {
           return;
         }
         setDownloadProgress(_progress);
         if (_progress.status === 'completed') {
-          // 下载完成后引擎仍需冷启动校验，期间保持「检测中」，挡住重复点击。
+          // 下載完成後引擎仍需冷啟動校驗，期間保持「檢測中」，擋住重複點擊。
           setVerifying(true);
           setUpdateInfo(null);
           (async () => {
@@ -219,7 +219,7 @@ const EngineModelTab: React.FC = () => {
                 engineId: 'faster-whisper',
               });
             } catch {
-              // 校验失败交给 refresh() 反映真实状态（broken → 显示修复入口）
+              // 校驗失敗交給 refresh() 反映真實狀態（broken → 顯示修復入口）
             } finally {
               await refresh();
               setVerifying(false);
@@ -260,7 +260,7 @@ const EngineModelTab: React.FC = () => {
     };
   }, [refresh, updateSystemInfo, t]);
 
-  // 模型/引擎变更后同时刷新清单与引擎状态，保证左栏就绪点即时更新
+  // 模型/引擎變更後同時刷新清單與引擎狀態，保證左欄就緒點即時更新
   const handleResourcesUpdate = useCallback(() => {
     void updateSystemInfo();
     void refresh();
@@ -276,7 +276,7 @@ const EngineModelTab: React.FC = () => {
     }
   };
 
-  // localCli「启用」沿用 useLocalWhisper：开启后任务页「引擎 ▸ 模型」选择器才会列出本地命令行。
+  // localCli「啟用」沿用 useLocalWhisper：開啟後任務頁「引擎 ▸ 模型」選擇器才會列出本地命令行。
   const handleToggleLocalCli = async (value: boolean) => {
     setLocalCliEnabled(value);
     try {
@@ -287,15 +287,15 @@ const EngineModelTab: React.FC = () => {
     }
   };
 
-  // 当前已安装变体（manifest 来源）；未安装/老安装按 cpu 兜底。
+  // 當前已安裝變體（manifest 來源）；未安裝/老安裝按 cpu 兜底。
   const installedVariantOf = (): 'cpu' | 'cuda' =>
     engineStatuses.fasterWhisper?.variant === 'cuda' ? 'cuda' : 'cpu';
   const isGpuVariantPlatform = () =>
     platform === 'win32' || platform === 'linux';
 
   /**
-   * 统一的运行时下载入口。coupleDevice=true（仅在「选择/切换变体」时）联动计算设备：
-   * GPU 包→auto；CPU 包→cpu（CPU 包无 CUDA 运行库，置 cpu 可规避 cublas 加载报错）。
+   * 統一的運行時下載入口。coupleDevice=true（僅在「選擇/切換變體」時）聯動計算設備：
+   * GPU 包→auto；CPU 包→cpu（CPU 包無 CUDA 運行庫，置 cpu 可規避 cublas 加載報錯）。
    */
   const startEngineDownload = async (
     variant: 'cpu' | 'cuda',
@@ -321,7 +321,7 @@ const EngineModelTab: React.FC = () => {
           device: nextDevice,
         });
       } catch {
-        // 设备偏好写入失败不影响下载本身
+        // 設備偏好寫入失敗不影響下載本身
       }
     }
   };
@@ -329,7 +329,7 @@ const EngineModelTab: React.FC = () => {
   const handleStartDownload = () =>
     startEngineDownload(isGpuVariantPlatform() ? selectedVariant : 'cpu', true);
 
-  // 修复/升级沿用已安装变体；切换变体则显式下载目标变体并联动设备。
+  // 修復/升級沿用已安裝變體；切換變體則顯式下載目標變體並聯動設備。
   const handleRepair = () => startEngineDownload(installedVariantOf());
 
   const handleSwitchVariant = (target: 'cpu' | 'cuda') => {
@@ -394,7 +394,7 @@ const EngineModelTab: React.FC = () => {
   const fasterStatus = engineStatuses.fasterWhisper;
   const localCliStatus = engineStatuses.localCli;
   const installedVariant: 'cpu' | 'cuda' | undefined = fasterStatus?.variant;
-  // GPU 包仅 Win/Linux 提供；其余平台强制 cpu。
+  // GPU 包僅 Win/Linux 提供；其餘平臺強制 cpu。
   const gpuVariantAvailable = platform === 'win32' || platform === 'linux';
   const effectiveSelectedVariant: 'cpu' | 'cuda' = gpuVariantAvailable
     ? selectedVariant
@@ -411,13 +411,13 @@ const EngineModelTab: React.FC = () => {
     localCliEnabled &&
     (localCliStatus?.state === 'ready' || whisperCommand.trim().length > 0);
 
-  // 安全网：引擎一旦确认 ready/broken，立即清掉「检测中」标志
+  // 安全網：引擎一旦確認 ready/broken，立即清掉「檢測中」標誌
   useEffect(() => {
     if (verifying && (fasterInstalled || fasterBroken)) setVerifying(false);
   }, [verifying, fasterInstalled, fasterBroken]);
 
-  // 设备选项随已安装变体收敛：CPU 包不暴露 cuda（用不了，避免误选后 cublas 报错）；
-  // GPU 包(cuda) 才提供 auto/cpu/cuda；macOS 恒无 cuda。
+  // 設備選項隨已安裝變體收斂：CPU 包不暴露 cuda（用不了，避免誤選後 cublas 報錯）；
+  // GPU 包(cuda) 才提供 auto/cpu/cuda；macOS 恆無 cuda。
   const deviceOptions =
     platform === 'darwin'
       ? ['auto', 'cpu']
@@ -425,7 +425,7 @@ const EngineModelTab: React.FC = () => {
         ? ['auto', 'cpu', 'cuda']
         : ['auto', 'cpu'];
 
-  // sherpa 展示组三族就绪态（共用内置运行库，差异在模型）；供合并面板、左栏状态点、徽标聚合。
+  // sherpa 展示組三族就緒態（共用內置運行庫，差異在模型）；供合併面板、左欄狀態點、徽標聚合。
   const sherpaFamilies = SHERPA_FAMILIES.map((engine) => {
     if (engine === 'funasr') {
       return {
@@ -457,7 +457,7 @@ const EngineModelTab: React.FC = () => {
 
   const renderEngineBadge = (view: EngineView) => {
     if (view === 'sherpa') {
-      // 组徽标：任一族就绪即视为可用；否则提示去下载模型（运行库已内置，无"未安装"态）。
+      // 組徽標：任一族就緒即視為可用；否則提示去下載模型（運行庫已內置，無"未安裝"態）。
       return sherpaAnyReady ? (
         readyBadge
       ) : (
@@ -505,7 +505,7 @@ const EngineModelTab: React.FC = () => {
         </Badge>
       );
     }
-    // builtin：内置运行时无需安装；未装任何 ggml 模型时提示去下载模型。
+    // builtin：內置運行時無需安裝；未裝任何 ggml 模型時提示去下載模型。
     if ((systemInfo.modelsInstalled?.length ?? 0) > 0) return readyBadge;
     return (
       <Badge variant="outline" className="border-primary/40 text-primary">
@@ -523,14 +523,14 @@ const EngineModelTab: React.FC = () => {
       return 'pending';
     }
     if (view === 'localCli') return localCliReady ? 'ready' : 'pending';
-    // builtin：内置运行时始终可用，但未装任何模型则无法转写，按待办呈现。
+    // builtin：內置運行時始終可用，但未裝任何模型則無法轉寫，按待辦呈現。
     return (systemInfo.modelsInstalled?.length ?? 0) > 0 ? 'ready' : 'pending';
   };
 
   const engineName = (view: EngineView) => t(`engines.${view}.name`);
 
-  // 引擎特色标签：sherpa 组展示 FunASR / Qwen3-ASR / FireRedASR 三平台，让用户一眼看出
-  // 该引擎同时支持这三个平台；其余引擎展示能力关键词（如 NVIDIA / 高速 / Apple 芯片）。
+  // 引擎特色標籤：sherpa 組展示 FunASR / Qwen3-ASR / FireRedASR 三平臺，讓用戶一眼看出
+  // 該引擎同時支持這三個平臺；其餘引擎展示能力關鍵詞（如 NVIDIA / 高速 / Apple 芯片）。
   const engineTags = (view: EngineView): string[] => {
     const raw = t(`engines.${view}.tags`, { returnObjects: true });
     return Array.isArray(raw) ? (raw as string[]) : [];
@@ -543,8 +543,8 @@ const EngineModelTab: React.FC = () => {
     persistDownloadSource(s);
   };
 
-  // 引擎二进制下载源（GitHub / 国内加速 / GitCode）：在「点击下载/升级时」于气泡内选择，
-  // 与各模型下载源统一为同款气泡交互。
+  // 引擎二進制下載源（GitHub / 國內加速 / GitCode）：在「點擊下載/升級時」於氣泡內選擇，
+  // 與各模型下載源統一為同款氣泡交互。
   const binarySourceConfig: DownloadSourceConfig = {
     value: binarySource,
     options: (['github', 'ghproxy', 'gitcode'] as DownloadSource[]).map(
@@ -561,7 +561,7 @@ const EngineModelTab: React.FC = () => {
     onChange: (s) => handleBinarySourceChange(s as DownloadSource),
     label: t('engines.fasterWhisper.downloadSource'),
     confirmLabel: commonT('startDownload'),
-    // 复制链接反映目标变体：已安装时取已装变体（升级气泡），未安装时取当前选择（安装气泡）。
+    // 複製鏈接反映目標變體：已安裝時取已裝變體（升級氣泡），未安裝時取當前選擇（安裝氣泡）。
     getCopyUrl: (s) =>
       resolveModelDownloadUrl(
         'pyEngine',
@@ -633,9 +633,9 @@ const EngineModelTab: React.FC = () => {
 
   return (
     <TooltipProvider delayDuration={150}>
-      {/* 左栏固定、仅右栏滚动：根容器撑满父高，左 nav 整列常驻，右栏独立纵向滚动。 */}
+      {/* 左欄固定、僅右欄滾動：根容器撐滿父高，左 nav 整列常駐，右欄獨立縱向滾動。 */}
       <div className="flex h-full min-h-0 flex-col gap-4 md:flex-row">
-        {/* 左栏：引擎列表（状态点，无启用开关）——md 下整列固定，不随右栏滚动 */}
+        {/* 左欄：引擎列表（狀態點，無啟用開關）——md 下整列固定，不隨右欄滾動 */}
         <nav className="flex shrink-0 gap-1 overflow-x-auto md:w-56 md:flex-col md:overflow-x-visible md:overflow-y-auto md:border-r md:pr-2">
           {ENGINE_VIEWS.map((id) => {
             const active = selectedView === id;
@@ -686,7 +686,7 @@ const EngineModelTab: React.FC = () => {
           })}
         </nav>
 
-        {/* 右栏：选中引擎运行时 + 模型清单（独立纵向滚动） */}
+        {/* 右欄：選中引擎運行時 + 模型清單（獨立縱向滾動） */}
         <div className="min-w-0 flex-1 space-y-4 overflow-y-auto pb-4 md:pl-1">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
             <div className="min-w-0">
@@ -704,7 +704,7 @@ const EngineModelTab: React.FC = () => {
 
           {renderRuntimePanel()}
 
-          {/* sherpa 组的模型清单由组面板按族内联渲染，这里不再外挂统一清单 */}
+          {/* sherpa 組的模型清單由組面板按族內聯渲染，這裡不再外掛統一清單 */}
           {selectedView !== 'sherpa' && (
             <div className="border-t pt-4">
               <ModelLibrarySection

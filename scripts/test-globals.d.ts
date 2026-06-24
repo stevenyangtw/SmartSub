@@ -1,14 +1,14 @@
 /**
- * 测试专用全局声明（仅供 scripts/test-engine-units.ts 的 tsc 编译使用）。
+ * 測試專用全局聲明（僅供 scripts/test-engine-units.ts 的 tsc 編譯使用）。
  *
- * 纯逻辑测试现在会通过 renderer/lib/engineModels → renderer/lib/utils 间接引入
- * `window.ipc`，而该全局类型由 renderer/preload.d.ts 声明（其又 import 了
- * main/preload，会牵连 electron）。为保持测试无 electron 依赖，这里给出最小化的
- * 结构化兜底声明，避免把 preload.d.ts/electron 拖进测试编译。
+ * 純邏輯測試現在會通過 renderer/lib/engineModels → renderer/lib/utils 間接引入
+ * `window.ipc`，而該全局類型由 renderer/preload.d.ts 聲明（其又 import 了
+ * main/preload，會牽連 electron）。為保持測試無 electron 依賴，這裡給出最小化的
+ * 結構化兜底聲明，避免把 preload.d.ts/electron 拖進測試編譯。
  */
 interface Window {
-  // 形状对齐 main/preload.ts 的 IpcHandler（invoke 返回 Promise<any>），
-  // 避免该兜底声明被根 tsconfig 扫到后把渲染层 window.ipc 调用误判为 unknown。
+  // 形狀對齊 main/preload.ts 的 IpcHandler（invoke 返回 Promise<any>），
+  // 避免該兜底聲明被根 tsconfig 掃到後把渲染層 window.ipc 調用誤判為 unknown。
   ipc: {
     send: (channel: string, value?: unknown) => void;
     invoke: (channel: string, ...args: unknown[]) => Promise<any>;

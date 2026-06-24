@@ -2,18 +2,18 @@ import React from 'react';
 import { cn } from 'lib/utils';
 
 interface SectionHeaderProps {
-  /** 左侧图标，统一放入主色圆角容器，保证资源中心各 Tab 头部观感一致 */
+  /** 左側圖標，統一放入主色圓角容器，保證資源中心各 Tab 頭部觀感一致 */
   icon?: React.ComponentType<{ className?: string }>;
   title: string;
   description?: string;
-  /** 右侧操作位（按钮、开关、下拉等） */
+  /** 右側操作位（按鈕、開關、下拉等） */
   actions?: React.ReactNode;
   className?: string;
 }
 
 /**
- * 资源中心各 Tab 统一的区块头部：图标容器 + 标题 + 描述 + 右侧操作。
- * 收敛此前每个 Tab 各写一套头部导致的视觉不一致。
+ * 資源中心各 Tab 統一的區塊頭部：圖標容器 + 標題 + 描述 + 右側操作。
+ * 收斂此前每個 Tab 各寫一套頭部導致的視覺不一致。
  */
 const SectionHeader: React.FC<SectionHeaderProps> = ({
   icon: Icon,

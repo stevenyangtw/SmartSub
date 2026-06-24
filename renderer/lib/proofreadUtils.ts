@@ -1,12 +1,12 @@
 /**
- * 字幕校对相关的工具函数
- * 封装公共的字幕检测、创建 PendingFile 等逻辑
+ * 字幕校對相關的工具函數
+ * 封裝公共的字幕檢測、創建 PendingFile 等邏輯
  */
 
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
-// 检测到的字幕信息
+// 檢測到的字幕信息
 export interface DetectedSubtitle {
   filePath: string;
   type: 'source' | 'translated' | 'bilingual' | 'unknown';
@@ -14,7 +14,7 @@ export interface DetectedSubtitle {
   confidence: number;
 }
 
-// 待校对文件项
+// 待校對文件項
 export interface PendingFile {
   id: string;
   videoPath?: string;
@@ -25,15 +25,15 @@ export interface PendingFile {
   sourceLanguage?: string;
   targetLanguage?: string;
   status: 'pending' | 'proofreading' | 'completed';
-  isSubtitleOnlyMode?: boolean; // 字幕导入模式，源字幕不可切换
+  isSubtitleOnlyMode?: boolean; // 字幕導入模式，源字幕不可切換
 }
 
-// 支持的字幕类型
+// 支持的字幕類型
 export type SubtitleType = 'source' | 'translated' | 'bilingual' | 'unknown';
 
 /**
- * 按用户任务语向判定字幕是原文还是译文;语向不匹配时回退「en=原文」启发式。
- * 与 main/helpers/subtitleDetector.ts 的同名逻辑保持一致(进程边界无法共享模块)。
+ * 按用戶任務語向判定字幕是原文還是譯文;語向不匹配時回退「en=原文」啟發式。
+ * 與 main/helpers/subtitleDetector.ts 的同名邏輯保持一致(進程邊界無法共享模塊)。
  */
 export function classifySubtitleLang(
   lang: string | undefined | null,
@@ -48,7 +48,7 @@ export function classifySubtitleLang(
 }
 
 /**
- * 从检测到的字幕列表中选择最佳的源字幕和翻译字幕
+ * 從檢測到的字幕列表中選擇最佳的源字幕和翻譯字幕
  */
 export function selectBestSubtitles(
   detectedSubtitles: DetectedSubtitle[],
@@ -57,12 +57,12 @@ export function selectBestSubtitles(
   bestSource: DetectedSubtitle | undefined;
   bestTarget: DetectedSubtitle | undefined;
 } {
-  // 源字幕优先选择 source 或 unknown 类型
+  // 源字幕優先選擇 source 或 unknown 類型
   const sourceSubtitles = detectedSubtitles
     .filter((s) => s.type === 'source' || s.type === 'unknown')
     .sort((a, b) => b.confidence - a.confidence);
 
-  // 翻译字幕优先选择 translated 类型
+  // 翻譯字幕優先選擇 translated 類型
   const translatedSubtitles = detectedSubtitles
     .filter(
       (s) =>
@@ -78,12 +78,12 @@ export function selectBestSubtitles(
 }
 
 /**
- * 从视频路径创建 PendingFile
+ * 從影片路徑創建 PendingFile
  */
 export async function createPendingFileFromVideo(
   videoPath: string,
 ): Promise<PendingFile> {
-  // 检测关联的字幕
+  // 檢測關聯的字幕
   const detectResult = await window.ipc.invoke('detectSubtitles', {
     videoPath,
   });
@@ -108,9 +108,9 @@ export async function createPendingFileFromVideo(
 }
 
 /**
- * 从字幕文件路径创建 PendingFile
- * @param sourceFilePath 源字幕文件路径
- * @param detectRelated 是否检测关联字幕（同目录下的其他字幕）
+ * 從字幕文件路徑創建 PendingFile
+ * @param sourceFilePath 源字幕文件路徑
+ * @param detectRelated 是否檢測關聯字幕（同目錄下的其他字幕）
  */
 export async function createPendingFileFromSubtitle(
   sourceFilePath: string,
@@ -119,7 +119,7 @@ export async function createPendingFileFromSubtitle(
   const sourceFileName = path.basename(sourceFilePath);
   const sourceBaseName = sourceFileName.replace(/\.[^.]+$/, '');
 
-  // 检测源字幕语言
+  // 檢測源字幕語言
   const sourceLangResult = await window.ipc.invoke('detectLanguage', {
     filePath: sourceFilePath,
   });
@@ -130,9 +130,9 @@ export async function createPendingFileFromSubtitle(
   let detectedSubtitles: DetectedSubtitle[] = [];
 
   if (detectRelated) {
-    // 使用检测逻辑获取同目录下的相关字幕
+    // 使用檢測邏輯獲取同目錄下的相關字幕
     const detectResult = await window.ipc.invoke('detectSubtitles', {
-      videoPath: sourceFilePath.replace(/\.[^.]+$/, '.mp4'), // 伪造视频路径以复用检测逻辑
+      videoPath: sourceFilePath.replace(/\.[^.]+$/, '.mp4'), // 偽造影片路徑以複用檢測邏輯
     });
 
     if (detectResult.success && detectResult.data.detectedSubtitles) {
@@ -140,7 +140,7 @@ export async function createPendingFileFromSubtitle(
     }
   }
 
-  // 确保源字幕在列表中（标记为 source，置信度 100%）
+  // 確保源字幕在列表中（標記為 source，置信度 100%）
   const sourceInList = detectedSubtitles.find(
     (s) => s.filePath === sourceFilePath,
   );
@@ -157,7 +157,7 @@ export async function createPendingFileFromSubtitle(
     sourceInList.confidence = 100;
   }
 
-  // 找到置信度最高的翻译字幕（排除源字幕）
+  // 找到置信度最高的翻譯字幕（排除源字幕）
   const translatedSubtitles = detectedSubtitles
     .filter((s) => s.filePath !== sourceFilePath && s.type !== 'source')
     .sort((a, b) => b.confidence - a.confidence);
@@ -173,15 +173,15 @@ export async function createPendingFileFromSubtitle(
     sourceLanguage,
     targetLanguage: bestTranslated?.language,
     status: 'pending',
-    isSubtitleOnlyMode: true, // 标记为字幕导入模式
+    isSubtitleOnlyMode: true, // 標記為字幕導入模式
   };
 }
 
 /**
- * 获取字幕文件同目录下的可用字幕列表
- * @param subtitlePath 字幕文件路径
- * @param sourceLanguage 用户任务的源语言(用于语向判定,可选)
- * @param targetLanguage 用户任务的目标语言(用于语向判定,可选)
+ * 獲取字幕文件同目錄下的可用字幕列表
+ * @param subtitlePath 字幕文件路徑
+ * @param sourceLanguage 用戶任務的源語言(用於語向判定,可選)
+ * @param targetLanguage 用戶任務的目標語言(用於語向判定,可選)
  */
 export async function getAvailableSubtitles(
   subtitlePath: string,
@@ -198,7 +198,7 @@ export async function getAvailableSubtitles(
     return [];
   }
 
-  // 对每个字幕文件进行语言检测和置信度计算
+  // 對每個字幕文件進行語言檢測和置信度計算
   const detectedSubtitles = await Promise.all(
     scanResult.data.map(async (filePath: string) => {
       const langResult = await window.ipc.invoke('detectLanguage', {
@@ -206,7 +206,7 @@ export async function getAvailableSubtitles(
       });
       const lang = langResult.success ? langResult.data?.code : undefined;
 
-      // 计算置信度：与源字幕同名的文件置信度更高
+      // 計算置信度：與源字幕同名的文件置信度更高
       const sourceName = path
         .basename(subtitlePath, path.extname(subtitlePath))
         .replace(/\.\w{2,3}$/, '');
@@ -235,12 +235,12 @@ export async function getAvailableSubtitles(
 }
 
 /**
- * 确保指定的字幕文件在列表中
- * @param subtitles 现有字幕列表
- * @param filePath 要确保存在的文件路径
- * @param type 字幕类型
- * @param language 语言代码
- * @returns 更新后的字幕列表
+ * 確保指定的字幕文件在列表中
+ * @param subtitles 現有字幕列表
+ * @param filePath 要確保存在的文件路徑
+ * @param type 字幕類型
+ * @param language 語言代碼
+ * @returns 更新後的字幕列表
  */
 export function ensureSubtitleInList(
   subtitles: DetectedSubtitle[],
@@ -259,14 +259,14 @@ export function ensureSubtitleInList(
       filePath,
       type,
       language,
-      confidence: 100, // 用户已选择的置信度设为最高
+      confidence: 100, // 用戶已選擇的置信度設為最高
     },
   ];
 }
 
 /**
- * 从 ProofreadItem 加载 PendingFile（包括检测可用字幕）
- * @param item ProofreadItem 数据
+ * 從 ProofreadItem 加載 PendingFile（包括檢測可用字幕）
+ * @param item ProofreadItem 數據
  */
 export async function loadPendingFileFromItem(item: {
   id: string;
@@ -281,7 +281,7 @@ export async function loadPendingFileFromItem(item: {
   let detectedSubtitles: DetectedSubtitle[] = [];
   const isSubtitleOnlyMode = !item.videoPath;
 
-  // 如果任务中已保存了 detectedSubtitles，优先使用
+  // 如果任務中已保存了 detectedSubtitles，優先使用
   if (item.detectedSubtitles && item.detectedSubtitles.length > 0) {
     detectedSubtitles = item.detectedSubtitles.map((s) => ({
       filePath: s.filePath,
@@ -290,9 +290,9 @@ export async function loadPendingFileFromItem(item: {
       confidence: s.confidence,
     }));
   } else {
-    // 否则重新检测
+    // 否則重新檢測
     if (item.videoPath) {
-      // 有视频：使用视频检测
+      // 有影片：使用影片檢測
       const detectResult = await window.ipc.invoke('detectSubtitles', {
         videoPath: item.videoPath,
       });
@@ -300,7 +300,7 @@ export async function loadPendingFileFromItem(item: {
         detectedSubtitles = detectResult.data.detectedSubtitles || [];
       }
     } else if (item.sourceSubtitlePath) {
-      // 仅字幕：检测同目录下的其他字幕文件（按用户任务语向判定原文/译文）
+      // 僅字幕：檢測同目錄下的其他字幕文件（按用戶任務語向判定原文/譯文）
       const userConfig = await window.ipc.invoke('getUserConfig');
       detectedSubtitles = await getAvailableSubtitles(
         item.sourceSubtitlePath,
@@ -310,7 +310,7 @@ export async function loadPendingFileFromItem(item: {
     }
   }
 
-  // 确保已选择的字幕在列表中
+  // 確保已選擇的字幕在列表中
   detectedSubtitles = ensureSubtitleInList(
     detectedSubtitles,
     item.sourceSubtitlePath,
@@ -341,7 +341,7 @@ export async function loadPendingFileFromItem(item: {
 }
 
 /**
- * 将 PendingFile 转换为保存格式（用于创建/更新任务）
+ * 將 PendingFile 轉換為保存格式（用於創建/更新任務）
  */
 export function pendingFileToSaveFormat(file: PendingFile): {
   id: string;
@@ -353,7 +353,7 @@ export function pendingFileToSaveFormat(file: PendingFile): {
   detectedSubtitles: DetectedSubtitle[];
   status: 'pending' | 'in_progress' | 'completed';
 } {
-  // 将 PendingFile 的 status 映射到 ProofreadItem 的 status
+  // 將 PendingFile 的 status 映射到 ProofreadItem 的 status
   const itemStatus =
     file.status === 'completed'
       ? 'completed'

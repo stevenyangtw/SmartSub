@@ -4,21 +4,21 @@ import * as http from 'http';
 import { URL } from 'url';
 
 /**
- * 多连接 / HTTP Range 分块并行下载（与下载源无关，对大文件成倍提速）。
+ * 多連接 / HTTP Range 分塊並行下載（與下載源無關，對大文件成倍提速）。
  *
- * 与源无关地工作，但要求服务端支持 Range（返回 206 + Content-Range/总长）。
- * 不支持 / 文件过小 / 无法判定总长时抛 {@link RangeNotSupportedError}，调用方
- * 应回退到原有单连接下载。设计取舍：
- *   - 写 `${destPath}.par` 临时文件，校验总大小后再 rename 到 destPath；中断只会
- *     残留 `.par`（下次开始前清理），绝不污染单连接续传用的 `.download` 文件；
- *   - 每块独立重试 + 块内按已写字节续传，断一块只重那一块；
- *   - 定位写（pwrite, 指定 position）+ 背压（写盘期间 pause 响应），内存有界；
- *   - 签名 CDN URL 过期（401/403/410）时自动按原始 URL 重新解析。
+ * 與源無關地工作，但要求服務端支持 Range（返回 206 + Content-Range/總長）。
+ * 不支持 / 文件過小 / 無法判定總長時拋 {@link RangeNotSupportedError}，調用方
+ * 應回退到原有單連接下載。設計取捨：
+ *   - 寫 `${destPath}.par` 臨時文件，校驗總大小後再 rename 到 destPath；中斷只會
+ *     殘留 `.par`（下次開始前清理），絕不汙染單連接續傳用的 `.download` 文件；
+ *   - 每塊獨立重試 + 塊內按已寫字節續傳，斷一塊只重那一塊；
+ *   - 定位寫（pwrite, 指定 position）+ 背壓（寫盤期間 pause 響應），內存有界；
+ *   - 簽名 CDN URL 過期（401/403/410）時自動按原始 URL 重新解析。
  */
 
 const DEFAULT_CONNECTIONS = 4;
 const DEFAULT_CHUNK_SIZE = 16 * 1024 * 1024; // 16 MiB
-const DEFAULT_MIN_PARALLEL_SIZE = 24 * 1024 * 1024; // 小于此值不值得并行
+const DEFAULT_MIN_PARALLEL_SIZE = 24 * 1024 * 1024; // 小於此值不值得並行
 const CONNECT_TIMEOUT = 30_000;
 const CHUNK_INACTIVITY_TIMEOUT = 60_000;
 const MAX_CHUNK_RETRIES = 4;
@@ -34,16 +34,16 @@ export class RangeNotSupportedError extends Error {
 }
 
 export interface ParallelDownloadParams {
-  /** 原始下载地址（可含重定向）。 */
+  /** 原始下載地址（可含重定向）。 */
   url: string;
-  /** 最终落盘路径；下载写入 `${destPath}.par` 后校验并 rename 到此路径。 */
+  /** 最終落盤路徑；下載寫入 `${destPath}.par` 後校驗並 rename 到此路徑。 */
   destPath: string;
   signal?: AbortSignal;
   connections?: number;
   chunkSize?: number;
   minParallelSize?: number;
   headers?: Record<string, string>;
-  /** 进度回调：本文件已下载字节数 + 文件总字节数。 */
+  /** 進度回調：本文件已下載字節數 + 文件總字節數。 */
   onProgress?: (downloaded: number, total: number) => void;
   log?: (message: string, level: 'info' | 'warning' | 'error') => void;
 }
@@ -66,8 +66,8 @@ function isExpiredStatus(code: number): boolean {
 }
 
 /**
- * 用 `Range: bytes=0-0` 探测：跟随重定向，返回最终 URL 与总大小。
- * 服务端不支持 Range（非 206 或无 Content-Range 总长）时抛 RangeNotSupportedError。
+ * 用 `Range: bytes=0-0` 探測：跟隨重定向，返回最終 URL 與總大小。
+ * 服務端不支持 Range（非 206 或無 Content-Range 總長）時拋 RangeNotSupportedError。
  */
 function probe(
   url: string,
@@ -151,9 +151,9 @@ interface ChunkContext {
   log: (message: string, level: 'info' | 'warning' | 'error') => void;
 }
 
-/** 下载 [start, end] 闭区间到文件对应偏移；内部按已写字节续传 + 有限重试。 */
+/** 下載 [start, end] 閉區間到文件對應偏移；內部按已寫字節續傳 + 有限重試。 */
 async function downloadChunk(ctx: ChunkContext): Promise<void> {
-  let pos = ctx.start; // 下一个待写入的绝对偏移
+  let pos = ctx.start; // 下一個待寫入的絕對偏移
 
   for (let attempt = 0; attempt < MAX_CHUNK_RETRIES; attempt++) {
     if (ctx.signal?.aborted) throw new Error(CANCELLED_MESSAGE);
@@ -259,13 +259,13 @@ async function downloadChunk(ctx: ChunkContext): Promise<void> {
         doRequest(ctx.getUrl());
       });
 
-      return; // 'end' 时 pos > end，块完成
+      return; // 'end' 時 pos > end，塊完成
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (message === CANCELLED_MESSAGE) throw error;
 
       if (message.startsWith('expired url')) {
-        // 签名 URL 过期：按原始地址重新解析后重试（不计入失败上限的"硬错误"）
+        // 簽名 URL 過期：按原始地址重新解析後重試（不計入失敗上限的"硬錯誤"）
         ctx.log(
           `chunk ${ctx.start}-${ctx.end} url expired; re-resolving`,
           'info',

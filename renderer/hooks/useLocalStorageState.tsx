@@ -39,7 +39,7 @@ export default function useLocalStorageState<
 
   useEffect(() => {
     if (typeof window === 'undefined' || !inited.current) return;
-    // 跳过首次 render 的写入，避免用 defaultValue 覆盖已从 localStorage 读出的值
+    // 跳過首次 render 的寫入，避免用 defaultValue 覆蓋已從 localStorage 讀出的值
     if (skipInitialWrite.current) {
       skipInitialWrite.current = false;
       return;

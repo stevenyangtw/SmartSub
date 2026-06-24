@@ -47,7 +47,7 @@ interface TaskGridListProps {
   onRetry: (file: any) => void;
 }
 
-// 仅在卡片进入视口时挂载 <video>，限制同时存在的解码器数量
+// 僅在卡片進入視口時掛載 <video>，限制同時存在的解碼器數量
 function useInView<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
@@ -80,7 +80,7 @@ function Cover({ file }: { file: any }) {
   if (isSub) Icon = FileText;
   else if (isAudio) Icon = Music;
 
-  // 仅视频且未解码失败时用 <video> 静态封面；其余/失败用类型大图标
+  // 僅影片且未解碼失敗時用 <video> 靜態封面；其餘/失敗用類型大圖標
   const showVideo = !isSub && !isAudio && !decodeFailed;
 
   return (
@@ -98,18 +98,18 @@ function Cover({ file }: { file: any }) {
           onError={() => setDecodeFailed(true)}
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
-            // 部分容器（mkv/ts/hevc 等）Chromium 解不出画面：videoWidth=0 → 退回图标
+            // 部分容器（mkv/ts/hevc 等）Chromium 解不出畫面：videoWidth=0 → 退回圖標
             if ((v.videoWidth || 0) === 0) {
               setDecodeFailed(true);
               return;
             }
-            // preload=metadata 下仅靠 #t= 片段不一定绘制首帧（画面空白），
-            // 主动 seek 触发解码并绘制：取 1s 处，短片回退到中点。
+            // preload=metadata 下僅靠 #t= 片段不一定繪製首幀（畫面空白），
+            // 主動 seek 觸發解碼並繪製：取 1s 處，短片回退到中點。
             try {
               v.currentTime =
                 v.duration && v.duration < 1.5 ? v.duration / 2 : 1;
             } catch {
-              // seek 失败：保持元素，真正解码失败由 onError 兜底退回图标
+              // seek 失敗：保持元素，真正解碼失敗由 onError 兜底退回圖標
             }
           }}
         />

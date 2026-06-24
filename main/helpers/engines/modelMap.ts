@@ -1,8 +1,8 @@
 /**
- * ggml 模型名（去掉量化后缀后）→ faster-whisper(CT2) 仓库/目录名 的显式映射。
- * 显式优于隐式正则，覆盖 large-v3-turbo 等边界，未来可扩展更多列。
+ * ggml 模型名（去掉量化後綴後）→ faster-whisper(CT2) 倉庫/目錄名 的顯式映射。
+ * 顯式優於隱式正則，覆蓋 large-v3-turbo 等邊界，未來可擴展更多列。
  *
- * 本模块刻意保持「纯」（不依赖 electron/store），便于单元测试直接导入。
+ * 本模塊刻意保持「純」（不依賴 electron/store），便於單元測試直接導入。
  */
 export const GGML_TO_CT2: Record<string, string> = {
   tiny: 'tiny',
@@ -20,8 +20,8 @@ export const GGML_TO_CT2: Record<string, string> = {
 };
 
 /**
- * 把 ggml 模型名（可能含 -q5_0 等量化后缀）解析为 faster-whisper 模型名。
- * 未命中映射表时回退原值（去后缀后）并记日志，避免硬失败。
+ * 把 ggml 模型名（可能含 -q5_0 等量化後綴）解析為 faster-whisper 模型名。
+ * 未命中映射表時回退原值（去後綴後）並記日誌，避免硬失敗。
  */
 export function toFasterWhisperModel(model?: string): string {
   const base = (model || 'base').toLowerCase().replace(/-q\d+_\d+$/, '');

@@ -64,7 +64,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 
-/** 品牌 logo 统一放在白色圆角底上，保证深色模式与选中态下都清晰可见 */
+/** 品牌 logo 統一放在白色圓角底上，保證深色模式與選中態下都清晰可見 */
 function ProviderIcon({
   iconImg,
   icon,
@@ -122,7 +122,7 @@ type TestResult = {
   target: string;
 };
 
-/** 推荐卡：免费起步 / 质量优先，名字直接可点选中 */
+/** 推薦卡：免費起步 / 質量優先，名字直接可點選中 */
 const RECOMMEND_ROWS: { labelKey: string; ids: string[] }[] = [
   { labelKey: 'groupFree', ids: ['deeplx', 'google'] },
   { labelKey: 'recommendQuality', ids: ['deepseek', 'Gemini'] },
@@ -212,7 +212,7 @@ const ProvidersTab: React.FC = () => {
     if (resolved) setLastSelectedId(resolved);
   };
 
-  // 持久化降噪：本地 state 即时更新，IPC 写入 500ms debounce，卸载时 flush
+  // 持久化降噪：本地 state 即時更新，IPC 寫入 500ms debounce，卸載時 flush
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingProvidersRef = useRef<Provider[] | null>(null);
 
@@ -235,7 +235,7 @@ const ProvidersTab: React.FC = () => {
     [flashSaved],
   );
 
-  // 立即持久化（新增/删除等结构变更），并废弃挂起的 debounce，防止旧数组回写覆盖
+  // 立即持久化（新增/刪除等結構變更），並廢棄掛起的 debounce，防止舊數組回寫覆蓋
   const persistNow = useCallback((updatedProviders: Provider[]) => {
     if (persistTimerRef.current) {
       clearTimeout(persistTimerRef.current);
@@ -247,7 +247,7 @@ const ProvidersTab: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      // 卸载前 flush，避免最后一次输入丢失
+      // 卸載前 flush，避免最後一次輸入丟失
       if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
       if (pendingProvidersRef.current) {
         window?.ipc?.send(
@@ -312,7 +312,7 @@ const ProvidersTab: React.FC = () => {
       (t) => t.id === (provider?.type || selectedProvider),
     );
 
-    // 如果是自定义服务商，使用配置模板
+    // 如果是自定義服務商，使用配置模板
     if (provider?.type === 'openai') {
       return {
         ...CONFIG_TEMPLATES.openai,
@@ -362,7 +362,7 @@ const ProvidersTab: React.FC = () => {
     const updatedProviders = providers.filter((p) => p.id !== providerId);
     setProviders(updatedProviders);
     persistNow(updatedProviders);
-    // 删的是当前选中项：回落到第一个仍存在的服务商
+    // 刪的是當前選中項：回落到第一個仍存在的服務商
     if (selectedProvider === providerId) {
       const next = resolveSelectedProvider(updatedProviders);
       setSelectedProvider(next);
@@ -370,7 +370,7 @@ const ProvidersTab: React.FC = () => {
     }
     confirmOrUndo(
       t('providerRemoved', { name: removed?.name ?? providerId }) ||
-        `已删除服务商「${removed?.name ?? providerId}」`,
+        `已刪除服務商「${removed?.name ?? providerId}」`,
       () => {
         setProviders(prevProviders);
         persistNow(prevProviders);
@@ -491,7 +491,7 @@ const ProvidersTab: React.FC = () => {
 
   return (
     <div className="flex h-full overflow-hidden flex-col lg:flex-row">
-      {/* 左侧服务商列表 */}
+      {/* 左側服務商列表 */}
       <div
         className={cn(
           'w-full lg:w-64 border-b lg:border-b-0 lg:border-r p-4 space-y-2 overflow-auto shrink-0',
@@ -512,7 +512,7 @@ const ProvidersTab: React.FC = () => {
             )}
           </div>
 
-          {/* 添加自定义 AI 服务 */}
+          {/* 添加自定義 AI 服務 */}
           <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3 space-y-2">
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t('addCustomProviderHint')}
@@ -554,7 +554,7 @@ const ProvidersTab: React.FC = () => {
           />
         </div>
 
-        {/* 推荐卡：搜索时隐藏 */}
+        {/* 推薦卡：搜索時隱藏 */}
         {!trimmedQuery && (
           <div className="rounded-lg border bg-muted/40 px-3 py-2 space-y-1.5">
             <div className="label-caps">{t('recommendTitle')}</div>
@@ -588,7 +588,7 @@ const ProvidersTab: React.FC = () => {
         )}
 
         <div className="space-y-1 mt-4">
-          {/* 自定义服务商（置顶：用户自添的一般为常用） */}
+          {/* 自定義服務商（置頂：用戶自添的一般為常用） */}
           {visibleCustomProviders.length > 0 && (
             <>
               <div className="text-sm font-medium text-muted-foreground mb-2">
@@ -645,7 +645,7 @@ const ProvidersTab: React.FC = () => {
             </>
           )}
 
-          {/* 三个分组段（可折叠） */}
+          {/* 三個分組段（可摺疊） */}
           {groupSections.map(
             (section) =>
               section.items.length > 0 && (
@@ -694,7 +694,7 @@ const ProvidersTab: React.FC = () => {
               ),
           )}
 
-          {/* 无匹配 */}
+          {/* 無匹配 */}
           {nothingMatched && (
             <p className="px-1 py-2 text-xs text-muted-foreground">
               {t('noProviderMatch')}
@@ -703,7 +703,7 @@ const ProvidersTab: React.FC = () => {
         </div>
       </div>
 
-      {/* 右侧配置面板 */}
+      {/* 右側配置面板 */}
       <div
         ref={panelScrollRef}
         className={cn(
@@ -874,7 +874,7 @@ const ProvidersTab: React.FC = () => {
         )}
       </div>
 
-      {/* 添加服务商对话框 */}
+      {/* 添加服務商對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>

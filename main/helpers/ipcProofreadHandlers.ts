@@ -1,5 +1,5 @@
 /**
- * 字幕校对相关的 IPC 处理器
+ * 字幕校對相關的 IPC 處理器
  */
 
 import { ipcMain } from 'electron';
@@ -43,14 +43,14 @@ import {
 } from '../translate/types';
 import { runWithTaskContext, isTaskCancelledError } from './taskContext';
 
-// 校对批量操作（批量 AI 优化 / 重翻失败）取消注册表
+// 校對批量操作（批量 AI 優化 / 重翻失敗）取消註冊表
 const batchAbortControllers = new Map<string, AbortController>();
 
 /**
- * 设置字幕校对相关的 IPC 处理器
+ * 設置字幕校對相關的 IPC 處理器
  */
 export function setupProofreadHandlers(): void {
-  // 取消进行中的校对批量操作
+  // 取消進行中的校對批量操作
   ipcMain.handle(
     'cancelProofreadBatch',
     async (_event, { batchId }: { batchId: string }) => {
@@ -64,15 +64,15 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // ============ 字幕检测相关 ============
+  // ============ 字幕檢測相關 ============
 
-  // 检测视频对应的字幕文件（不再需要语言参数）
+  // 檢測影片對應的字幕文件（不再需要語言參數）
   ipcMain.handle(
     'detectSubtitles',
     async (_event, { videoPath }: { videoPath: string }) => {
       try {
         logMessage(`Detecting subtitles for video: ${videoPath}`, 'info');
-        // 使用空字符串让检测器自动从文件名推断
+        // 使用空字符串讓檢測器自動從文件名推斷
         const result = await detectSubtitlesForVideo(videoPath, '', '');
         logMessage(
           `Found ${result.detectedSubtitles.length} subtitle files`,
@@ -86,7 +86,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 根据规则匹配字幕文件（不再需要语言参数）
+  // 根據規則匹配字幕文件（不再需要語言參數）
   ipcMain.handle(
     'matchSubtitleFiles',
     async (_event, { files }: { files: string[] }) => {
@@ -102,7 +102,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 扫描目录获取字幕文件
+  // 掃描目錄獲取字幕文件
   ipcMain.handle(
     'scanDirectorySubtitles',
     async (_event, { directoryPath }: { directoryPath: string }) => {
@@ -121,7 +121,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 智能扫描目录（同时获取视频和字幕）
+  // 智能掃描目錄（同時獲取影片和字幕）
   ipcMain.handle(
     'smartScanDirectory',
     async (_event, { directoryPath }: { directoryPath: string }) => {
@@ -140,7 +140,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 验证字幕文件
+  // 驗證字幕文件
   ipcMain.handle(
     'validateSubtitleFile',
     async (_event, { filePath }: { filePath: string }) => {
@@ -153,9 +153,9 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // ============ 语言检测相关 ============
+  // ============ 語言檢測相關 ============
 
-  // 从文件名检测语言
+  // 從文件名檢測語言
   ipcMain.handle(
     'detectLanguage',
     async (_event, { filePath }: { filePath: string }) => {
@@ -169,7 +169,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 从多个字幕文件检测语言对
+  // 從多個字幕文件檢測語言對
   ipcMain.handle(
     'detectLanguagePair',
     async (_event, { files }: { files: string[] }) => {
@@ -188,7 +188,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 获取支持的语言列表
+  // 獲取支持的語言列表
   ipcMain.handle('getSupportedLanguages', async () => {
     try {
       const languages = getSupportedLanguages();
@@ -198,9 +198,9 @@ export function setupProofreadHandlers(): void {
     }
   });
 
-  // ============ 任务管理相关 ============
+  // ============ 任務管理相關 ============
 
-  // 获取所有校对任务
+  // 獲取所有校對任務
   ipcMain.handle('getProofreadTasks', async () => {
     try {
       const tasks = getProofreadTasks();
@@ -211,7 +211,7 @@ export function setupProofreadHandlers(): void {
     }
   });
 
-  // 根据 ID 获取单个任务
+  // 根據 ID 獲取單個任務
   ipcMain.handle(
     'getProofreadTaskById',
     async (_event, { id }: { id: string }) => {
@@ -225,7 +225,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 创建新任务
+  // 創建新任務
   ipcMain.handle(
     'createProofreadTask',
     async (
@@ -255,7 +255,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 更新任务
+  // 更新任務
   ipcMain.handle(
     'updateProofreadTask',
     async (
@@ -278,7 +278,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 删除任务
+  // 刪除任務
   ipcMain.handle(
     'deleteProofreadTask',
     async (_event, { taskId }: { taskId: string }) => {
@@ -293,7 +293,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 清空所有任务
+  // 清空所有任務
   ipcMain.handle('clearProofreadTasks', async () => {
     try {
       logMessage('Clearing all proofread tasks', 'info');
@@ -305,9 +305,9 @@ export function setupProofreadHandlers(): void {
     }
   });
 
-  // ============ 项目管理相关 ============
+  // ============ 項目管理相關 ============
 
-  // 更新任务中的单个项目
+  // 更新任務中的單個項目
   ipcMain.handle(
     'updateProofreadItem',
     async (
@@ -332,7 +332,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 完成当前项目并移动到下一个
+  // 完成當前項目並移動到下一個
   ipcMain.handle(
     'completeProofreadItem',
     async (
@@ -359,7 +359,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 向任务添加新项目
+  // 向任務添加新項目
   ipcMain.handle(
     'addItemsToTask',
     async (
@@ -386,7 +386,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 从任务中移除项目
+  // 從任務中移除項目
   ipcMain.handle(
     'removeItemFromTask',
     async (
@@ -410,7 +410,7 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // 获取任务进度
+  // 獲取任務進度
   ipcMain.handle(
     'getTaskProgress',
     async (_event, { taskId }: { taskId: string }) => {
@@ -427,9 +427,9 @@ export function setupProofreadHandlers(): void {
     },
   );
 
-  // ============ 兼容旧版本 ============
+  // ============ 兼容舊版本 ============
 
-  // 获取旧版历史记录（用于迁移）
+  // 獲取舊版歷史記錄（用於遷移）
   ipcMain.handle('getProofreadHistories', async () => {
     try {
       const histories = getProofreadHistories();
@@ -439,7 +439,7 @@ export function setupProofreadHandlers(): void {
     }
   });
 
-  // 清空旧版历史记录
+  // 清空舊版歷史記錄
   ipcMain.handle('clearProofreadHistories', async () => {
     try {
       clearProofreadHistories();
@@ -449,9 +449,9 @@ export function setupProofreadHandlers(): void {
     }
   });
 
-  // ============ AI 优化相关 ============
+  // ============ AI 優化相關 ============
 
-  // 获取可用的 AI 翻译服务商列表
+  // 獲取可用的 AI 翻譯服務商列表
   ipcMain.handle('getAiTranslationProviders', async () => {
     try {
       const providers = store.get('translationProviders') || [];
@@ -463,7 +463,7 @@ export function setupProofreadHandlers(): void {
     }
   });
 
-  // 优化单条字幕翻译
+  // 優化單條字幕翻譯
   ipcMain.handle(
     'optimizeSubtitle',
     async (
@@ -483,20 +483,20 @@ export function setupProofreadHandlers(): void {
       try {
         logMessage(`Optimizing subtitle translation`, 'info');
 
-        // 获取用户配置
+        // 獲取用戶配置
         const userConfig = store.get('userConfig') || {};
 
-        // 使用传入的 providerId 或用户配置中的默认服务商
+        // 使用傳入的 providerId 或用戶配置中的預設服務商
         const translateProviderId = providerId || userConfig.translateProvider;
 
         if (!translateProviderId || translateProviderId === '-1') {
           return {
             success: false,
-            error: '请先选择一个 AI 翻译服务',
+            error: '請先選擇一個 AI 翻譯服務',
           };
         }
 
-        // 获取翻译提供商
+        // 獲取翻譯提供商
         const providers = store.get('translationProviders') || [];
         const provider = providers.find(
           (p: Provider) => p.id === translateProviderId,
@@ -505,33 +505,33 @@ export function setupProofreadHandlers(): void {
         if (!provider) {
           return {
             success: false,
-            error: '未找到选择的翻译服务',
+            error: '未找到選擇的翻譯服務',
           };
         }
 
-        // 检查是否为 AI 翻译服务
+        // 檢查是否為 AI 翻譯服務
         if (!provider.isAi) {
           return {
             success: false,
-            error: 'AI 优化功能仅支持 AI 翻译服务（如 OpenAI、Ollama 等）',
+            error: 'AI 優化功能僅支持 AI 翻譯服務（如 OpenAI、Ollama 等）',
           };
         }
 
-        // 获取翻译器
+        // 獲取翻譯器
         const translator =
           TRANSLATOR_MAP[provider.type as keyof typeof TRANSLATOR_MAP];
         if (!translator) {
           return {
             success: false,
-            error: `不支持的翻译服务类型: ${provider.type}`,
+            error: `不支持的翻譯服務類型: ${provider.type}`,
           };
         }
 
-        // 获取源语言和目标语言
+        // 獲取源語言和目標語言
         const sourceLanguage = userConfig.sourceLanguage || 'en';
         const targetLanguage = userConfig.targetLanguage || 'zh';
 
-        // 根据是否有翻译内容选择不同的默认提示词
+        // 根據是否有翻譯內容選擇不同的預設提示詞
         const hasTranslation = targetText && targetText.trim();
         const defaultPrompt = hasTranslation
           ? `You are a professional subtitle translator and proofreader. Your task is to improve the translation of the following subtitle.
@@ -562,19 +562,19 @@ Please translate to ${targetLanguage}:
 
 Only respond with the translation, nothing else.`;
 
-        // 如果有自定义提示词，替换变量
+        // 如果有自定義提示詞，替換變量
         let optimizePrompt = defaultPrompt;
         if (customPrompt && customPrompt.trim()) {
-          // 处理简单的条件模板 {{#if targetText}}...{{else}}...{{/if}}
+          // 處理簡單的條件模板 {{#if targetText}}...{{else}}...{{/if}}
           let processedPrompt = customPrompt;
           if (hasTranslation) {
-            // 有翻译内容：保留 if 块，移除 else 块
+            // 有翻譯內容：保留 if 塊，移除 else 塊
             processedPrompt = processedPrompt.replace(
               /\{\{#if\s+targetText\}\}([\s\S]*?)\{\{else\}\}[\s\S]*?\{\{\/if\}\}/g,
               '$1',
             );
           } else {
-            // 无翻译内容：移除 if 块，保留 else 块
+            // 無翻譯內容：移除 if 塊，保留 else 塊
             processedPrompt = processedPrompt.replace(
               /\{\{#if\s+targetText\}\}[\s\S]*?\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g,
               '$1',
@@ -588,7 +588,7 @@ Only respond with the translation, nothing else.`;
             .replace(/\{\{targetText\}\}/g, targetText || '');
         }
 
-        // 调用翻译服务
+        // 調用翻譯服務
         const optimizedProvider = {
           ...provider,
           systemPrompt:
@@ -605,7 +605,7 @@ Only respond with the translation, nothing else.`;
         );
 
         if (result) {
-          // 清理结果，移除可能的引号或多余空白
+          // 清理結果，移除可能的引號或多餘空白
           const cleanedResult = result
             .trim()
             .replace(/^["']|["']$/g, '')
@@ -615,7 +615,7 @@ Only respond with the translation, nothing else.`;
         } else {
           return {
             success: false,
-            error: 'AI 优化返回空结果',
+            error: 'AI 優化返回空結果',
           };
         }
       } catch (error) {
@@ -628,7 +628,7 @@ Only respond with the translation, nothing else.`;
     },
   );
 
-  // 批量优化字幕
+  // 批量優化字幕
   ipcMain.handle(
     'batchOptimizeSubtitles',
     async (
@@ -662,18 +662,18 @@ Only respond with the translation, nothing else.`;
           'info',
         );
 
-        // 获取用户配置
+        // 獲取用戶配置
         const userConfig = store.get('userConfig') || {};
         const translateProviderId = providerId || userConfig.translateProvider;
 
         if (!translateProviderId || translateProviderId === '-1') {
           return {
             success: false,
-            error: '请先选择一个 AI 翻译服务',
+            error: '請先選擇一個 AI 翻譯服務',
           };
         }
 
-        // 获取翻译提供商
+        // 獲取翻譯提供商
         const providers = store.get('translationProviders') || [];
         const provider = providers.find(
           (p: Provider) => p.id === translateProviderId,
@@ -682,14 +682,14 @@ Only respond with the translation, nothing else.`;
         if (!provider) {
           return {
             success: false,
-            error: '未找到选择的翻译服务',
+            error: '未找到選擇的翻譯服務',
           };
         }
 
         if (!provider.isAi) {
           return {
             success: false,
-            error: 'AI 优化功能仅支持 AI 翻译服务',
+            error: 'AI 優化功能僅支持 AI 翻譯服務',
           };
         }
 
@@ -698,14 +698,14 @@ Only respond with the translation, nothing else.`;
         if (!translator) {
           return {
             success: false,
-            error: `不支持的翻译服务类型: ${provider.type}`,
+            error: `不支持的翻譯服務類型: ${provider.type}`,
           };
         }
 
         const sourceLanguage = userConfig.sourceLanguage || 'en';
         const targetLanguage = userConfig.targetLanguage || 'zh';
 
-        // 构建默认批量优化提示词
+        // 構建預設批量優化提示詞
         const defaultBatchPrompt = `You are a professional subtitle translator and proofreader. Optimize the following subtitle translations.
 
 For each subtitle, improve the translation to:
@@ -733,9 +733,9 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
         let processedCount = 0;
         let cancelled = false;
 
-        // 分批处理
+        // 分批處理
         for (let i = 0; i < subtitles.length; i += batchSize) {
-          // 每批边界检查取消信号
+          // 每批邊界檢查取消信號
           if (abortController.signal.aborted) {
             cancelled = true;
             break;
@@ -750,7 +750,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
             'info',
           );
 
-          // 发送进度更新
+          // 發送進度更新
           const progress = Math.round(
             (processedCount / subtitles.length) * 100,
           );
@@ -768,7 +768,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
               break;
             }
             try {
-              // 构建批量输入
+              // 構建批量輸入
               const batchInput: Record<
                 string,
                 { source: string; target: string }
@@ -780,7 +780,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
                 };
               });
 
-              // 构建提示词
+              // 構建提示詞
               let optimizePrompt = customPrompt || defaultBatchPrompt;
               optimizePrompt = optimizePrompt
                 .replace(/\{\{sourceLanguage\}\}/g, sourceLanguage)
@@ -788,7 +788,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
 
               const fullPrompt = `${optimizePrompt}\n\nSubtitles to optimize:\n${JSON.stringify(batchInput, null, 2)}`;
 
-              // 配置翻译器
+              // 配置翻譯器
               const optimizedProvider = {
                 ...provider,
                 systemPrompt:
@@ -814,11 +814,11 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
                 'info',
               );
 
-              // 解析响应
+              // 解析響應
               const parsedResponse = parseOptimizationResponse(response);
 
               if (parsedResponse && typeof parsedResponse === 'object') {
-                // 处理结果
+                // 處理結果
                 batch.forEach((sub) => {
                   const optimized = parsedResponse[sub.id];
                   if (optimized !== undefined) {
@@ -843,7 +843,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
                       originalTarget: sub.targetContent,
                       optimizedTarget: sub.targetContent,
                       status: 'skipped',
-                      error: '未在响应中找到对应结果',
+                      error: '未在響應中找到對應結果',
                     });
                   }
                 });
@@ -855,7 +855,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
                   'info',
                 );
               } else {
-                throw new Error('无法解析 AI 响应');
+                throw new Error('無法解析 AI 響應');
               }
             } catch (error) {
               retryCount++;
@@ -872,7 +872,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
                   `Batch ${currentBatchIndex} failed after ${maxRetries} retries: ${error}`,
                   'error',
                 );
-                // 批次失败，标记所有字幕为错误
+                // 批次失敗，標記所有字幕為錯誤
                 batch.forEach((sub) => {
                   results.push({
                     id: sub.id,
@@ -885,14 +885,14 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
                   });
                 });
                 processedCount += batch.length;
-                batchSuccess = true; // 继续下一批
+                batchSuccess = true; // 繼續下一批
               }
             }
           }
           if (cancelled) break;
         }
 
-        // 发送完成进度
+        // 發送完成進度
         event.sender.send('batchOptimizeProgress', {
           progress: cancelled
             ? Math.round((processedCount / subtitles.length) * 100)
@@ -934,7 +934,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
     },
   );
 
-  // 重翻字幕（失败集中处理）：复用正式任务翻译链路，支持取消与部分结果
+  // 重翻字幕（失敗集中處理）：複用正式任務翻譯鏈路，支持取消與部分結果
   ipcMain.handle(
     'retranslateSubtitles',
     async (
@@ -981,7 +981,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
         if (!translator) {
           return {
             success: false,
-            error: `不支持的翻译服务类型: ${provider.type}`,
+            error: `不支持的翻譯服務類型: ${provider.type}`,
           };
         }
 
@@ -993,7 +993,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
           'info',
         );
 
-        // 跑在任务上下文中：翻译链路批次边界的取消检查可感知 signal
+        // 跑在任務上下文中：翻譯鏈路批次邊界的取消檢查可感知 signal
         await runWithTaskContext(
           { signal: abortController.signal },
           async () => {
@@ -1045,7 +1045,7 @@ IMPORTANT: You MUST return a valid JSON object. Do NOT include any text before o
   logMessage('Proofread IPC handlers initialized', 'info');
 }
 
-// 辅助函数：解析优化响应
+// 輔助函數：解析優化響應
 function parseOptimizationResponse(
   response: string,
 ): Record<string, any> | null {
@@ -1053,12 +1053,12 @@ function parseOptimizationResponse(
     .replace(/<think>[\s\S]*?<\/think>/g, '')
     .trim();
 
-  // 尝试直接解析
+  // 嘗試直接解析
   try {
     return JSON.parse(cleanResponse);
   } catch {}
 
-  // 尝试提取 JSON 块
+  // 嘗試提取 JSON 塊
   const jsonMatch = cleanResponse.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (jsonMatch) {
     try {
@@ -1066,13 +1066,13 @@ function parseOptimizationResponse(
     } catch {}
   }
 
-  // 尝试找到 JSON 对象
+  // 嘗試找到 JSON 對象
   const objectMatch = cleanResponse.match(/\{[\s\S]*\}/);
   if (objectMatch) {
     try {
       return JSON.parse(objectMatch[0]);
     } catch {
-      // 尝试修复常见的 JSON 错误
+      // 嘗試修復常見的 JSON 錯誤
       try {
         const { jsonrepair } = require('jsonrepair');
         const repaired = jsonrepair(objectMatch[0]);

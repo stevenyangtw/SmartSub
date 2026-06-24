@@ -258,85 +258,85 @@ export const needsCoreML = (model: string) => {
 };
 
 /**
- * 支持的语言列表（前端使用）
- * 优化结构：默认使用 value 作为各平台的语言代码
- * 只有当某平台的代码与 value 不同时才显式定义，不支持则定义为 null
+ * 支持的語言列表（前端使用）
+ * 優化結構：預設使用 value 作為各平臺的語言代碼
+ * 只有當某平臺的代碼與 value 不同時才顯式定義，不支持則定義為 null
  */
 export const supportedLanguage = [
-  // 最常用语言
+  // 最常用語言
   { name: '中文', value: 'zh' },
-  { name: '英语', value: 'en' },
-  { name: '日语', value: 'ja', baidu: 'jp' },
-  { name: '韩语', value: 'ko', baidu: 'kor' },
-  { name: '法语', value: 'fr', baidu: 'fra' },
-  { name: '德语', value: 'de' },
-  { name: '西班牙语', value: 'es', baidu: 'spa' },
-  { name: '俄语', value: 'ru' },
-  { name: '葡萄牙语', value: 'pt' },
-  { name: '意大利语', value: 'it' },
+  { name: '英語', value: 'en' },
+  { name: '日語', value: 'ja', baidu: 'jp' },
+  { name: '韓語', value: 'ko', baidu: 'kor' },
+  { name: '法語', value: 'fr', baidu: 'fra' },
+  { name: '德語', value: 'de' },
+  { name: '西班牙語', value: 'es', baidu: 'spa' },
+  { name: '俄語', value: 'ru' },
+  { name: '葡萄牙語', value: 'pt' },
+  { name: '意大利語', value: 'it' },
 
-  // 其他欧洲语言
-  { name: '荷兰语', value: 'nl' },
-  { name: '波兰语', value: 'pl' },
-  { name: '土耳其语', value: 'tr', baidu: null },
-  { name: '瑞典语', value: 'sv', baidu: 'swe' },
-  { name: '捷克语', value: 'cs' },
-  { name: '丹麦语', value: 'da', baidu: 'dan' },
-  { name: '芬兰语', value: 'fi', baidu: 'fin' },
-  { name: '希腊语', value: 'el' },
-  { name: '匈牙利语', value: 'hu' },
-  { name: '挪威语', value: 'no', baidu: null },
-  { name: '罗马尼亚语', value: 'ro', baidu: 'rom' },
-  { name: '斯洛伐克语', value: 'sk', baidu: null },
-  { name: '克罗地亚语', value: 'hr', baidu: null },
-  { name: '塞尔维亚语', value: 'sr', baidu: null },
-  { name: '斯洛文尼亚语', value: 'sl', baidu: 'slo' },
-  { name: '保加利亚语', value: 'bg', baidu: 'bul' },
-  { name: '乌克兰语', value: 'uk', baidu: null },
-  { name: '爱沙尼亚语', value: 'et', baidu: 'est' },
-  { name: '拉脱维亚语', value: 'lv', baidu: null },
-  { name: '立陶宛语', value: 'lt', baidu: null },
+  // 其他歐洲語言
+  { name: '荷蘭語', value: 'nl' },
+  { name: '波蘭語', value: 'pl' },
+  { name: '土耳其語', value: 'tr', baidu: null },
+  { name: '瑞典語', value: 'sv', baidu: 'swe' },
+  { name: '捷克語', value: 'cs' },
+  { name: '丹麥語', value: 'da', baidu: 'dan' },
+  { name: '芬蘭語', value: 'fi', baidu: 'fin' },
+  { name: '希臘語', value: 'el' },
+  { name: '匈牙利語', value: 'hu' },
+  { name: '挪威語', value: 'no', baidu: null },
+  { name: '羅馬尼亞語', value: 'ro', baidu: 'rom' },
+  { name: '斯洛伐克語', value: 'sk', baidu: null },
+  { name: '克羅地亞語', value: 'hr', baidu: null },
+  { name: '塞爾維亞語', value: 'sr', baidu: null },
+  { name: '斯洛文尼亞語', value: 'sl', baidu: 'slo' },
+  { name: '保加利亞語', value: 'bg', baidu: 'bul' },
+  { name: '烏克蘭語', value: 'uk', baidu: null },
+  { name: '愛沙尼亞語', value: 'et', baidu: 'est' },
+  { name: '拉脫維亞語', value: 'lv', baidu: null },
+  { name: '立陶宛語', value: 'lt', baidu: null },
 
-  // 亚洲语言
-  { name: '印地语', value: 'hi', baidu: null },
-  { name: '泰语', value: 'th' },
-  { name: '越南语', value: 'vi', baidu: 'vie' },
-  { name: '印度尼西亚语', value: 'id', baidu: null },
-  { name: '马来语', value: 'ms', baidu: null },
-  { name: '泰米尔语', value: 'ta', baidu: null },
-  { name: '乌尔都语', value: 'ur', baidu: null },
-  { name: '马拉地语', value: 'mr', baidu: null },
+  // 亞洲語言
+  { name: '印地語', value: 'hi', baidu: null },
+  { name: '泰語', value: 'th' },
+  { name: '越南語', value: 'vi', baidu: 'vie' },
+  { name: '印度尼西亞語', value: 'id', baidu: null },
+  { name: '馬來語', value: 'ms', baidu: null },
+  { name: '泰米爾語', value: 'ta', baidu: null },
+  { name: '烏爾都語', value: 'ur', baidu: null },
+  { name: '馬拉地語', value: 'mr', baidu: null },
 
-  // 中东语言
-  { name: '阿拉伯语', value: 'ar', baidu: 'ara' },
-  { name: '希伯来语', value: 'he', baidu: null },
-  { name: '波斯语', value: 'fa', baidu: null },
+  // 中東語言
+  { name: '阿拉伯語', value: 'ar', baidu: 'ara' },
+  { name: '希伯來語', value: 'he', baidu: null },
+  { name: '波斯語', value: 'fa', baidu: null },
 
-  // 其他语言
-  { name: '阿非利堪斯语', value: 'af', baidu: null },
-  { name: '加泰罗尼亚语', value: 'ca', baidu: null },
-  { name: '加利西亚语', value: 'gl', baidu: null },
-  { name: '塔加洛语', value: 'tl', baidu: null },
-  { name: '斯瓦希里语', value: 'sw', baidu: null },
-  { name: '威尔士语', value: 'cy', baidu: null },
-  { name: '蒙古语', value: 'mn', baidu: null, volc: null },
+  // 其他語言
+  { name: '阿非利堪斯語', value: 'af', baidu: null },
+  { name: '加泰羅尼亞語', value: 'ca', baidu: null },
+  { name: '加利西亞語', value: 'gl', baidu: null },
+  { name: '塔加洛語', value: 'tl', baidu: null },
+  { name: '斯瓦希里語', value: 'sw', baidu: null },
+  { name: '威爾士語', value: 'cy', baidu: null },
+  { name: '蒙古語', value: 'mn', baidu: null, volc: null },
   {
-    name: '繁体中文',
+    name: '繁體中文',
     value: 'zh-Hant',
     baidu: 'cht',
     aliyun: 'zh-tw',
     google: 'zh-TW',
   },
-  // 粤语：主要用于 Whisper 语音识别源语言；Google 翻译无粤语，标记为不支持
-  { name: '粤语', value: 'yue', google: null },
+  // 粵語：主要用於 Whisper 語音識別源語言；Google 翻譯無粵語，標記為不支持
+  { name: '粵語', value: 'yue', google: null },
 ];
 
-// 翻译平台类型
+// 翻譯平臺類型
 type TranslateProvider = 'baidu' | 'volc' | 'aliyun' | 'google' | 'doubao';
 
 /**
- * 语言代码转换函数
- * 优化逻辑：如果平台有显式定义则使用定义值（包括 null 表示不支持），否则使用 value 作为默认值
+ * 語言代碼轉換函數
+ * 優化邏輯：如果平臺有顯式定義則使用定義值（包括 null 表示不支持），否則使用 value 作為預設值
  */
 export const convertLanguageCode = (
   code: string,
@@ -345,12 +345,12 @@ export const convertLanguageCode = (
   const lang = supportedLanguage.find((lang) => lang.value === code);
   if (!lang) return code;
 
-  // 检查是否有显式定义该平台的映射（包括 null）
+  // 檢查是否有顯式定義該平臺的映射（包括 null）
   if (target in lang) {
     return lang[target] as string | null;
   }
 
-  // 没有显式定义，使用 value 作为默认值
+  // 沒有顯式定義，使用 value 作為預設值
   return lang.value;
 };
 
@@ -360,8 +360,8 @@ export const openUrl = (url) => {
 
 export const gitCloneSteps = {
   'Compressing objects': '打包文件',
-  'Receiving objects': '下载文件',
-  'Resolving deltas': '解压文件',
+  'Receiving objects': '下載文件',
+  'Resolving deltas': '解壓文件',
   'Updating workdir': '更新文件',
 };
 
@@ -374,7 +374,7 @@ export const isSubtitleFile = (filePath) => {
   );
 };
 
-// 纯音频扩展名：校对界面据此渲染紧凑音频播放器，避免空的视频黑框占位
+// 純音頻擴展名：校對界面據此渲染緊湊音頻播放器，避免空的影片黑框佔位
 const AUDIO_FILE_EXTENSIONS = [
   'mp3',
   'wav',
@@ -405,7 +405,7 @@ export const getModelDownloadUrl = (
     'huggingFaceMirror' | 'huggingFaceOfficial'
   > = DEFAULT_DOWNLOAD_ENDPOINTS,
 ) => {
-  // base 已含协议（如 https://hf-mirror.com），与用户在设置页配置的镜像保持一致。
+  // base 已含協議（如 https://hf-mirror.com），與用戶在設置頁配置的鏡像保持一致。
   const base =
     source === 'hf-mirror'
       ? endpoints.huggingFaceMirror
@@ -413,9 +413,9 @@ export const getModelDownloadUrl = (
   return `${base}/ggerganov/whisper.cpp/resolve/main/ggml-${modelName.toLowerCase()}.bin?download=true`;
 };
 
-// 添加支持的文件扩展名常量
+// 添加支持的文件擴展名常量
 export const SUPPORTED_FILE_EXTENSIONS = [
-  // 视频格式
+  // 影片格式
   'mp4',
   'avi',
   'mov',
@@ -423,7 +423,7 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   'flv',
   'wmv',
   'webm',
-  // 音频格式
+  // 音頻格式
   'mp3',
   'wav',
   'ogg',
@@ -438,7 +438,7 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   'amr',
   'au',
   'mid',
-  // 其他常见格式
+  // 其他常見格式
   '3gp',
   'asf',
   'rm',
@@ -454,7 +454,7 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   'ssa',
 ] as const;
 
-// 添加文件过滤方法
+// 添加文件過濾方法
 export const filterSupportedFiles = (files: File[]) => {
   return Array.from(files).filter((file) => {
     const ext = file.name.toLowerCase().split('.').pop();

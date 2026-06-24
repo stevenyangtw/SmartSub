@@ -8,7 +8,7 @@ import {
   getModelScopeBase,
 } from './config/downloadConfig';
 
-/** qwen 模型根目录：settings.qwenModelsPath 覆盖，否则 userData/models/qwen */
+/** qwen 模型根目錄：settings.qwenModelsPath 覆蓋，否則 userData/models/qwen */
 export function getQwenModelsRoot(): string {
   const { store } = require('./store') as typeof import('./store');
   const fallback = path.join(app.getPath('userData'), 'models', 'qwen');
@@ -20,65 +20,65 @@ export function getQwenModelsRoot(): string {
   return root;
 }
 
-/** qwen 子模型标识（与本地子目录一一对应）。P2 仅 0.6B。 */
+/** qwen 子模型標識（與本地子目錄一一對應）。P2 僅 0.6B。 */
 export type QwenModelId = 'qwen3-asr-0.6b';
 
-/** 默认（当前唯一）qwen 模型。 */
+/** 預設（當前唯一）qwen 模型。 */
 export const QWEN_DEFAULT_MODEL_ID: QwenModelId = 'qwen3-asr-0.6b';
 
 /**
- * qwen 模型下载源：
- * - modelscope：ModelScope 国内仓库逐文件直下（国内 CDN 最快，且免解包）；
- * - ghproxy：GitHub release 整包经 gh-proxy.com 代理（国内加速）；
- * - github：GitHub release 整包直连（海外）。
+ * qwen 模型下載源：
+ * - modelscope：ModelScope 國內倉庫逐文件直下（國內 CDN 最快，且免解包）；
+ * - ghproxy：GitHub release 整包經 gh-proxy.com 代理（國內加速）；
+ * - github：GitHub release 整包直連（海外）。
  */
 export type QwenModelSource = 'modelscope' | 'ghproxy' | 'github';
 
-/** 默认下载源：国内优先 ModelScope。 */
+/** 預設下載源：國內優先 ModelScope。 */
 export const QWEN_DEFAULT_SOURCE: QwenModelSource = 'modelscope';
 
-/** 源回退规范顺序（国内优先）：modelscope → ghproxy → github。 */
+/** 源回退規範順序（國內優先）：modelscope → ghproxy → github。 */
 const QWEN_SOURCE_ORDER: QwenModelSource[] = [
   'modelscope',
   'ghproxy',
   'github',
 ];
 
-/** 所选源排第一，其余按规范顺序补齐，供下载失败时自动回退。 */
+/** 所選源排第一，其餘按規範順序補齊，供下載失敗時自動回退。 */
 export function getQwenSourceOrder(
   selected: QwenModelSource,
 ): QwenModelSource[] {
   return [selected, ...QWEN_SOURCE_ORDER.filter((s) => s !== selected)];
 }
 
-/** ModelScope 逐文件映射：remote=仓库内路径，local=相对模型目录的落地路径。 */
+/** ModelScope 逐文件映射：remote=倉庫內路徑，local=相對模型目錄的落地路徑。 */
 export interface QwenModelScopeFile {
   remote: string;
   local: string;
 }
 
 /**
- * qwen 模型清单：支持两种获取方式——
- * - ModelScope 逐文件（modelScopeRepo + modelScopeFiles）：国内首选，免解包；
- * - GitHub release tar.bz2 整包（releasePath + archiveName）：经 gh-proxy / 直连回退，需解包。
- * sherpa-onnx Qwen3-ASR 四件套：conv_frontend / encoder / decoder + tokenizer 目录。
+ * qwen 模型清單：支持兩種獲取方式——
+ * - ModelScope 逐文件（modelScopeRepo + modelScopeFiles）：國內首選，免解包；
+ * - GitHub release tar.bz2 整包（releasePath + archiveName）：經 gh-proxy / 直連回退，需解包。
+ * sherpa-onnx Qwen3-ASR 四件套：conv_frontend / encoder / decoder + tokenizer 目錄。
  */
 export interface QwenModelSpec {
   id: QwenModelId;
   dirName: string;
-  /** 体积/硬件提示用（解包后约 0.95GB；tar.bz2 下载包约 838MB）。 */
+  /** 體積/硬件提示用（解包後約 0.95GB；tar.bz2 下載包約 838MB）。 */
   approxInstallBytes: number;
-  /** ModelScope 仓库 id（逐文件国内源）。 */
+  /** ModelScope 倉庫 id（逐文件國內源）。 */
   modelScopeRepo: string;
-  /** ModelScope 逐文件清单（remote→local）。 */
+  /** ModelScope 逐文件清單（remote→local）。 */
   modelScopeFiles: QwenModelScopeFile[];
-  /** GitHub release 路径（owner/repo/releases/download/tag），用于整包源拼 URL。 */
+  /** GitHub release 路徑（owner/repo/releases/download/tag），用於整包源拼 URL。 */
   releasePath: string;
   /** release 整包文件名（tar.bz2）。 */
   archiveName: string;
-  /** 解包后顶层目录名（用 decompress strip:1 去掉，此处仅作记录）。 */
+  /** 解包後頂層目錄名（用 decompress strip:1 去掉，此處僅作記錄）。 */
   archiveInnerDir: string;
-  /** 判定「已安装」必须存在的关键文件（相对 dirName）。 */
+  /** 判定「已安裝」必須存在的關鍵文件（相對 dirName）。 */
   requiredFiles: string[];
 }
 
@@ -86,7 +86,7 @@ const QWEN_0_6B_ARCHIVE = 'sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25.tar.bz2';
 const QWEN_0_6B_INNER = 'sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25';
 const QWEN_0_6B_RELEASE_PATH =
   'k2-fsa/sherpa-onnx/releases/download/asr-models';
-/** sherpa-onnx 的 Qwen3-ASR onnx 即源自该 ModelScope 仓库（k2-fsa 据此打包 tar.bz2）。 */
+/** sherpa-onnx 的 Qwen3-ASR onnx 即源自該 ModelScope 倉庫（k2-fsa 據此打包 tar.bz2）。 */
 const QWEN_MS_REPO = 'zengshuishui/Qwen3-ASR-onnx';
 
 export const QWEN_MODELS: Record<QwenModelId, QwenModelSpec> = {
@@ -118,7 +118,7 @@ export const QWEN_MODELS: Record<QwenModelId, QwenModelSpec> = {
     releasePath: QWEN_0_6B_RELEASE_PATH,
     archiveName: QWEN_0_6B_ARCHIVE,
     archiveInnerDir: QWEN_0_6B_INNER,
-    // tokenizer 是目录；以其中两个关键文件作为安装完整性标记。
+    // tokenizer 是目錄；以其中兩個關鍵文件作為安裝完整性標記。
     requiredFiles: [
       'conv_frontend.onnx',
       'encoder.int8.onnx',
@@ -129,7 +129,7 @@ export const QWEN_MODELS: Record<QwenModelId, QwenModelSpec> = {
   },
 };
 
-/** 整包源（ghproxy/github）的 tar.bz2 下载 URL。 */
+/** 整包源（ghproxy/github）的 tar.bz2 下載 URL。 */
 export function getQwenArchiveUrl(
   spec: QwenModelSpec,
   source: 'ghproxy' | 'github',
@@ -138,7 +138,7 @@ export function getQwenArchiveUrl(
   return source === 'ghproxy' ? `${getGithubProxyPrefix()}/${github}` : github;
 }
 
-/** ModelScope 单文件 resolve 直链（302 跳国内 CDN，支持 Range）。 */
+/** ModelScope 單文件 resolve 直鏈（302 跳國內 CDN，支持 Range）。 */
 export function getQwenModelScopeFileUrl(
   spec: QwenModelSpec,
   remote: string,
@@ -146,7 +146,7 @@ export function getQwenModelScopeFileUrl(
   return `${getModelScopeBase()}/models/${spec.modelScopeRepo}/resolve/master/${remote}`;
 }
 
-/** ModelScope 文件树 API（取各文件 size 以计算总进度）。 */
+/** ModelScope 文件樹 API（取各文件 size 以計算總進度）。 */
 export function getQwenModelScopeTreeUrl(spec: QwenModelSpec): string {
   return `${getModelScopeBase()}/api/v1/models/${spec.modelScopeRepo}/repo/files?Revision=master&Recursive=true`;
 }
@@ -164,7 +164,7 @@ export function isQwenModelInstalled(id: QwenModelId): boolean {
   );
 }
 
-/** 四件套绝对路径（供 adapter 注入 worker 模型请求；tokenizer 为目录）。 */
+/** 四件套絕對路徑（供 adapter 注入 worker 模型請求；tokenizer 為目錄）。 */
 export function getQwenModelFiles(id: QwenModelId): {
   convFrontend: string;
   encoder: string;
@@ -180,33 +180,33 @@ export function getQwenModelFiles(id: QwenModelId): {
   };
 }
 
-/** 共享 silero VAD：随应用内置（extraResources/sherpa/vad/silero_vad.onnx），与 funasr/fireRed 共用同一份。 */
+/** 共享 silero VAD：隨應用內置（extraResources/sherpa/vad/silero_vad.onnx），與 funasr/fireRed 共用同一份。 */
 export function getQwenVadModelPath(): string {
   const { getExtraResourcesPath } =
     require('./utils') as typeof import('./utils');
   return resolveBundledVadPath(getExtraResourcesPath());
 }
 
-/** 共享 VAD 是否就绪：检查随包内置文件是否存在（正常安装下恒为真）。 */
+/** 共享 VAD 是否就緒：檢查隨包內置文件是否存在（正常安裝下恆為真）。 */
 export function isQwenVadInstalled(): boolean {
   return fs.existsSync(getQwenVadModelPath());
 }
 
-/** 全部 qwen 模型 id（静态，纯函数，不触磁盘）。 */
+/** 全部 qwen 模型 id（靜態，純函數，不觸磁盤）。 */
 export function getQwenModelIds(): QwenModelId[] {
   return Object.keys(QWEN_MODELS) as QwenModelId[];
 }
 
-/** 已安装的 qwen 模型 id（触磁盘）。 */
+/** 已安裝的 qwen 模型 id（觸磁盤）。 */
 export function getInstalledQwenModels(): QwenModelId[] {
   return getQwenModelIds().filter((id) => isQwenModelInstalled(id));
 }
 
 /**
- * 选定要使用的 qwen 模型（纯函数）：
- * - requested 命中已装 → 用它；
- * - 否则回退首个已装；
- * - 无已装 → null。
+ * 選定要使用的 qwen 模型（純函數）：
+ * - requested 命中已裝 → 用它；
+ * - 否則回退首個已裝；
+ * - 無已裝 → null。
  */
 export function resolveQwenSelection(
   requested: string | undefined,
@@ -221,7 +221,7 @@ export function resolveQwenSelection(
   return { id: chosen };
 }
 
-/** qwen 转写就绪 = 至少一个 qwen 模型 + 共享 silero VAD 均已安装。 */
+/** qwen 轉寫就緒 = 至少一個 qwen 模型 + 共享 silero VAD 均已安裝。 */
 export function isQwenReady(): boolean {
   return getInstalledQwenModels().length > 0 && isQwenVadInstalled();
 }

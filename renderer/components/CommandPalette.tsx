@@ -34,8 +34,8 @@ import { getWorkItemTarget } from 'lib/workItemUtils';
 import type { WorkItem } from '../../types/workItem';
 
 /**
- * 全局命令面板（Cmd+K）：跳转 / 最近工程 / 全局动作。
- * 复用既有 cmdk 基元；动作均复用既有 handler，v1 不含破坏性操作、不新增后端能力。
+ * 全局命令面板（Cmd+K）：跳轉 / 最近工程 / 全局動作。
+ * 複用既有 cmdk 基元；動作均複用既有 handler，v1 不含破壞性操作、不新增後端能力。
  */
 export default function CommandPalette({
   open,
@@ -80,13 +80,13 @@ export default function CommandPalette({
     if (open) loadRecent();
   }, [open, loadRecent]);
 
-  // 跳转：直接关闭并路由
+  // 跳轉：直接關閉並路由
   const navTo = (href: string) => {
     onOpenChange(false);
     router.push(href);
   };
 
-  // 触发会打开其它 Dialog 的动作：先关面板再延迟执行，避免 Radix body pointer-events 争用
+  // 觸發會打開其它 Dialog 的動作：先關面板再延遲執行，避免 Radix body pointer-events 爭用
   const runDeferred = (fn: () => void) => {
     onOpenChange(false);
     setTimeout(fn, 0);

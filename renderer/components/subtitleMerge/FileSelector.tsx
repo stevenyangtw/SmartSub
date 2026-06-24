@@ -1,6 +1,6 @@
 /**
- * 文件选择器组件
- * 用于选择视频和字幕文件 - 紧凑版
+ * 文件選擇器組件
+ * 用於選擇影片和字幕文件 - 緊湊版
  */
 
 import React from 'react';
@@ -38,7 +38,7 @@ export default function FileSelector({
 
   return (
     <div className="flex flex-col sm:flex-row gap-2">
-      {/* 视频文件选择 */}
+      {/* 影片文件選擇 */}
       <div
         className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer hover:border-primary ${
           videoPath
@@ -89,7 +89,7 @@ export default function FileSelector({
         )}
       </div>
 
-      {/* 字幕文件选择 */}
+      {/* 字幕文件選擇 */}
       <div
         className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer hover:border-primary ${
           subtitlePath

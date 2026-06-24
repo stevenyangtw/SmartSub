@@ -1,17 +1,17 @@
 import type { FunasrAddonParams } from '../engines/funasrParams';
 
 /**
- * 纯配置映射：FunasrAddonParams → sherpa-onnx VAD / OfflineRecognizer 配置，
- * 以及段时间与进度的数学。无 electron / fs / 原生库依赖，便于单测。
+ * 純配置映射：FunasrAddonParams → sherpa-onnx VAD / OfflineRecognizer 配置，
+ * 以及段時間與進度的數學。無 electron / fs / 原生庫依賴，便於單測。
  *
- * 注意：worker（extraResources 纯 JS，不经 webpack）内联了等价逻辑，
- * 两者必须保持一致（见 sherpa-worker.js 的 loadConfigHelpers）。
+ * 注意：worker（extraResources 純 JS，不經 webpack）內聯了等價邏輯，
+ * 兩者必須保持一致（見 sherpa-worker.js 的 loadConfigHelpers）。
  */
 
 const SAMPLE_RATE = 16000;
-/** SmartSub 约定 0 = 不限制最大语音时长；sherpa 用一个足够大的秒数表达「不限制」。 */
+/** SmartSub 約定 0 = 不限制最大語音時長；sherpa 用一個足夠大的秒數表達「不限制」。 */
 const UNLIMITED_SPEECH_SECONDS = 100000;
-/** silero-vad 窗口大小（样本数），sherpa 推荐值。 */
+/** silero-vad 窗口大小（樣本數），sherpa 推薦值。 */
 const VAD_WINDOW_SIZE = 512;
 
 export interface VadConfig {
@@ -37,7 +37,7 @@ export interface OfflineRecognizerConfig {
       useInverseTextNormalization: number;
     };
     paraformer?: { model: string };
-    /** Qwen3-ASR 四件套 + 自回归解码参数（sherpa-onnx >= 1.12.34）。 */
+    /** Qwen3-ASR 四件套 + 自迴歸解碼參數（sherpa-onnx >= 1.12.34）。 */
     qwen3Asr?: {
       convFrontend: string;
       encoder: string;
@@ -49,7 +49,7 @@ export interface OfflineRecognizerConfig {
       topP: number;
       seed: number;
     };
-    /** FireRedASR-AED：encoder + decoder 两件套（tokens 走顶层 tokens.txt）。 */
+    /** FireRedASR-AED：encoder + decoder 兩件套（tokens 走頂層 tokens.txt）。 */
     fireRedAsr?: {
       encoder: string;
       decoder: string;
@@ -61,7 +61,7 @@ export interface OfflineRecognizerConfig {
   };
 }
 
-/** buildVadConfig 仅需的 VAD 字段（funasr / qwen 参数均结构兼容）。 */
+/** buildVadConfig 僅需的 VAD 字段（funasr / qwen 參數均結構兼容）。 */
 export interface SherpaVadParams {
   vad_threshold: number;
   vad_min_silence_duration_ms: number;
@@ -108,7 +108,7 @@ export function buildRecognizerConfig(
   } else {
     modelConfig.senseVoice = {
       model: asrModel,
-      // 'auto' → '' 让 SenseVoice 自动检测语言
+      // 'auto' → '' 讓 SenseVoice 自動檢測語言
       language: p.language === 'auto' ? '' : p.language,
       useInverseTextNormalization: p.use_itn ? 1 : 0,
     };
@@ -119,7 +119,7 @@ export function buildRecognizerConfig(
   };
 }
 
-/** Qwen3-ASR 解码相关参数（VAD 字段见 SherpaVadParams）。 */
+/** Qwen3-ASR 解碼相關參數（VAD 字段見 SherpaVadParams）。 */
 export interface QwenRecognizerParams {
   num_threads: number;
   provider: string;
@@ -131,11 +131,11 @@ export interface QwenRecognizerParams {
 }
 
 /**
- * Qwen3-ASR OfflineRecognizer 配置：四件套（convFrontend/encoder/decoder + tokenizer 目录）
- * 映射到 sherpa 的 `qwen3Asr` 块。Qwen 无 tokens.txt（用 tokenizer 目录），故 tokens 置空。
+ * Qwen3-ASR OfflineRecognizer 配置：四件套（convFrontend/encoder/decoder + tokenizer 目錄）
+ * 映射到 sherpa 的 `qwen3Asr` 塊。Qwen 無 tokens.txt（用 tokenizer 目錄），故 tokens 置空。
  *
- * ⚠️ 原生绑定对该 config 先 `memset(0)` 再按存在的键覆盖，故每个数值字段都必须显式给值，
- *    否则 maxTotalLen / maxNewTokens 等会变成 0（而非 C++ 结构体默认值）导致解码失败。
+ * ⚠️ 原生綁定對該 config 先 `memset(0)` 再按存在的鍵覆蓋，故每個數值字段都必須顯式給值，
+ *    否則 maxTotalLen / maxNewTokens 等會變成 0（而非 C++ 結構體預設值）導致解碼失敗。
  */
 export function buildQwenRecognizerConfig(
   files: {
@@ -168,17 +168,17 @@ export function buildQwenRecognizerConfig(
   };
 }
 
-/** FireRedASR-AED 解码相关参数（VAD 字段见 SherpaVadParams）。 */
+/** FireRedASR-AED 解碼相關參數（VAD 字段見 SherpaVadParams）。 */
 export interface FireRedRecognizerParams {
   num_threads: number;
   provider: string;
 }
 
 /**
- * FireRedASR-AED OfflineRecognizer 配置：encoder + decoder 两件套映射到 sherpa 的
- * `fireRedAsr` 块，tokens.txt 走**顶层 `tokens`**（与 sense_voice/paraformer 同位，
- * 区别于 qwen 的 tokenizer 目录 + 空 tokens）。AED beam search 无暴露的数值解码超参，
- * 故不存在 qwen 那样的 memset(0) 数值清零陷阱。
+ * FireRedASR-AED OfflineRecognizer 配置：encoder + decoder 兩件套映射到 sherpa 的
+ * `fireRedAsr` 塊，tokens.txt 走**頂層 `tokens`**（與 sense_voice/paraformer 同位，
+ * 區別於 qwen 的 tokenizer 目錄 + 空 tokens）。AED beam search 無暴露的數值解碼超參，
+ * 故不存在 qwen 那樣的 memset(0) 數值清零陷阱。
  */
 export function buildFireRedRecognizerConfig(
   files: {
@@ -208,7 +208,7 @@ export interface SegmentTiming {
   end: number;
 }
 
-/** VAD 段的样本区间 → 秒。 */
+/** VAD 段的樣本區間 → 秒。 */
 export function segmentTiming(
   startSample: number,
   numSamples: number,
@@ -220,7 +220,7 @@ export function segmentTiming(
   };
 }
 
-/** 进度百分比（0..100，整数；total<=0 视为已完成）。 */
+/** 進度百分比（0..100，整數；total<=0 視為已完成）。 */
 export function progressPercent(processed: number, total: number): number {
   if (total <= 0) return 100;
   return Math.max(0, Math.min(100, Math.round((processed / total) * 100)));

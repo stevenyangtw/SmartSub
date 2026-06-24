@@ -22,12 +22,12 @@ import type { SherpaRuntime } from '@/components/resources/engines/useSherpaRunt
 import type { EngineStatus } from '../../../../types/engine';
 import type { ISystemInfo } from '../../../../types/types';
 
-/** sherpa 系（funasr / qwen / fireRedAsr）共享同一原生运行库，仅模型与少量参数不同。 */
+/** sherpa 系（funasr / qwen / fireRedAsr）共享同一原生運行庫，僅模型與少量參數不同。 */
 export type SherpaFamilyKey = 'funasr' | 'qwen' | 'fireRedAsr';
 
 interface SherpaFamily {
   engine: SherpaFamilyKey;
-  /** 该族模型是否就绪（可转写）。运行库随包内置，不再参与判断。 */
+  /** 該族模型是否就緒（可轉寫）。運行庫隨包內置，不再參與判斷。 */
   modelsReady: boolean;
   status?: EngineStatus;
 }
@@ -44,9 +44,9 @@ interface SherpaEngineGroupPanelProps {
 const THREAD_OPTIONS = ['1', '2', '4', '8'];
 
 /**
- * 合并后的「高级设置」：FunASR · Qwen · FireRed 共用同一 sherpa-onnx 运行库，
- * 故线程数为统一一项（更改时同步写入三引擎设置，保持行为一致）；
- * 逆文本规整（ITN）仅 FunASR（SenseVoice）生效，单独备注说明。
+ * 合併後的「高級設置」：FunASR · Qwen · FireRed 共用同一 sherpa-onnx 運行庫，
+ * 故線程數為統一一項（更改時同步寫入三引擎設置，保持行為一致）；
+ * 逆文本規整（ITN）僅 FunASR（SenseVoice）生效，單獨備註說明。
  */
 const SherpaAdvancedSettings: React.FC = () => {
   const { t } = useTranslation('resources');
@@ -66,7 +66,7 @@ const SherpaAdvancedSettings: React.FC = () => {
         ].find((x) => typeof x === 'number');
         if (typeof persisted === 'number') setNumThreads(persisted);
       } catch {
-        // 忽略：保持默认
+        // 忽略：保持預設
       }
     })();
   }, []);
@@ -79,7 +79,7 @@ const SherpaAdvancedSettings: React.FC = () => {
   const handleThreadsChange = async (value: string) => {
     const n = Number(value);
     setNumThreads(n);
-    // 三族共用同一运行库，线程数统一应用到三引擎设置。
+    // 三族共用同一運行庫，線程數統一應用到三引擎設置。
     await Promise.all([
       window?.ipc?.invoke('set-funasr-settings', { numThreads: n }),
       window?.ipc?.invoke('set-qwen-settings', { numThreads: n }),
@@ -133,13 +133,13 @@ const SherpaAdvancedSettings: React.FC = () => {
 };
 
 /**
- * sherpa 系引擎（FunASR · Qwen · FireRed）合并管理面板。
+ * sherpa 系引擎（FunASR · Qwen · FireRed）合併管理面板。
  *
- * 三者共用同一 sherpa-onnx 原生运行库（已随应用内置），差异仅在模型与少量参数。
- * 运行库内置故不再做安装检测：状态只看「是否已下载模型」。
- * 顶部一次性声明运行库已内置；下方按模型族分区（仅模型清单）；
- * 全部高级设置（线程数 + ITN）合并到底部单独一处。
- * 未装任何模型的族默认折叠以收敛纵向长度。
+ * 三者共用同一 sherpa-onnx 原生運行庫（已隨應用內置），差異僅在模型與少量參數。
+ * 運行庫內置故不再做安裝檢測：狀態只看「是否已下載模型」。
+ * 頂部一次性聲明運行庫已內置；下方按模型族分區（僅模型清單）；
+ * 全部高級設置（線程數 + ITN）合併到底部單獨一處。
+ * 未裝任何模型的族預設摺疊以收斂縱向長度。
  */
 const SherpaEngineGroupPanel: React.FC<SherpaEngineGroupPanelProps> = ({
   runtime,
@@ -152,7 +152,7 @@ const SherpaEngineGroupPanel: React.FC<SherpaEngineGroupPanelProps> = ({
   const { t } = useTranslation('resources');
   const anyReady = families.some((f) => f.modelsReady);
 
-  // 运行库内置，无「未安装」态：仅区分「可用」与「需下载模型」。
+  // 運行庫內置，無「未安裝」態：僅區分「可用」與「需下載模型」。
   const familyBadge = (f: SherpaFamily) =>
     f.modelsReady ? (
       <Badge variant="outline" className="border-success/40 text-success">
@@ -170,7 +170,7 @@ const SherpaEngineGroupPanel: React.FC<SherpaEngineGroupPanelProps> = ({
         {t('engines.sherpa.desc')}
       </p>
 
-      {/* 共享运行库卡：三族同一份内置运行库，恒为就绪，只此一处 */}
+      {/* 共享運行庫卡：三族同一份內置運行庫，恆為就緒，只此一處 */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-muted/60 p-3">
         <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
         <span className="text-sm">{t('engines.sherpa.builtinRuntime')}</span>
@@ -189,7 +189,7 @@ const SherpaEngineGroupPanel: React.FC<SherpaEngineGroupPanelProps> = ({
         </p>
       )}
 
-      {/* 三族分区：仅模型清单（复用 ModelLibrarySection 的下载/导入/删除/换路径） */}
+      {/* 三族分區：僅模型清單（複用 ModelLibrarySection 的下載/導入/刪除/換路徑） */}
       <div className="space-y-3">
         {families.map((f, index) => (
           <Collapsible
@@ -220,7 +220,7 @@ const SherpaEngineGroupPanel: React.FC<SherpaEngineGroupPanelProps> = ({
         ))}
       </div>
 
-      {/* 合并的高级设置：线程数（三族统一）+ ITN（仅 FunASR） */}
+      {/* 合併的高級設置：線程數（三族統一）+ ITN（僅 FunASR） */}
       <Collapsible className="rounded-lg border">
         <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2.5 text-left">
           <Settings2 className="h-4 w-4 shrink-0 text-muted-foreground" />

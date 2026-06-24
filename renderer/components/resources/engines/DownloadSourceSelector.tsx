@@ -16,8 +16,8 @@ interface DownloadSourceSelectorProps<T extends string = string> {
 }
 
 /**
- * 统一的「下载源」选择器：按钮组形态 + 无障碍 radiogroup 语义。
- * 各引擎/模型的下载源选择共用此组件，保证视觉、交互、可访问性一致。
+ * 統一的「下載源」選擇器：按鈕組形態 + 無障礙 radiogroup 語義。
+ * 各引擎/模型的下載源選擇共用此組件，保證視覺、交互、可訪問性一致。
  */
 function DownloadSourceSelector<T extends string = string>({
   label,

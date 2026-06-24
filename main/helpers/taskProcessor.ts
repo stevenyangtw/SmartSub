@@ -31,8 +31,8 @@ const TASK_EVENT_CHANNELS = new Set([
 ]);
 
 /**
- * 包装 IPC event：任务事件除发往渲染层外，同步镜像进任务工程存储。
- * 这样用户中途离开任务页（无渲染层监听）时，工程状态也不会停留在 loading。
+ * 包裝 IPC event：任務事件除發往渲染層外，同步鏡像進任務工程存儲。
+ * 這樣用戶中途離開任務頁（無渲染層監聽）時，工程狀態也不會停留在 loading。
  */
 function wrapTaskEvent(event: any) {
   const sender = event.sender;
@@ -46,7 +46,7 @@ function wrapTaskEvent(event: any) {
         try {
           sender.send(channel, ...args);
         } catch (error) {
-          // 窗口销毁等场景下发送失败，但镜像已落库
+          // 窗口銷燬等場景下發送失敗，但鏡像已落庫
           console.error('send task event failed', error);
         }
       },
@@ -61,17 +61,17 @@ interface QueueItem {
 }
 
 interface ProjectRuntime {
-  /** 正在执行的文件数 */
+  /** 正在執行的文件數 */
   active: number;
-  /** 正在执行的文件 uuid（取消时定位 ffmpeg 进程） */
+  /** 正在執行的文件 uuid（取消時定位 ffmpeg 進程） */
   activeFiles: Set<string>;
   paused: boolean;
   cancelled: boolean;
-  /** 取消信号：翻译批次边界与阶段边界检查 */
+  /** 取消信號：翻譯批次邊界與階段邊界檢查 */
   controller: AbortController;
-  /** 本轮入列的文件总数（Dock/任务栏进度分母） */
+  /** 本輪入列的文件總數（Dock/任務欄進度分母） */
   total: number;
-  /** 已结束（成功/失败/取消）的文件数（进度分子） */
+  /** 已結束（成功/失敗/取消）的文件數（進度分子） */
   completed: number;
 }
 
@@ -84,10 +84,10 @@ let isProcessing = false;
 let maxConcurrentTasks = 3;
 let hasOpenAiWhisper = false;
 let activeTasksCount = 0;
-/** 执行中"受限引擎"(faster-whisper/funasr)任务数：混合引擎队列并发钳制用。 */
+/** 執行中"受限引擎"(faster-whisper/funasr)任務數：混合引擎隊列併發鉗制用。 */
 let activeRestrictiveCount = 0;
 
-/** faster-whisper / funasr / qwen / fireRedAsr 共享单 sidecar/worker，需钳制有效并发为 1。 */
+/** faster-whisper / funasr / qwen / fireRedAsr 共享單 sidecar/worker，需鉗制有效併發為 1。 */
 function isRestrictiveEngine(engine: TranscriptionEngine): boolean {
   return (
     engine === 'fasterWhisper' ||
@@ -96,9 +96,9 @@ function isRestrictiveEngine(engine: TranscriptionEngine): boolean {
     engine === 'fireRedAsr'
   );
 }
-/** 最近一次 handleTask 的 event：resume 触发派发时复用 */
+/** 最近一次 handleTask 的 event：resume 觸發派發時複用 */
 let dispatchEvent: any = null;
-/** Dock/任务栏进度条目标窗口 */
+/** Dock/任務欄進度條目標窗口 */
 let progressWindow: BrowserWindow | null = null;
 
 function hasRunnableQueuedTasks(): boolean {
@@ -117,14 +117,14 @@ function syncTranscriptionPowerSaveBlocker() {
 }
 
 /**
- * 正在执行 + 排队中的转写任务总数。供关闭窗口提示展示「仍在处理 N 个任务」。
+ * 正在執行 + 排隊中的轉寫任務總數。供關閉窗口提示展示「仍在處理 N 個任務」。
  */
 export function getTranscriptionBusyCount(): number {
   return activeTasksCount + processingQueue.length;
 }
 
 /**
- * 是否有转写任务在执行或排队。供升级/下载 IPC 在运行中拒绝操作（避免 Windows 文件锁）。
+ * 是否有轉寫任務在執行或排隊。供升級/下載 IPC 在運行中拒絕操作（避免 Windows 文件鎖）。
  */
 export function isTranscriptionBusy(): boolean {
   return getTranscriptionBusyCount() > 0;
@@ -147,7 +147,7 @@ function ensureRuntime(projectId: string): ProjectRuntime {
   return runtime;
 }
 
-/** 按文件粒度聚合全部工程，更新 macOS Dock / Windows 任务栏进度条 */
+/** 按文件粒度聚合全部工程，更新 macOS Dock / Windows 任務欄進度條 */
 function updateTaskbarProgress() {
   if (!progressWindow || progressWindow.isDestroyed()) return;
   try {
@@ -183,7 +183,7 @@ function sendTaskComplete(
   }
 }
 
-/** 工程内已无排队与执行中文件时收尾：发完成事件并清理运行时 */
+/** 工程內已無排隊與執行中文件時收尾：發完成事件並清理運行時 */
 function finalizeProjectIfDrained(event: any, projectId: string) {
   const runtime = projectRuntimes.get(projectId);
   if (!runtime) return;
@@ -265,7 +265,7 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
         logMessage(`formData: \n ${JSON.stringify(formData, null, 2)}`, 'info');
       });
       const runtime = ensureRuntime(pid);
-      // 重新开始：清除上一轮的暂停/取消残留
+      // 重新開始：清除上一輪的暫停/取消殘留
       runtime.paused = false;
       runtime.cancelled = false;
       if (runtime.controller.signal.aborted) {
@@ -281,14 +281,14 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
         isProcessing = true;
         hasOpenAiWhisper = await checkOpenAiWhisper();
         maxConcurrentTasks = formData.maxConcurrentTasks || 3;
-        // 预热 sidecar：把冷启动成本移出首个文件关键路径（faster-whisper 等需运行时引擎）。
-        // ensureStarted 成功后再 prewarm（按引擎预加载模型），与首个文件的音频抽取并行，
-        // 避免 FunASR 等首个 transcribe 因首次加载原生库/ONNX 过慢而长时间卡在 0%。
+        // 預熱 sidecar：把冷啟動成本移出首個文件關鍵路徑（faster-whisper 等需運行時引擎）。
+        // ensureStarted 成功後再 prewarm（按引擎預加載模型），與首個文件的音頻抽取並行，
+        // 避免 FunASR 等首個 transcribe 因首次加載原生庫/ONNX 過慢而長時間卡在 0%。
         try {
-          // 按本批任务携带的引擎预热（缺省回退全局/默认）。
+          // 按本批任務攜帶的引擎預熱（缺省回退全局/預設）。
           const batchAdapter = getEngineAdapterForTask(formData);
           if (batchAdapter.requiresRuntime && batchAdapter.pyEngineId) {
-            // Python 运行时引擎（faster-whisper）：先拉起 sidecar 再预热。
+            // Python 運行時引擎（faster-whisper）：先拉起 sidecar 再預熱。
             void getPythonRuntimeManager()
               .ensureStarted(batchAdapter.pyEngineId)
               .then(() => batchAdapter.prewarm?.(formData))
@@ -296,7 +296,7 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
                 logMessage(`engine warmup failed (non-fatal): ${e}`, 'warning'),
               );
           } else if (batchAdapter.prewarm) {
-            // 无 Python 的引擎（funasr/sherpa）：worker 线程直接预加载模型。
+            // 無 Python 的引擎（funasr/sherpa）：worker 線程直接預加載模型。
             batchAdapter.prewarm(formData);
           }
         } catch (e) {
@@ -355,11 +355,11 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
         runtime.cancelled = true;
         runtime.paused = false;
         runtime.controller.abort();
-        // kill ffmpeg 提取；whisper 转写经 AbortSignal 同步中断
+        // kill ffmpeg 提取；whisper 轉寫經 AbortSignal 同步中斷
         killFfmpegForFiles(Array.from(runtime.activeFiles));
-        // 通知所有引擎中断进行中的转写（如 faster-whisper sidecar 的逐段取消）。
-        // 逐任务引擎下无全局"当前引擎"，对全部适配器调用 cancelActive；
-        // 未在运行的引擎为空操作（内置 whisper 已由 AbortSignal 中断）。
+        // 通知所有引擎中斷進行中的轉寫（如 faster-whisper sidecar 的逐段取消）。
+        // 逐任務引擎下無全局"當前引擎"，對全部適配器調用 cancelActive；
+        // 未在運行的引擎為空操作（內置 whisper 已由 AbortSignal 中斷）。
         for (const adapter of listEngineAdapters()) {
           try {
             adapter.cancelActive();
@@ -380,7 +380,7 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
     syncTranscriptionPowerSaveBlocker();
   });
 
-  // 获取指定工程的任务状态（无 projectId 时回退全局语义）
+  // 獲取指定工程的任務狀態（無 projectId 時回退全局語義）
   ipcMain.handle('getTaskStatus', (event, projectId?: string) => {
     if (!projectId) {
       return activeTasksCount > 0 || processingQueue.length > 0
@@ -397,11 +397,11 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
   });
 
   ipcMain.handle('checkMlmodel', async (event, modelName) => {
-    // 如果不是苹果芯片，不需要该文件，直接返回true
+    // 如果不是蘋果芯片，不需要該文件，直接返回true
     if (!isAppleSilicon()) {
       return true;
     }
-    // 判断模型目录下是否存在 `ggml-${modelName}-encoder.mlmodelc` 文件或者目录
+    // 判斷模型目錄下是否存在 `ggml-${modelName}-encoder.mlmodelc` 文件或者目錄
     const modelsPath = getPath('modelsPath');
     const modelPath = path.join(
       modelsPath,
@@ -412,18 +412,18 @@ export function setupTaskProcessor(mainWindow: BrowserWindow) {
   });
 }
 
-/** 工程全部完成且应用不在前台时发系统通知 */
+/** 工程全部完成且應用不在前臺時發系統通知 */
 function notifyProjectDone(event) {
   try {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win?.isFocused()) return;
     if (!Notification.isSupported()) return;
-    const lang = store.get('settings')?.language || 'zh';
+    const lang = store.get('settings')?.language || 'zh-TW';
     const notification = new Notification({
-      title: lang === 'zh' ? '任务全部完成' : 'All tasks completed',
+      title: lang === 'zh' ? '任務全部完成' : 'All tasks completed',
       body:
         lang === 'zh'
-          ? '字幕任务已处理完毕，点击查看结果'
+          ? '字幕任務已處理完畢，點擊查看結果'
           : 'Your subtitle tasks are done — click to view results',
     });
     notification.on('click', () => {
@@ -436,7 +436,7 @@ function notifyProjectDone(event) {
   }
 }
 
-/** 取出最多 limit 个可派发项（跳过暂停/已取消工程），其余留在队列 */
+/** 取出最多 limit 個可派發項（跳過暫停/已取消工程），其餘留在隊列 */
 function takeEligibleItems(limit: number): QueueItem[] {
   const taken: QueueItem[] = [];
   const rest: QueueItem[] = [];
@@ -454,15 +454,15 @@ function takeEligibleItems(limit: number): QueueItem[] {
 
 async function processNextTasks(event) {
   syncTranscriptionPowerSaveBlocker();
-  // 队列与执行均清空：全局收工
+  // 隊列與執行均清空：全局收工
   if (processingQueue.length === 0 && activeTasksCount === 0) {
     isProcessing = false;
     return;
   }
 
-  // 混合引擎并发钳制：只要"执行中"或"待派发(可派发)"任务里含 faster-whisper/funasr，
-  // 有效并发钳为 1（共享单 sidecar/worker，避免显存争用与取消句柄相互覆盖）；
-  // 纯 builtin/localCli 队列遵循用户配置的并发。
+  // 混合引擎併發鉗制：只要"執行中"或"待派發(可派發)"任務裡含 faster-whisper/funasr，
+  // 有效併發鉗為 1（共享單 sidecar/worker，避免顯存爭用與取消句柄相互覆蓋）；
+  // 純 builtin/localCli 隊列遵循用戶配置的併發。
   let effectiveMax = maxConcurrentTasks;
   try {
     let hasRestrictive = activeRestrictiveCount > 0;
@@ -478,10 +478,10 @@ async function processNextTasks(event) {
     }
     if (hasRestrictive) effectiveMax = 1;
   } catch {
-    // 解析引擎失败时回退到用户配置的并发
+    // 解析引擎失敗時回退到用戶配置的併發
   }
 
-  // 计算可以启动的新任务数量
+  // 計算可以啟動的新任務數量
   const availableSlots = effectiveMax - activeTasksCount;
 
   if (availableSlots > 0) {
@@ -502,8 +502,8 @@ async function processNextTasks(event) {
             (p) => p.id === task.formData.translateProvider,
           );
 
-          // 找不到服务商（'-1' 残留或已删除）时不加载扩展参数；
-          // 是否报错由翻译阶段判定，转写等阶段照常执行
+          // 找不到服務商（'-1' 殘留或已刪除）時不加載擴展參數；
+          // 是否報錯由翻譯階段判定，轉寫等階段照常執行
           const extendedProvider = baseProvider
             ? await createExtendedProvider(baseProvider)
             : undefined;
@@ -534,15 +534,15 @@ async function processNextTasks(event) {
           finalizeProjectIfDrained(event, task.projectId);
           syncTranscriptionPowerSaveBlocker();
           updateTaskbarProgress();
-          // 处理完一个任务后，检查是否可以启动新任务
+          // 處理完一個任務後，檢查是否可以啟動新任務
           processNextTasks(event);
         }
       });
     }
   }
 
-  // 有任务在跑（100ms）或队列里还躺着暂停项（500ms）：保持轮询，
-  // 这样 handleTask/resumeTask 之后的新增项总能被派发
+  // 有任務在跑（100ms）或隊列裡還躺著暫停項（500ms）：保持輪詢，
+  // 這樣 handleTask/resumeTask 之後的新增項總能被派發
   if (activeTasksCount > 0) {
     setTimeout(() => processNextTasks(event), 100);
   } else if (processingQueue.length > 0) {

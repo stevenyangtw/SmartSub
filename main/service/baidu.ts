@@ -11,17 +11,17 @@ export default async function baidu(
 ) {
   const { apiKey: appid, apiSecret: key } = proof || {};
   if (!appid || !key) {
-    console.log('请先配置 API KEY 和 API SECRET');
+    console.log('請先配置 API KEY 和 API SECRET');
     throw new Error('missingKeyOrSecret');
   }
 
-  // 支持字符串数组输入
+  // 支持字符串數組輸入
   const queryText = Array.isArray(query) ? query.join('\n') : query;
 
   const formatSourceLanguage = convertLanguageCode(sourceLanguage, 'baidu');
   const formatTargetLanguage = convertLanguageCode(targetLanguage, 'baidu');
   if (!formatSourceLanguage || !formatTargetLanguage) {
-    console.log('不支持的语言');
+    console.log('不支持的語言');
     throw new Error('not supported language');
   }
   const salt = new Date().getTime();
@@ -46,10 +46,10 @@ export default async function baidu(
     },
   );
   if (!res?.data?.trans_result) {
-    throw new Error(res?.data?.error_msg || '未知错误');
+    throw new Error(res?.data?.error_msg || '未知錯誤');
   }
 
-  // 如果输入是数组，返回结果也转换为数组
+  // 如果輸入是數組，返回結果也轉換為數組
   if (Array.isArray(query)) {
     return res.data.trans_result.map((item) => item.dst);
   }

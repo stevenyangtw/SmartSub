@@ -1,6 +1,6 @@
 /**
- * 统一日期版本比较（addon 与（未来）py 共用）。
- * 把分隔符归一为点号后按字符串比较，适配 YYYY.MM.DD / YYYY-MM-DD。
+ * 統一日期版本比較（addon 與（未來）py 共用）。
+ * 把分隔符歸一為點號後按字符串比較，適配 YYYY.MM.DD / YYYY-MM-DD。
  */
 export function normalizeDateVersion(version: string): string {
   return version.replace(/-/g, '.');

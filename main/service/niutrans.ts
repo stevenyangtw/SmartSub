@@ -5,11 +5,11 @@ import { TRANSLATION_REQUEST_TIMEOUT } from '../translate/constants';
 const NIUTRANS_API = 'https://api.niutrans.com/NiuTransServer/translation';
 
 /**
- * 小牛翻译（NiuTrans）文本翻译
- * 文档：https://niutrans.com/documents/contents/trans_text
- * 仅需 API-KEY（控制台 -> 个人中心），无需签名。
- * 文本翻译接口一次翻译一段文本，为保证与时间轴一一对应，默认 batchSize=1，
- * 这里对数组逐条翻译并返回等长数组。
+ * 小牛翻譯（NiuTrans）文本翻譯
+ * 文檔：https://niutrans.com/documents/contents/trans_text
+ * 僅需 API-KEY（控制台 -> 個人中心），無需簽名。
+ * 文本翻譯接口一次翻譯一段文本，為保證與時間軸一一對應，預設 batchSize=1，
+ * 這裡對數組逐條翻譯並返回等長數組。
  */
 export default async function niutrans(
   query: string | string[],
@@ -19,14 +19,14 @@ export default async function niutrans(
 ): Promise<string | string[]> {
   const { apiKey } = proof || {};
   if (!apiKey) {
-    console.log('请先配置小牛翻译 API Key');
+    console.log('請先配置小牛翻譯 API Key');
     throw new Error('missingKeyOrSecret');
   }
 
   const from = convertLanguageCode(sourceLanguage, 'niutrans') || 'auto';
   const to = convertLanguageCode(targetLanguage, 'niutrans');
   if (!to) {
-    console.log('不支持的语言');
+    console.log('不支持的語言');
     throw new Error('not supported language');
   }
 

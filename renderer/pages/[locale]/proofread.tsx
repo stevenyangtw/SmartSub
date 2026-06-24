@@ -14,10 +14,10 @@ import {
 } from '@/lib/proofreadUtils';
 import { useConfirmOrUndo } from '../../hooks/useConfirmOrUndo';
 
-// 工作流阶段
+// 工作流階段
 type WorkflowStage = 'import' | 'list' | 'edit';
 
-// 重新导出 PendingFile 类型供其他组件使用
+// 重新導出 PendingFile 類型供其他組件使用
 export type { PendingFile } from '@/lib/proofreadUtils';
 
 export default function ProofreadPage() {
@@ -26,7 +26,7 @@ export default function ProofreadPage() {
   const { t } = useTranslation('home');
   const confirmOrUndo = useConfirmOrUndo();
 
-  // 工作流状态
+  // 工作流狀態
   const [stage, setStage] = useState<WorkflowStage>('import');
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
   const [currentEditIndex, setCurrentEditIndex] = useState<number>(-1);
@@ -34,14 +34,14 @@ export default function ProofreadPage() {
   const [taskName, setTaskName] = useState<string>('');
   const [importType, setImportType] = useState<'video' | 'subtitle'>('video');
 
-  // 从历史任务加载
+  // 從歷史任務加載
   const handleLoadTask = useCallback(async (task: ProofreadTask) => {
-    // 使用工具函数为每个项目加载可用字幕
+    // 使用工具函數為每個項目加載可用字幕
     const files: PendingFile[] = await Promise.all(
       task.items.map((item) => loadPendingFileFromItem(item)),
     );
 
-    // 判断导入类型
+    // 判斷導入類型
     const hasVideo = task.items.some((item) => item.videoPath);
     setImportType(hasVideo ? 'video' : 'subtitle');
 
@@ -51,7 +51,7 @@ export default function ProofreadPage() {
     setStage('list');
   }, []);
 
-  // 从启动台 deep link 加载已保存的校对批次
+  // 從啟動臺 deep link 加載已保存的校對批次
   useEffect(() => {
     if (typeof workItemQuery !== 'string' || !workItemQuery) return;
 
@@ -73,13 +73,13 @@ export default function ProofreadPage() {
     };
   }, [workItemQuery, handleLoadTask]);
 
-  // 导入完成后进入列表
+  // 導入完成後進入列表
   const handleImportComplete = useCallback(
     (files: PendingFile[], type: 'video' | 'subtitle') => {
       setPendingFiles(files);
       setSavedTaskId(null);
       setImportType(type);
-      // 默认任务名为第一个文件名（去除扩展名）
+      // 預設任務名為第一個文件名（去除擴展名）
       const defaultName = files[0]?.fileName?.replace(/\.[^.]+$/, '') || '';
       setTaskName(defaultName);
       setStage('list');
@@ -87,7 +87,7 @@ export default function ProofreadPage() {
     [],
   );
 
-  // 开始校对某个文件
+  // 開始校對某個文件
   const handleStartProofread = useCallback((index: number) => {
     setCurrentEditIndex(index);
     setPendingFiles((prev) => {
@@ -98,7 +98,7 @@ export default function ProofreadPage() {
     setStage('edit');
   }, []);
 
-  // 标记完成，返回列表
+  // 標記完成，返回列表
   const handleMarkComplete = useCallback(() => {
     setPendingFiles((prev) => {
       const next = [...prev];
@@ -112,7 +112,7 @@ export default function ProofreadPage() {
     setStage('list');
   }, [currentEditIndex]);
 
-  // 返回列表（不标记完成）
+  // 返回列表（不標記完成）
   const handleBackToList = useCallback(() => {
     setCurrentEditIndex(-1);
     setStage('list');
@@ -130,7 +130,7 @@ export default function ProofreadPage() {
     [],
   );
 
-  // 删除文件（可撤销）
+  // 刪除文件（可撤銷）
   const handleRemoveFile = useCallback(
     (index: number) => {
       let removed: PendingFile | undefined;
@@ -156,19 +156,19 @@ export default function ProofreadPage() {
     setPendingFiles((prev) => [...prev, ...newFiles]);
   }, []);
 
-  // 保存任务
+  // 保存任務
   const handleSaveTask = useCallback(async () => {
-    // 使用工具函数转换为保存格式
+    // 使用工具函數轉換為保存格式
     const items = pendingFiles.map(pendingFileToSaveFormat);
 
     if (savedTaskId) {
-      // 更新现有任务
+      // 更新現有任務
       await window.ipc.invoke('updateProofreadTask', {
         taskId: savedTaskId,
         updates: { items, name: taskName },
       });
     } else {
-      // 创建新任务
+      // 創建新任務
       const result = await window.ipc.invoke('createProofreadTask', {
         items,
         name:
@@ -183,7 +183,7 @@ export default function ProofreadPage() {
     return true;
   }, [pendingFiles, savedTaskId, taskName]);
 
-  // 重置，开始新的导入（可撤销）
+  // 重置，開始新的導入（可撤銷）
   const handleReset = useCallback(() => {
     const prev = {
       pendingFiles,
@@ -220,16 +220,16 @@ export default function ProofreadPage() {
     t,
   ]);
 
-  // 自动保存：当已保存的任务有变化时自动更新
+  // 自動保存：當已保存的任務有變化時自動更新
   const isInitialMount = useRef(true);
   useEffect(() => {
-    // 跳过首次加载
+    // 跳過首次加載
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
 
-    // 只有在已保存任务且列表不为空时才自动保存
+    // 只有在已保存任務且列表不為空時才自動保存
     if (savedTaskId && pendingFiles.length > 0 && stage === 'list') {
       const autoSaveTimeout = setTimeout(async () => {
         try {
@@ -243,7 +243,7 @@ export default function ProofreadPage() {
     }
   }, [pendingFiles, savedTaskId, stage]);
 
-  // 渲染当前阶段
+  // 渲染當前階段
   const renderStage = () => {
     switch (stage) {
       case 'import':
@@ -283,7 +283,7 @@ export default function ProofreadPage() {
 
   return (
     <div className="h-full p-4 overflow-hidden flex flex-col gap-4">
-      {/* 仅导入阶段显示枢纽页大标题；列表/编辑阶段为工作页，用自带的返回箭头头部 */}
+      {/* 僅導入階段顯示樞紐頁大標題；列表/編輯階段為工作頁，用自帶的返回箭頭頭部 */}
       {stage === 'import' && (
         <PageHeader
           title={t('proofreadPageTitle')}

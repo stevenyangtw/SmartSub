@@ -20,7 +20,7 @@ export function backendDisplay(info: AddonLoadResultInfo | null): string {
   return BACKEND_LABELS[info.backend] || info.backend;
 }
 
-/** macOS 转写结果在 Windows 模拟下、或反之，不应作为当前平台状态展示 */
+/** macOS 轉寫結果在 Windows 模擬下、或反之，不應作為當前平臺狀態展示 */
 export function isActiveBackendStaleForPlatform(
   active: AddonLoadResultInfo | null,
   gpuEnv: GpuEnvironment,

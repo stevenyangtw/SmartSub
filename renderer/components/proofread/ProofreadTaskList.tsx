@@ -37,7 +37,7 @@ export default function ProofreadTaskList({
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  // 加载任务列表
+  // 加載任務列表
   const loadTasks = useCallback(async () => {
     setLoading(true);
     try {
@@ -56,7 +56,7 @@ export default function ProofreadTaskList({
     loadTasks();
   }, [loadTasks]);
 
-  // 删除任务
+  // 刪除任務
   const handleDeleteTask = useCallback(
     async (taskId: string) => {
       try {
@@ -74,7 +74,7 @@ export default function ProofreadTaskList({
     [loadTasks],
   );
 
-  // 计算任务进度
+  // 計算任務進度
   const getTaskProgress = (task: ProofreadTask) => {
     const completed = task.items.filter((i) => i.status === 'completed').length;
     return {
@@ -87,7 +87,7 @@ export default function ProofreadTaskList({
     };
   };
 
-  // 格式化时间
+  // 格式化時間
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
   };
@@ -136,7 +136,7 @@ export default function ProofreadTaskList({
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                     <span>
                       {t('itemsCount', { count: task.items.length }) ||
-                        `${task.items.length} 个文件`}
+                        `${task.items.length} 個文件`}
                     </span>
                     <span>{formatDate(task.updatedAt)}</span>
                   </div>
@@ -171,7 +171,7 @@ export default function ProofreadTaskList({
         );
       })}
 
-      {/* 删除确认对话框 */}
+      {/* 刪除確認對話框 */}
       <AlertDialog
         open={!!deleteConfirm}
         onOpenChange={() => setDeleteConfirm(null)}

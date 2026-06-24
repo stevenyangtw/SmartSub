@@ -23,7 +23,7 @@ import { resolveModelDownloadUrl } from 'lib/resolveModelDownloadUrl';
 
 type QwenModelId = 'qwen3-asr-0.6b';
 
-/** qwen 模型下载源（与主进程 QwenModelSource 一致）：国内优先 ModelScope。 */
+/** qwen 模型下載源（與主進程 QwenModelSource 一致）：國內優先 ModelScope。 */
 type QwenModelSource = 'modelscope' | 'ghproxy' | 'github';
 const QWEN_MODEL_SOURCES: QwenModelSource[] = [
   'modelscope',
@@ -77,7 +77,7 @@ const QwenModelSection: React.FC<{ onUpdate?: () => void }> = ({
       const r = await window?.ipc?.invoke('getQwenModelStatus');
       if (r?.success) setStatus(r as QwenModelStatus);
     } catch {
-      // 保持上次状态
+      // 保持上次狀態
     }
   }, []);
 
@@ -113,7 +113,7 @@ const QwenModelSection: React.FC<{ onUpdate?: () => void }> = ({
   const qwenInstalled =
     status?.models.find((m) => m.id === 'qwen3-asr-0.6b')?.installed ?? false;
 
-  // 下载源在「点击下载时」于气泡内选择（与各引擎统一）。
+  // 下載源在「點擊下載時」於氣泡內選擇（與各引擎統一）。
   const sourceConfig: DownloadSourceConfig = {
     value: source,
     options: QWEN_MODEL_SOURCES.map((s) => ({

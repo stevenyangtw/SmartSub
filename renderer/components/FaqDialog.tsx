@@ -14,7 +14,7 @@ interface FaqDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/** hasCommand 的条目在答案下方以 <code> 块展示可复制命令（key 后缀 Cmd） */
+/** hasCommand 的條目在答案下方以 <code> 塊展示可複製命令（key 後綴 Cmd） */
 const FAQ_ITEMS = [
   { id: 'macDamaged', hasCommand: true },
   { id: 'cudaCrash', hasCommand: false },

@@ -43,13 +43,13 @@ import type {
 let mainWindow: BrowserWindow | null = null;
 
 /**
- * 设置主窗口引用
+ * 設置主窗口引用
  */
 export function setMainWindowForAddon(window: BrowserWindow): void {
   mainWindow = window;
   getAddonDownloader(window);
 
-  // 加载降级 / 后端变更事件推送到渲染层
+  // 加載降級 / 後端變更事件推送到渲染層
   setFallbackNotifier((event) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('addon-fallback', event);
@@ -63,10 +63,10 @@ export function setMainWindowForAddon(window: BrowserWindow): void {
 }
 
 /**
- * 注册所有加速包相关的 IPC 处理程序
+ * 註冊所有加速包相關的 IPC 處理程序
  */
 export function registerAddonIpcHandlers(): void {
-  // 获取 CUDA 环境信息
+  // 獲取 CUDA 環境信息
   ipcMain.handle('get-cuda-environment', async () => {
     try {
       const env = await getCudaEnvironment();
@@ -77,7 +77,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 获取跨厂商 GPU 环境信息
+  // 獲取跨廠商 GPU 環境信息
   ipcMain.handle(
     'get-gpu-environment',
     async (_event, forceRefresh?: boolean) => {
@@ -93,7 +93,7 @@ export function registerAddonIpcHandlers(): void {
     },
   );
 
-  // 获取当前生效的后端（最近一次加载结果）
+  // 獲取當前生效的後端（最近一次加載結果）
   ipcMain.handle('get-active-backend', async () => {
     try {
       return getActiveBackend();
@@ -103,7 +103,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 获取已安装的加速包列表
+  // 獲取已安裝的加速包列表
   ipcMain.handle('get-installed-addons', async () => {
     try {
       return getInstalledAddons();
@@ -113,7 +113,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 获取加速包配置
+  // 獲取加速包配置
   ipcMain.handle('get-addon-config', async () => {
     try {
       return getAddonConfig();
@@ -123,7 +123,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 获取当前选中的加速包版本
+  // 獲取當前選中的加速包版本
   ipcMain.handle('get-selected-addon-version', async () => {
     try {
       return getSelectedAddonVersion();
@@ -133,7 +133,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 选择加速包版本
+  // 選擇加速包版本
   ipcMain.handle(
     'select-addon-version',
     async (event, version: AddonVariant) => {
@@ -148,25 +148,25 @@ export function registerAddonIpcHandlers(): void {
     },
   );
 
-  // 开始下载加速包（立即返回，不等待下载完成）
+  // 開始下載加速包（立即返回，不等待下載完成）
   ipcMain.handle(
     'start-addon-download',
     async (event, config: DownloadConfig) => {
       try {
         const downloader = getAddonDownloader(mainWindow || undefined);
 
-        // 异步启动下载，不等待完成
+        // 異步啟動下載，不等待完成
         downloader
           .download(config.source, config.variant, config.type)
           .then(async () => {
-            // 下载完成后注册加速包并自动选中
+            // 下載完成後註冊加速包並自動選中
             const remoteInfo = await getRemoteVersionInfo(config.variant);
             registerInstalledAddon(
               config.variant,
               remoteInfo?.version ||
                 new Date().toISOString().split('T')[0].replace(/-/g, '.'),
             );
-            // 自动选中刚下载的版本
+            // 自動選中剛下載的版本
             selectAddonVersion(config.variant);
             clearAddonLoadCache();
             logMessage(
@@ -178,7 +178,7 @@ export function registerAddonIpcHandlers(): void {
             logMessage(`Download failed: ${error}`, 'error');
           });
 
-        // 立即返回，表示下载已启动
+        // 立即返回，表示下載已啟動
         return { success: true, started: true };
       } catch (error) {
         logMessage(`Error starting addon download: ${error}`, 'error');
@@ -187,7 +187,7 @@ export function registerAddonIpcHandlers(): void {
     },
   );
 
-  // 取消下载
+  // 取消下載
   ipcMain.handle('cancel-addon-download', async () => {
     try {
       const downloader = getAddonDownloader();
@@ -199,7 +199,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 删除加速包
+  // 刪除加速包
   ipcMain.handle('remove-addon', async (event, version: AddonVariant) => {
     try {
       await removeAddon(version);
@@ -211,7 +211,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 检查加速包更新
+  // 檢查加速包更新
   ipcMain.handle('check-addon-updates', async () => {
     try {
       const updates = await checkAllUpdates();
@@ -222,7 +222,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 获取远程版本信息
+  // 獲取遠程版本信息
   ipcMain.handle('get-remote-addon-versions', async () => {
     try {
       return await fetchRemoteVersions();
@@ -255,7 +255,7 @@ export function registerAddonIpcHandlers(): void {
     },
   );
 
-  // 获取加速包摘要信息
+  // 獲取加速包摘要信息
   ipcMain.handle('get-addon-summary', async () => {
     try {
       return getAddonSummary();
@@ -270,12 +270,12 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 检查平台是否支持 CUDA
+  // 檢查平臺是否支持 CUDA
   ipcMain.handle('is-platform-cuda-capable', async () => {
     return isPlatformCudaCapable();
   });
 
-  // 获取下载 URL（用于显示或手动下载）
+  // 獲取下載 URL（用於顯示或手動下載）
   ipcMain.handle(
     'get-addon-download-url',
     async (
@@ -298,7 +298,7 @@ export function registerAddonIpcHandlers(): void {
     },
   );
 
-  // 选择自定义 addon.node 文件
+  // 選擇自定義 addon.node 文件
   ipcMain.handle('select-addon-file', async () => {
     try {
       const result = await dialog.showOpenDialog({
@@ -323,7 +323,7 @@ export function registerAddonIpcHandlers(): void {
     }
   });
 
-  // 设置自定义 addon.node 路径
+  // 設置自定義 addon.node 路徑
   ipcMain.handle(
     'set-custom-addon-path',
     async (event, filePath: string | null) => {
@@ -338,7 +338,7 @@ export function registerAddonIpcHandlers(): void {
     },
   );
 
-  // 获取自定义 addon.node 路径
+  // 獲取自定義 addon.node 路徑
   ipcMain.handle('get-custom-addon-path', async () => {
     try {
       return getCustomAddonPath();

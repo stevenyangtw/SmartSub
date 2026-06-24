@@ -5,15 +5,15 @@ import {
   getGithubProxyPrefix,
 } from '../config/downloadConfig';
 
-/** 同一发布物在 GitHub 与 GitCode 上的仓库 slug 往往不同，必须分开声明。 */
+/** 同一發佈物在 GitHub 與 GitCode 上的倉庫 slug 往往不同，必須分開聲明。 */
 export interface ReleaseRepoSlugs {
   github: string;
   gitcode: string;
 }
 
 /**
- * 统一解析某下载源下的 release 基础 URL（不含末尾斜杠）。
- * 各源 base / 代理前缀均来自可配置的下载端点（用户可在设置页覆盖）。
+ * 統一解析某下載源下的 release 基礎 URL（不含末尾斜槓）。
+ * 各源 base / 代理前綴均來自可配置的下載端點（用戶可在設置頁覆蓋）。
  * - github:  {githubBase}/{slugs.github}/releases/download/{tag}
  * - ghproxy: {githubProxyPrefix}/{github url}
  * - gitcode: {gitcodeBase}/{slugs.gitcode}/releases/download/{tag}

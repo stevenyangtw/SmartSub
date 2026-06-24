@@ -5,39 +5,39 @@ import { APP_DISPLAY_NAME } from './appBranding';
 type MenuLanguage = 'zh' | 'en';
 
 /**
- * 应用菜单本地化字典。
- * 主进程不引 i18n 运行时，菜单条目有限，直接维护双语字典。
+ * 應用菜單本地化字典。
+ * 主進程不引 i18n 運行時，菜單條目有限，直接維護雙語字典。
  */
 const LABELS: Record<MenuLanguage, Record<string, string>> = {
   zh: {
-    about: '关于 %s',
-    hide: '隐藏 %s',
-    hideOthers: '隐藏其他',
-    unhide: '全部显示',
+    about: '關於 %s',
+    hide: '隱藏 %s',
+    hideOthers: '隱藏其他',
+    unhide: '全部顯示',
     quit: '退出 %s',
     file: '文件',
-    edit: '编辑',
-    undo: '撤销',
+    edit: '編輯',
+    undo: '撤銷',
     redo: '重做',
     cut: '剪切',
-    copy: '复制',
-    paste: '粘贴',
-    selectAll: '全选',
-    view: '视图',
-    reload: '重新加载',
-    toggleDevTools: '开发者工具',
-    resetZoom: '实际大小',
+    copy: '複製',
+    paste: '粘貼',
+    selectAll: '全選',
+    view: '視圖',
+    reload: '重新加載',
+    toggleDevTools: '開發者工具',
+    resetZoom: '實際大小',
     zoomIn: '放大',
-    zoomOut: '缩小',
-    togglefullscreen: '切换全屏',
+    zoomOut: '縮小',
+    togglefullscreen: '切換全屏',
     window: '窗口',
     minimize: '最小化',
-    close: '关闭窗口',
-    help: '帮助',
-    checkUpdates: '检查更新…',
-    openLogs: '查看日志',
-    github: 'GitHub 仓库',
-    reportIssue: '反馈问题',
+    close: '關閉窗口',
+    help: '幫助',
+    checkUpdates: '檢查更新…',
+    openLogs: '查看日誌',
+    github: 'GitHub 倉庫',
+    reportIssue: '反饋問題',
   },
   en: {
     about: 'About %s',
@@ -83,7 +83,7 @@ function resolveLanguage(): MenuLanguage {
   return app.getLocale().toLowerCase().startsWith('zh') ? 'zh' : 'en';
 }
 
-/** 发事件给 renderer 前确保窗口可见（菜单可能在窗口隐藏时触发） */
+/** 發事件給 renderer 前確保窗口可見（菜單可能在窗口隱藏時觸發） */
 function sendToRenderer(channel: string) {
   const win = mainWindowRef;
   if (!win || win.isDestroyed()) return;
@@ -187,7 +187,7 @@ export function setupAppMenu(mainWindow: BrowserWindow) {
   buildAppMenu();
 }
 
-/** 语言切换后重建菜单（由 setSettings 拦截调用） */
+/** 語言切換後重建菜單（由 setSettings 攔截調用） */
 export function rebuildAppMenu(language?: string) {
   buildAppMenu(
     language === 'zh' || language === 'en' ? language : resolveLanguage(),

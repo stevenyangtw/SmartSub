@@ -4,8 +4,8 @@ import os from 'os';
 import { spawn } from 'child_process';
 
 /**
- * 敏感字段列表（小写形式，用于不区分大小写匹配）
- * 包含 API 密钥、密码、令牌等敏感信息的字段名
+ * 敏感字段列表（小寫形式，用於不區分大小寫匹配）
+ * 包含 API 密鑰、密碼、令牌等敏感信息的字段名
  */
 const SENSITIVE_FIELDS = [
   'apikey',
@@ -31,7 +31,7 @@ const SENSITIVE_FIELDS = [
 ];
 
 /**
- * 检查字段名是否为敏感字段
+ * 檢查字段名是否為敏感字段
  */
 function isSensitiveField(fieldName: string): boolean {
   const lowerFieldName = fieldName.toLowerCase();
@@ -42,8 +42,8 @@ function isSensitiveField(fieldName: string): boolean {
 }
 
 /**
- * 对敏感值进行脱敏处理
- * 保留前2位和后2位，中间用 **** 替换
+ * 對敏感值進行脫敏處理
+ * 保留前2位和後2位，中間用 **** 替換
  */
 function maskValue(value: string): string {
   if (!value || typeof value !== 'string') {
@@ -62,9 +62,9 @@ function maskValue(value: string): string {
 }
 
 /**
- * 递归处理对象，对敏感字段进行脱敏
- * @param obj 要处理的对象
- * @param maxDepth 最大递归深度，防止循环引用
+ * 遞歸處理對象，對敏感字段進行脫敏
+ * @param obj 要處理的對象
+ * @param maxDepth 最大遞歸深度，防止循環引用
  */
 export function sanitizeObject(obj: any, maxDepth: number = 10): any {
   if (maxDepth <= 0) {
@@ -86,11 +86,11 @@ export function sanitizeObject(obj: any, maxDepth: number = 10): any {
   const sanitized: Record<string, any> = {};
   for (const [key, value] of Object.entries(obj)) {
     if (isSensitiveField(key)) {
-      // 对敏感字段进行脱敏
+      // 對敏感字段進行脫敏
       sanitized[key] =
         typeof value === 'string' ? maskValue(value) : '[REDACTED]';
     } else if (typeof value === 'object' && value !== null) {
-      // 递归处理嵌套对象
+      // 遞歸處理嵌套對象
       sanitized[key] = sanitizeObject(value, maxDepth - 1);
     } else {
       sanitized[key] = value;
@@ -101,8 +101,8 @@ export function sanitizeObject(obj: any, maxDepth: number = 10): any {
 }
 
 /**
- * 对日志消息进行脱敏处理
- * 支持处理字符串中的 JSON 对象和常见敏感值模式
+ * 對日誌消息進行脫敏處理
+ * 支持處理字符串中的 JSON 對象和常見敏感值模式
  */
 export function sanitizeLogMessage(message: string): string {
   if (!message || typeof message !== 'string') {
@@ -111,7 +111,7 @@ export function sanitizeLogMessage(message: string): string {
 
   let sanitized = message;
 
-  // 尝试检测和处理 JSON 对象
+  // 嘗試檢測和處理 JSON 對象
   const jsonPattern = /\{[\s\S]*\}/g;
   const jsonMatches = message.match(jsonPattern);
 
@@ -125,12 +125,12 @@ export function sanitizeLogMessage(message: string): string {
           JSON.stringify(sanitizedObj, null, 2),
         );
       } catch {
-        // 不是有效的 JSON，继续处理下一个
+        // 不是有效的 JSON，繼續處理下一個
       }
     }
   }
 
-  // 处理常见的敏感值模式（如 apiKey: "xxx", "apiKey": "xxx"）
+  // 處理常見的敏感值模式（如 apiKey: "xxx", "apiKey": "xxx"）
   const sensitivePatterns = SENSITIVE_FIELDS.map((field) => {
     // 匹配 key: "value" 或 key: 'value' 或 "key": "value" 等模式
     const pattern = new RegExp(
@@ -149,7 +149,7 @@ export function sanitizeLogMessage(message: string): string {
   return sanitized;
 }
 
-// 将字符串转成模板字符串
+// 將字符串轉成模板字符串
 export const renderTemplate = (template, data) => {
   let result = template;
   for (const [key, value] of Object.entries(data)) {
@@ -223,14 +223,14 @@ function throttle(func, limit) {
   };
 }
 
-// 删除 processFile 函数
+// 刪除 processFile 函數
 
 export const defaultUserConfig = {
   sourceLanguage: 'en',
   targetLanguage: 'zh',
   customTargetSrtFileName: '${fileName}.${targetLanguage}',
   customSourceSrtFileName: '${fileName}.${sourceLanguage}',
-  // 逐任务引擎：任务携带引擎，后端按此解析执行（缺省 builtin，任务页默认逻辑会按"上次使用"细化）
+  // 逐任務引擎：任務攜帶引擎，後端按此解析執行（缺省 builtin，任務頁預設邏輯會按"上次使用"細化）
   transcriptionEngine: 'builtin',
   model: 'tiny',
   translateProvider: 'baidu',
@@ -264,71 +264,71 @@ export function getSrtFileName(
 }
 
 /**
- * 支持的语言列表
- * 优化结构：默认使用 value 作为各平台的语言代码
- * 只有当某平台的代码与 value 不同时才显式定义，不支持则定义为 null
+ * 支持的語言列表
+ * 優化結構：預設使用 value 作為各平臺的語言代碼
+ * 只有當某平臺的代碼與 value 不同時才顯式定義，不支持則定義為 null
  */
 export const supportedLanguage = [
-  // 最常用语言
-  // 讯飞机器翻译简体中文代码为 cn（非 zh）；小牛/腾讯均使用 zh
+  // 最常用語言
+  // 訊飛機器翻譯簡體中文代碼為 cn（非 zh）；小牛/騰訊均使用 zh
   { name: '中文', value: 'zh', xunfei: 'cn' },
-  { name: '英语', value: 'en' },
-  { name: '日语', value: 'ja', baidu: 'jp' },
-  { name: '韩语', value: 'ko', baidu: 'kor' },
-  { name: '法语', value: 'fr', baidu: 'fra' },
-  { name: '德语', value: 'de' },
-  { name: '西班牙语', value: 'es', baidu: 'spa' },
-  { name: '俄语', value: 'ru' },
-  { name: '葡萄牙语', value: 'pt' },
-  { name: '意大利语', value: 'it' },
+  { name: '英語', value: 'en' },
+  { name: '日語', value: 'ja', baidu: 'jp' },
+  { name: '韓語', value: 'ko', baidu: 'kor' },
+  { name: '法語', value: 'fr', baidu: 'fra' },
+  { name: '德語', value: 'de' },
+  { name: '西班牙語', value: 'es', baidu: 'spa' },
+  { name: '俄語', value: 'ru' },
+  { name: '葡萄牙語', value: 'pt' },
+  { name: '意大利語', value: 'it' },
 
-  // 其他欧洲语言
-  { name: '荷兰语', value: 'nl' },
-  { name: '波兰语', value: 'pl' },
-  { name: '土耳其语', value: 'tr', baidu: null },
-  { name: '瑞典语', value: 'sv', baidu: 'swe' },
-  { name: '捷克语', value: 'cs' },
-  { name: '丹麦语', value: 'da', baidu: 'dan' },
-  { name: '芬兰语', value: 'fi', baidu: 'fin' },
-  { name: '希腊语', value: 'el', doubao: null },
-  { name: '匈牙利语', value: 'hu' },
-  { name: '挪威语', value: 'no', baidu: null, doubao: 'nb' },
-  { name: '罗马尼亚语', value: 'ro', baidu: 'rom' },
-  { name: '斯洛伐克语', value: 'sk', baidu: null, doubao: null },
-  { name: '克罗地亚语', value: 'hr', baidu: null },
-  { name: '塞尔维亚语', value: 'sr', baidu: null, doubao: null },
-  { name: '斯洛文尼亚语', value: 'sl', baidu: 'slo', doubao: null },
-  { name: '保加利亚语', value: 'bg', baidu: 'bul', doubao: null },
-  { name: '乌克兰语', value: 'uk', baidu: null },
-  { name: '爱沙尼亚语', value: 'et', baidu: 'est', doubao: null },
-  { name: '拉脱维亚语', value: 'lv', baidu: null, doubao: null },
-  { name: '立陶宛语', value: 'lt', baidu: null, doubao: null },
+  // 其他歐洲語言
+  { name: '荷蘭語', value: 'nl' },
+  { name: '波蘭語', value: 'pl' },
+  { name: '土耳其語', value: 'tr', baidu: null },
+  { name: '瑞典語', value: 'sv', baidu: 'swe' },
+  { name: '捷克語', value: 'cs' },
+  { name: '丹麥語', value: 'da', baidu: 'dan' },
+  { name: '芬蘭語', value: 'fi', baidu: 'fin' },
+  { name: '希臘語', value: 'el', doubao: null },
+  { name: '匈牙利語', value: 'hu' },
+  { name: '挪威語', value: 'no', baidu: null, doubao: 'nb' },
+  { name: '羅馬尼亞語', value: 'ro', baidu: 'rom' },
+  { name: '斯洛伐克語', value: 'sk', baidu: null, doubao: null },
+  { name: '克羅地亞語', value: 'hr', baidu: null },
+  { name: '塞爾維亞語', value: 'sr', baidu: null, doubao: null },
+  { name: '斯洛文尼亞語', value: 'sl', baidu: 'slo', doubao: null },
+  { name: '保加利亞語', value: 'bg', baidu: 'bul', doubao: null },
+  { name: '烏克蘭語', value: 'uk', baidu: null },
+  { name: '愛沙尼亞語', value: 'et', baidu: 'est', doubao: null },
+  { name: '拉脫維亞語', value: 'lv', baidu: null, doubao: null },
+  { name: '立陶宛語', value: 'lt', baidu: null, doubao: null },
 
-  // 亚洲语言
-  { name: '印地语', value: 'hi', baidu: null, doubao: null },
-  { name: '泰语', value: 'th' },
-  { name: '越南语', value: 'vi', baidu: 'vie' },
-  { name: '印度尼西亚语', value: 'id', baidu: null },
-  { name: '马来语', value: 'ms', baidu: null },
-  { name: '泰米尔语', value: 'ta', baidu: null, doubao: null },
-  { name: '乌尔都语', value: 'ur', baidu: null, doubao: null },
-  { name: '马拉地语', value: 'mr', baidu: null, doubao: null },
+  // 亞洲語言
+  { name: '印地語', value: 'hi', baidu: null, doubao: null },
+  { name: '泰語', value: 'th' },
+  { name: '越南語', value: 'vi', baidu: 'vie' },
+  { name: '印度尼西亞語', value: 'id', baidu: null },
+  { name: '馬來語', value: 'ms', baidu: null },
+  { name: '泰米爾語', value: 'ta', baidu: null, doubao: null },
+  { name: '烏爾都語', value: 'ur', baidu: null, doubao: null },
+  { name: '馬拉地語', value: 'mr', baidu: null, doubao: null },
 
-  // 中东语言
-  { name: '阿拉伯语', value: 'ar', baidu: 'ara' },
-  { name: '希伯来语', value: 'he', baidu: null, doubao: null },
-  { name: '波斯语', value: 'fa', baidu: null, doubao: null },
+  // 中東語言
+  { name: '阿拉伯語', value: 'ar', baidu: 'ara' },
+  { name: '希伯來語', value: 'he', baidu: null, doubao: null },
+  { name: '波斯語', value: 'fa', baidu: null, doubao: null },
 
-  // 其他语言
-  { name: '阿非利堪斯语', value: 'af', baidu: null, doubao: null },
-  { name: '加泰罗尼亚语', value: 'ca', baidu: null, doubao: null },
-  { name: '加利西亚语', value: 'gl', baidu: null, doubao: null },
-  { name: '塔加洛语', value: 'tl', baidu: null, doubao: null },
-  { name: '斯瓦希里语', value: 'sw', baidu: null, doubao: null },
-  { name: '威尔士语', value: 'cy', baidu: null, doubao: null },
-  { name: '蒙古语', value: 'mn', baidu: null, volc: null, doubao: null },
+  // 其他語言
+  { name: '阿非利堪斯語', value: 'af', baidu: null, doubao: null },
+  { name: '加泰羅尼亞語', value: 'ca', baidu: null, doubao: null },
+  { name: '加利西亞語', value: 'gl', baidu: null, doubao: null },
+  { name: '塔加洛語', value: 'tl', baidu: null, doubao: null },
+  { name: '斯瓦希里語', value: 'sw', baidu: null, doubao: null },
+  { name: '威爾士語', value: 'cy', baidu: null, doubao: null },
+  { name: '蒙古語', value: 'mn', baidu: null, volc: null, doubao: null },
   {
-    name: '繁体中文',
+    name: '繁體中文',
     value: 'zh-Hant',
     baidu: 'cht',
     aliyun: 'zh-tw',
@@ -337,11 +337,11 @@ export const supportedLanguage = [
     tencent: 'zh-TW',
     xunfei: 'cht',
   },
-  // 粤语：主要用于 Whisper 语音识别源语言；Google 翻译无粤语，标记为不支持
-  { name: '粤语', value: 'yue', google: null },
+  // 粵語：主要用於 Whisper 語音識別源語言；Google 翻譯無粵語，標記為不支持
+  { name: '粵語', value: 'yue', google: null },
 ];
 
-// 翻译平台类型
+// 翻譯平臺類型
 type TranslateProvider =
   | 'baidu'
   | 'volc'
@@ -353,8 +353,8 @@ type TranslateProvider =
   | 'xunfei';
 
 /**
- * 语言代码转换函数
- * 优化逻辑：如果平台有显式定义则使用定义值（包括 null 表示不支持），否则使用 value 作为默认值
+ * 語言代碼轉換函數
+ * 優化邏輯：如果平臺有顯式定義則使用定義值（包括 null 表示不支持），否則使用 value 作為預設值
  */
 export const convertLanguageCode = (
   code: string,
@@ -363,11 +363,11 @@ export const convertLanguageCode = (
   const lang = supportedLanguage.find((lang) => lang.value === code);
   if (!lang) return code;
 
-  // 检查是否有显式定义该平台的映射（包括 null）
+  // 檢查是否有顯式定義該平臺的映射（包括 null）
   if (target in lang) {
     return lang[target] as string | null;
   }
 
-  // 没有显式定义，使用 value 作为默认值
+  // 沒有顯式定義，使用 value 作為預設值
   return lang.value;
 };

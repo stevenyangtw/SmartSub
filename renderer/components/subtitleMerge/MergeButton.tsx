@@ -1,5 +1,5 @@
 /**
- * 输出控件与合成按钮组件（进度/成功/错误状态由预览区浮层呈现）
+ * 輸出控件與合成按鈕組件（進度/成功/錯誤狀態由預覽區浮層呈現）
  */
 
 import React from 'react';
@@ -48,7 +48,7 @@ export default function MergeButton({
 }: MergeButtonProps) {
   const { t } = useTranslation('subtitleMerge');
   const isProcessing = status === 'processing';
-  // 画质仅对硬字幕烧录生效；软封装为流复制无损，无需该选项
+  // 畫質僅對硬字幕燒錄生效；軟封裝為流複製無損，無需該選項
   const isHardcode = outputMode === 'hardcode';
   const qualityOptions: Array<{ value: VideoQuality; label: string }> = [
     { value: 'original', label: t('videoQualityOriginal') },
@@ -79,7 +79,7 @@ export default function MergeButton({
   return (
     <TooltipProvider>
       <div className="space-y-3">
-        {/* 输出方式 */}
+        {/* 輸出方式 */}
         <div className="space-y-2">
           <Label className="text-sm">{t('outputMode')}</Label>
           <div className="grid grid-cols-2 gap-2">
@@ -110,7 +110,7 @@ export default function MergeButton({
           </div>
         </div>
 
-        {/* 导出画质（仅烧录硬字幕生效；提示移入 HelpHint 以压缩高度） */}
+        {/* 導出畫質（僅燒錄硬字幕生效；提示移入 HelpHint 以壓縮高度） */}
         {isHardcode && (
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5">
@@ -136,7 +136,7 @@ export default function MergeButton({
           </div>
         )}
 
-        {/* 输出路径：标签 + 输入框 + 选择按钮 同行 */}
+        {/* 輸出路徑：標籤 + 輸入框 + 選擇按鈕 同行 */}
         <div className="flex items-center gap-2">
           <Label className="shrink-0 text-sm">{t('outputPath')}</Label>
           <Input
@@ -156,7 +156,7 @@ export default function MergeButton({
           </Button>
         </div>
 
-        {/* 合并按钮 */}
+        {/* 合併按鈕 */}
         <Button
           className="w-full"
           size="lg"

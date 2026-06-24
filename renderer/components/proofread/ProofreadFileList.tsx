@@ -151,7 +151,7 @@ export default function ProofreadFileList({
   const [saving, setSaving] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
 
-  // 手动选择源字幕
+  // 手動選擇源字幕
   const handleSelectSourceSubtitle = useCallback(
     async (index: number) => {
       const result = await window.ipc.invoke('selectFiles', {
@@ -165,7 +165,7 @@ export default function ProofreadFileList({
         });
         const language = langResult.success ? langResult.data?.code : undefined;
 
-        // 检查是否已存在于 detectedSubtitles 中
+        // 檢查是否已存在於 detectedSubtitles 中
         const file = files[index];
         const exists = file.detectedSubtitles.some(
           (s) => s.filePath === filePath,
@@ -184,7 +184,7 @@ export default function ProofreadFileList({
               filePath,
               type: 'source' as const,
               language,
-              confidence: 100, // 手动上传的置信度设为 100
+              confidence: 100, // 手動上傳的置信度設為 100
             },
           ];
         }
@@ -195,7 +195,7 @@ export default function ProofreadFileList({
     [files, onUpdateFile],
   );
 
-  // 手动选择翻译字幕
+  // 手動選擇翻譯字幕
   const handleSelectTargetSubtitle = useCallback(
     async (index: number) => {
       const result = await window.ipc.invoke('selectFiles', {
@@ -209,7 +209,7 @@ export default function ProofreadFileList({
         });
         const language = langResult.success ? langResult.data?.code : undefined;
 
-        // 检查是否已存在于 detectedSubtitles 中
+        // 檢查是否已存在於 detectedSubtitles 中
         const file = files[index];
         const exists = file.detectedSubtitles.some(
           (s) => s.filePath === filePath,
@@ -228,7 +228,7 @@ export default function ProofreadFileList({
               filePath,
               type: 'translated' as const,
               language,
-              confidence: 100, // 手动上传的置信度设为 100
+              confidence: 100, // 手動上傳的置信度設為 100
             },
           ];
         }
@@ -239,7 +239,7 @@ export default function ProofreadFileList({
     [files, onUpdateFile],
   );
 
-  // 从下拉菜单选择字幕
+  // 從下拉菜單選擇字幕
   const handleSelectFromDropdown = useCallback(
     (index: number, type: 'source' | 'target', filePath: string) => {
       const file = files[index];
@@ -262,7 +262,7 @@ export default function ProofreadFileList({
     [files, onUpdateFile],
   );
 
-  // 保存任务
+  // 保存任務
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
@@ -277,11 +277,11 @@ export default function ProofreadFileList({
     }
   }, [onSaveTask, t]);
 
-  // 追加文件（根据 importType 自动选择类型）
+  // 追加文件（根據 importType 自動選擇類型）
   const handleAppendFiles = useCallback(async () => {
     try {
       if (importType === 'video') {
-        // 追加视频
+        // 追加影片
         const result = await window.ipc.invoke('selectFiles', {
           type: 'video',
           multiple: true,
@@ -289,7 +289,7 @@ export default function ProofreadFileList({
 
         if (!result || result.canceled || result.filePaths.length === 0) return;
 
-        // 使用工具函数创建 PendingFile
+        // 使用工具函數創建 PendingFile
         const newFiles = await Promise.all(
           result.filePaths.map((videoPath: string) =>
             createPendingFileFromVideo(videoPath),
@@ -309,7 +309,7 @@ export default function ProofreadFileList({
         if (!result || result.canceled || result.filePaths.length === 0) return;
 
         const allSubtitles: DetectedSubtitle[] = [];
-        // 取用户任务语向，用于判定每个字幕是原文还是译文
+        // 取用戶任務語向，用於判定每個字幕是原文還是譯文
         const userConfig = await window.ipc.invoke('getUserConfig');
 
         for (const filePath of result.filePaths) {
@@ -330,7 +330,7 @@ export default function ProofreadFileList({
           });
         }
 
-        // 使用工具函数选择最佳字幕
+        // 使用工具函數選擇最佳字幕
         const { bestSource, bestTarget } = selectBestSubtitles(allSubtitles);
         const sourceSubtitle = bestSource || allSubtitles[0];
         const targetSubtitle =
@@ -362,7 +362,7 @@ export default function ProofreadFileList({
     }
   }, [importType, onAddFiles]);
 
-  // 获取状态显示
+  // 獲取狀態顯示
   const getStatusDisplay = (status: PendingFile['status']) => {
     switch (status) {
       case 'completed':
@@ -389,18 +389,18 @@ export default function ProofreadFileList({
     }
   };
 
-  // 格式化文件名显示（仅用于无 Select 的静态展示）
+  // 格式化文件名顯示（僅用於無 Select 的靜態展示）
   const formatFileName = (filePath: string) => path.basename(filePath);
 
-  // 统计完成数
+  // 統計完成數
   const completedCount = files.filter((f) => f.status === 'completed').length;
 
   return (
     <div className="space-y-4">
-      {/* 顶部工具栏 */}
+      {/* 頂部工具欄 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          {/* 返回导入（二级页统一用返回箭头表达，避免「重新导入」按钮被误解为在当前页导入） */}
+          {/* 返回導入（二級頁統一用返回箭頭表達，避免「重新導入」按鈕被誤解為在當前頁導入） */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -417,7 +417,7 @@ export default function ProofreadFileList({
               <TooltipContent side="bottom">{t('backToImport')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {/* 任务名称 */}
+          {/* 任務名稱 */}
           <Popover open={showNameInput} onOpenChange={setShowNameInput}>
             <PopoverTrigger asChild>
               <div className="flex items-center gap-2 cursor-pointer hover:bg-muted px-2 py-1 rounded">
@@ -441,7 +441,7 @@ export default function ProofreadFileList({
               </div>
             </PopoverContent>
           </Popover>
-          {/* 保存到历史：紧邻任务名编辑，符合「命名→保存」操作路径；次要按钮样式 */}
+          {/* 保存到歷史：緊鄰任務名編輯，符合「命名→保存」操作路徑；次要按鈕樣式 */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -528,19 +528,19 @@ export default function ProofreadFileList({
           </TableHeader>
           <TableBody>
             {files.map((file, index) => {
-              // 所有字幕都可以作为源字幕或翻译字幕选择
-              // 源字幕优先显示 source 和 unknown 类型
+              // 所有字幕都可以作為源字幕或翻譯字幕選擇
+              // 源字幕優先顯示 source 和 unknown 類型
               const sourceOptions = file.detectedSubtitles.filter(
                 (s) => s.type === 'source' || s.type === 'unknown',
               );
-              // 如果没有 source 类型，显示所有字幕
+              // 如果沒有 source 類型，顯示所有字幕
               const effectiveSourceOptions =
                 sourceOptions.length > 0
                   ? sourceOptions
                   : file.detectedSubtitles;
 
-              // 翻译字幕可以选择任何字幕（除了已选为源的那个）
-              // 优先显示 translated 类型，但也允许选择其他类型
+              // 翻譯字幕可以選擇任何字幕（除了已選為源的那個）
+              // 優先顯示 translated 類型，但也允許選擇其他類型
               const targetOptions = file.detectedSubtitles.filter(
                 (s) => s.filePath !== file.selectedSource,
               );
@@ -560,7 +560,7 @@ export default function ProofreadFileList({
                   </TableCell>
                   <TableCell className="min-w-0">
                     <div className="flex min-w-0 items-center gap-2">
-                      {/* 字幕导入模式：源字幕固定不可切换 */}
+                      {/* 字幕導入模式：源字幕固定不可切換 */}
                       {file.isSubtitleOnlyMode ? (
                         <div className="flex min-w-0 flex-1 items-center gap-2">
                           <span
@@ -625,7 +625,7 @@ export default function ProofreadFileList({
                           {t('noSubtitle')}
                         </span>
                       )}
-                      {/* 字幕导入模式下隐藏上传按钮 */}
+                      {/* 字幕導入模式下隱藏上傳按鈕 */}
                       {!file.isSubtitleOnlyMode && (
                         <Button
                           variant="ghost"

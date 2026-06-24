@@ -25,7 +25,7 @@ import {
 } from '../helpers/chineseConvert';
 
 /**
- * 解析「中文标点去除」生效值：任务级单开关（issue #330）。
+ * 解析「中文標點去除」生效值：任務級單開關（issue #330）。
  */
 function resolveRemoveChinesePunctuation(
   formData: IFormData | undefined,
@@ -51,7 +51,7 @@ export default async function translate(
   } = formData || {};
   const { fileName, directory, srtFile } = file;
 
-  // 如果参数中有指定重试次数，则使用参数值，否则使用表单中的值或默认为2
+  // 如果參數中有指定重試次數，則使用參數值，否則使用表單中的值或預設為2
   const retryCount =
     maxRetries !== undefined
       ? maxRetries
@@ -60,9 +60,9 @@ export default async function translate(
         : 0;
   const renderContentTemplate = CONTENT_TEMPLATES[translateContent];
 
-  // 译文后处理：
-  // 1) 目标为中文时按简/繁做确定性归一，兜底 Ai 概率性输出繁体（issue #332）。
-  // 2) 按「中文标点去除」生效值，把中文标点替换为空格（issue #330）。
+  // 譯文後處理：
+  // 1) 目標為中文時按簡/繁做確定性歸一，兜底 Ai 概率性輸出繁體（issue #332）。
+  // 2) 按「中文標點去除」生效值，把中文標點替換為空格（issue #330）。
   const desiredTargetScript = getDesiredChineseScript(targetLanguage);
   const isChineseTarget = desiredTargetScript !== null;
   const removePunctuation = resolveRemoveChinesePunctuation(formData);
@@ -78,10 +78,10 @@ export default async function translate(
     return out;
   };
 
-  // 双语字幕内嵌「源文行」的标点后处理（issue #330）：
-  // 仅当源为中文、开关开启、且源字幕由 ASR 生成（generateAndTranslate）时才去标点；
-  // translateOnly 的源为用户导入字幕，保持原样。源字幕简繁归一已在 fileProcessor 完成，
-  // 翻译输入仍保留标点（不影响断句质量），此处只清理写入双语文件的源文展示。
+  // 雙語字幕內嵌「源文行」的標點後處理（issue #330）：
+  // 僅當源為中文、開關開啟、且源字幕由 ASR 生成（generateAndTranslate）時才去標點；
+  // translateOnly 的源為用戶導入字幕，保持原樣。源字幕簡繁歸一已在 fileProcessor 完成，
+  // 翻譯輸入仍保留標點（不影響斷句質量），此處只清理寫入雙語文件的源文展示。
   const isChineseSource = getDesiredChineseScript(sourceLanguage) !== null;
   const isGeneratedSource = formData?.taskType === 'generateAndTranslate';
   const removeSourcePunctuation =
@@ -104,7 +104,7 @@ export default async function translate(
       'info',
     );
 
-    // 源字幕按扩展名自动识别格式（srt/vtt/ass/lrc），统一解析为内部 Subtitle 结构
+    // 源字幕按擴展名自動識別格式（srt/vtt/ass/lrc），統一解析為內部 Subtitle 結構
     const rawSourceContent = await fs.promises.readFile(srtFile, 'utf-8');
     const subtitles = parseSubtitleEntries(
       rawSourceContent,
@@ -130,7 +130,7 @@ export default async function translate(
     file.translatedSrtFile = fileSave;
     await createOrClearFile(fileSave);
 
-    // 生成临时纯翻译文件，无论是否是双语字幕
+    // 生成臨時純翻譯文件，無論是否是雙語字幕
     const tempDir = ensureTempDir();
     const tempTranslatedFileName = `${uuidv4()}.srt`;
     const tempTranslatedFilePath = path.join(tempDir, tempTranslatedFileName);
@@ -147,12 +147,12 @@ export default async function translate(
       let tempTranslatedContent = '';
 
       results.forEach(async (result) => {
-        // 目标译文后处理（简繁归一 + 可选中文标点去除）
+        // 目標譯文後處理（簡繁歸一 + 可選中文標點去除）
         const targetContent = postProcessTarget(result.targetContent);
-        // 双语内嵌源文行后处理（仅生成并翻译 + 中文源 + 开关开启时去标点）
+        // 雙語內嵌源文行後處理（僅生成並翻譯 + 中文源 + 開關開啟時去標點）
         const sourceContent = postProcessBilingualSource(result.sourceContent);
 
-        // 根据用户设置的模板生成目标文件内容
+        // 根據用戶設置的模板生成目標文件內容
         const content = `${result.id}\n${result.startEndTime}\n${renderTemplate(
           renderContentTemplate,
           {
@@ -162,16 +162,16 @@ export default async function translate(
         )}`;
         concatContent += content;
 
-        // 对临时文件，只添加纯翻译内容
+        // 對臨時文件，只添加純翻譯內容
         const pureTranslatedContent = `${result.id}\n${result.startEndTime}\n${targetContent}\n\n`;
         tempTranslatedContent += pureTranslatedContent;
       });
 
-      // 保存到目标文件
+      // 保存到目標文件
       logMessage(`append to file ${fileSave}`);
       await appendToFile(fileSave, concatContent);
 
-      // 保存到临时纯翻译文件
+      // 保存到臨時純翻譯文件
       logMessage(`append to temp file ${tempTranslatedFilePath}`);
       await appendToFile(tempTranslatedFilePath, tempTranslatedContent);
     };
@@ -202,7 +202,7 @@ export async function testTranslation(
   sourceLanguage: string,
   targetLanguage: string,
 ): Promise<{ translation: string; analysis?: any }> {
-  // 样本文本跟随源语言，避免「中文源」却拿英文样本测试
+  // 樣本文本跟隨源語言，避免「中文源」卻拿英文樣本測試
   const sampleText = sourceLanguage?.startsWith('zh') ? '你好' : 'Hello';
   const testSubtitle = {
     id: '1',

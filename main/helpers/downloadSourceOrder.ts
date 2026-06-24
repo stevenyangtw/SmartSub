@@ -1,9 +1,9 @@
-/** addon 与 py-engine 共用的二进制下载源（与 HuggingFace 模型源无关）。 */
+/** addon 與 py-engine 共用的二進制下載源（與 HuggingFace 模型源無關）。 */
 export type BinaryDownloadSource = 'github' | 'ghproxy' | 'gitcode';
 
 /**
- * 回退规范顺序：国内优先（先域内 gitcode，再代理 ghproxy，最后直连 github）。
- * 所选源永远排第一，其余按此顺序补齐。
+ * 回退規範順序：國內優先（先域內 gitcode，再代理 ghproxy，最後直連 github）。
+ * 所選源永遠排第一，其餘按此順序補齊。
  */
 export const DEFAULT_SOURCE_ORDER: BinaryDownloadSource[] = [
   'gitcode',

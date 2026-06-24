@@ -300,8 +300,8 @@ export class ModelDownloader {
   }
 
   /**
-   * 全新下载到 finalPath：优先多连接并行（写 .par 校验后改名），不支持/失败则
-   * 回退单连接下载到 tempPath 再改名。取消错误向上抛出。
+   * 全新下載到 finalPath：優先多連接並行（寫 .par 校驗後改名），不支持/失敗則
+   * 回退單連接下載到 tempPath 再改名。取消錯誤向上拋出。
    */
   private async downloadToFinal(
     url: string,

@@ -426,7 +426,7 @@ function Ct2ModelRowActions({
   globalDownloading: boolean;
 }) {
   const endpoints = useDownloadEndpoints();
-  // base 已含协议（如 https://hf-mirror.com），与设置页配置保持一致。
+  // base 已含協議（如 https://hf-mirror.com），與設置頁配置保持一致。
   const ct2CopyUrl = (s: string) => {
     const base =
       s === DownSource.HuggingFace
@@ -821,7 +821,7 @@ function TierSection({
 }
 
 export interface ModelLibrarySectionProps {
-  /** 渲染哪个引擎的模型清单（由主从双栏左栏选中驱动，不依赖全局引擎）。 */
+  /** 渲染哪個引擎的模型清單（由主從雙欄左欄選中驅動，不依賴全局引擎）。 */
   engine: TranscriptionEngine;
   systemInfo: ISystemInfo;
   systemInfoLoaded: boolean;
@@ -830,8 +830,8 @@ export interface ModelLibrarySectionProps {
 }
 
 /**
- * 引擎模型清单（按传入 `engine` 渲染：ggml 档位 / ct2 档位 / FunASR / localCli 提示）。
- * 从原 `ModelsTab` 抽出，去掉"当前引擎上下文条"，模型下载与引擎安装彻底解耦。
+ * 引擎模型清單（按傳入 `engine` 渲染：ggml 檔位 / ct2 檔位 / FunASR / localCli 提示）。
+ * 從原 `ModelsTab` 抽出，去掉"當前引擎上下文條"，模型下載與引擎安裝徹底解耦。
  */
 const ModelLibrarySection: React.FC<ModelLibrarySectionProps> = ({
   engine,
@@ -1053,9 +1053,9 @@ const ModelLibrarySection: React.FC<ModelLibrarySectionProps> = ({
     (isFasterWhisper && !!recommendedCt2Model);
   const trimmedQuery = modelQuery.trim();
 
-  // HuggingFace 系下载源（官方/国内镜像）：ggml/ct2/FunASR 共用同一持久化偏好。
-  // 统一为「点击下载时再选源」——通过 Context 下发给真正发起下载的叶子组件，
-  // 由其就地弹出气泡选源，零常驻占位。qwen/firered 自管各自源（弹窗内选）。
+  // HuggingFace 系下載源（官方/國內鏡像）：ggml/ct2/FunASR 共用同一持久化偏好。
+  // 統一為「點擊下載時再選源」——通過 Context 下發給真正發起下載的葉子組件，
+  // 由其就地彈出氣泡選源，零常駐佔位。qwen/firered 自管各自源（彈窗內選）。
   const downloadSourceConfig: DownloadSourceConfig | null =
     isBuiltin || isFasterWhisper || isFunasr
       ? {

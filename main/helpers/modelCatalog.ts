@@ -9,7 +9,7 @@ import {
   getCt2HfRepo,
 } from './fasterWhisperModelCatalog';
 
-/** ggml 路径：语义不变，复用 getPath('modelsPath') */
+/** ggml 路徑：語義不變，複用 getPath('modelsPath') */
 export function getGgmlModelsPath(): string {
   return getPath('modelsPath') as string;
 }
@@ -26,7 +26,7 @@ export function getFasterWhisperModelsPath(): string {
   return resolved;
 }
 
-/** HuggingFace Hub 标准缓存子目录：{modelsPath}/hub/models--* */
+/** HuggingFace Hub 標準緩存子目錄：{modelsPath}/hub/models--* */
 export function getFasterWhisperHubDir(): string {
   const root = getFasterWhisperModelsPath();
   const hub = path.join(root, 'hub');
@@ -37,7 +37,7 @@ export function getFasterWhisperHubDir(): string {
   return hub;
 }
 
-/** 将旧版 {root}/models--* 布局迁移到 {root}/hub/models--* */
+/** 將舊版 {root}/models--* 佈局遷移到 {root}/hub/models--* */
 function migrateLegacyCt2Layout(root: string, hub: string): void {
   try {
     for (const entry of fs.readdirSync(root)) {
@@ -49,7 +49,7 @@ function migrateLegacyCt2Layout(root: string, hub: string): void {
       fs.renameSync(src, dest);
     }
   } catch {
-    // 忽略迁移失败，不影响主流程
+    // 忽略遷移失敗，不影響主流程
   }
 }
 
@@ -61,7 +61,7 @@ export function getCt2ModelCacheDir(modelId: string): string {
   return path.join(getFasterWhisperHubDir(), toCt2CacheDirName(modelId));
 }
 
-/** 解析 UI 模型目录下的 snapshot 绝对路径（仅查 fasterWhisperModelsPath） */
+/** 解析 UI 模型目錄下的 snapshot 絕對路徑（僅查 fasterWhisperModelsPath） */
 export function resolveCt2ModelSnapshotDir(modelId: string): string | null {
   const dirName = toCt2CacheDirName(modelId);
   const snapshotRoots = [
@@ -106,7 +106,7 @@ function collectInstalledFromHubLikeDir(
   }
 }
 
-/** 扫描 UI 模型目录，返回逻辑模型 id 列表 */
+/** 掃描 UI 模型目錄，返回邏輯模型 id 列表 */
 export function getFasterWhisperModelsInstalled(): string[] {
   const root = getFasterWhisperModelsPath();
   const found = new Set<string>();

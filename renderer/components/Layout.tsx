@@ -59,7 +59,7 @@ import { deriveGpuDisplayState } from '@/components/settings/gpu/gpuDisplayState
 import { backendDisplay } from '@/components/settings/gpu/gpuUtils';
 import type { GpuMode } from '../../types/addon';
 
-// 添加更新状态的类型定义
+// 添加更新狀態的類型定義
 interface UpdateStatus {
   status: string;
   version?: string;
@@ -98,7 +98,7 @@ const NAV_ITEMS: NavItemDef[] = [
     href: 'engines',
     labelKey: 'enginesAndModels',
     icon: Cpu,
-    // 资源中心已拆分：/engines 与旧 /resources、/modelsControl 重定向均落于此。
+    // 資源中心已拆分：/engines 與舊 /resources、/modelsControl 重定向均落於此。
     isActive: (p) =>
       p.includes('/engines') ||
       p.includes('/resources') ||
@@ -162,8 +162,8 @@ function NavItem({
   );
 }
 
-// Radix: 在 DropdownMenuItem 中同步打开 Dialog 会与菜单关闭争用 body 的
-// pointer-events，延迟到当前事件循环末尾（菜单已开始关闭）再打开，规避残留导致整页失效
+// Radix: 在 DropdownMenuItem 中同步打開 Dialog 會與菜單關閉爭用 body 的
+// pointer-events，延遲到當前事件循環末尾（菜單已開始關閉）再打開，規避殘留導致整頁失效
 const openAfterMenuClose = (open: () => void) => setTimeout(open, 0);
 
 const Layout = ({ children }) => {
@@ -172,7 +172,7 @@ const Layout = ({ children }) => {
     i18n: { language: locale },
   } = useTranslation('common');
   const router = useRouter();
-  // 兜底清理 Radix 残留的 body pointer-events 锁（从帮助菜单打开弹窗关闭后整页失效）
+  // 兜底清理 Radix 殘留的 body pointer-events 鎖（從幫助菜單打開彈窗關閉後整頁失效）
   useRadixPointerEventsGuard();
   const gpuModeLabel = (mode: GpuMode) =>
     t(
@@ -183,8 +183,8 @@ const Layout = ({ children }) => {
           : 'gpuModeCpuOnly',
     );
   const { asPath } = router;
-  // 顶栏「页面上下文」：由当前路由匹配到的导航项派生的章节名（chrome 面包屑，
-  // 与枢纽页 PageHeader 的内容大标题区分——前者是常驻外壳定位、后者是页面内容）
+  // 頂欄「頁面上下文」：由當前路由匹配到的導航項派生的章節名（chrome 麵包屑，
+  // 與樞紐頁 PageHeader 的內容大標題區分——前者是常駐外殼定位、後者是頁面內容）
   const activeNav = NAV_ITEMS.find((item) => item.isActive(asPath));
   const currentSectionLabel = activeNav ? t(activeNav.labelKey) : '';
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -201,7 +201,7 @@ const Layout = ({ children }) => {
   const [showFaq, setShowFaq] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
-  // SSR 默认 ⌘，挂载后按平台校正为 Ctrl（非 mac），避免水合不一致
+  // SSR 預設 ⌘，掛載後按平臺校正為 Ctrl（非 mac），避免水合不一致
   const [modKey, setModKey] = useState('⌘');
   const [onboardingResumeStep, setOnboardingResumeStep] = useState<
     number | null
@@ -218,7 +218,7 @@ const Layout = ({ children }) => {
     status: string;
   } | null>(null);
   const [taskRunning, setTaskRunning] = useState(false);
-  // 手动检查更新会话：等待 update-status 终态时为 true，持有 loading toast id
+  // 手動檢查更新會話：等待 update-status 終態時為 true，持有 loading toast id
   const manualCheckRef = useRef<{ toastId: string | number } | null>(null);
 
   const checkUpdatesManually = useCallback(() => {
@@ -227,7 +227,7 @@ const Layout = ({ children }) => {
       toastId: toast.loading(t('checkingForUpdates')),
     };
     window?.ipc?.invoke('check-for-updates').catch(() => {
-      // 失败终态由 update-status error 事件统一收尾
+      // 失敗終態由 update-status error 事件統一收尾
     });
   }, [t]);
 
@@ -236,13 +236,13 @@ const Layout = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // 首次启动（无已装模型且无完成标记）自动打开新手引导
+    // 首次啟動（無已裝模型且無完成標記）自動打開新手引導
     (async () => {
       try {
         const settings = await window?.ipc?.invoke('getSettings');
         if (settings?.onboardingCompleted || settings?.useLocalWhisper) return;
         const info = await window?.ipc?.invoke('getSystemInfo', null);
-        // 跨引擎就绪判断：任一引擎装有任一模型即视为已就绪，避免已装其它引擎模型仍被重复唤起引导
+        // 跨引擎就緒判斷：任一引擎裝有任一模型即視為已就緒，避免已裝其它引擎模型仍被重複喚起引導
         if (!hasAnyModelAnyEngine(info)) {
           setShowOnboarding(true);
         }
@@ -253,7 +253,7 @@ const Layout = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // 监听消息通知
+    // 監聽消息通知
     const cleanupMessage = window?.ipc?.on('message', (res: string) => {
       toast(t('notification'), {
         description: t(res),
@@ -261,7 +261,7 @@ const Layout = ({ children }) => {
       console.log(res);
     });
 
-    // 监听更新状态
+    // 監聽更新狀態
     const cleanupUpdateStatus = window?.ipc?.on(
       'update-status',
       (status: UpdateStatus) => {
@@ -270,7 +270,7 @@ const Layout = ({ children }) => {
           setNewVersion(status.version || '');
           setReleaseNotes(status.releaseNotes || '');
         }
-        // 手动检查会话收尾：available 开弹窗、not-available 提示已最新、error 静默（全局错误 toast 已有）
+        // 手動檢查會話收尾：available 開彈窗、not-available 提示已最新、error 靜默（全局錯誤 toast 已有）
         if (
           manualCheckRef.current &&
           ['available', 'not-available', 'error'].includes(status.status)
@@ -286,13 +286,13 @@ const Layout = ({ children }) => {
       },
     );
 
-    // 应用菜单/设置页触发的手动检查更新
+    // 應用菜單/設置頁觸發的手動檢查更新
     const cleanupMenuCheck = window?.ipc?.on('menu-check-updates', () => {
       checkUpdatesManually();
     });
     const handleAppCheckUpdates = () => checkUpdatesManually();
     window.addEventListener('app-check-updates', handleAppCheckUpdates);
-    // 设置页「关于」卡触发的查看日志
+    // 設置頁「關於」卡觸發的查看日誌
     const handleAppOpenLogs = () => setShowLogs(true);
     window.addEventListener('app-open-logs', handleAppOpenLogs);
 
@@ -305,7 +305,7 @@ const Layout = ({ children }) => {
       custom: 'Custom',
     };
 
-    // 检查加速状态（全平台：mac 显示正向 Metal/CoreML 徽章，CPU 态用中性文案）
+    // 檢查加速狀態（全平臺：mac 顯示正向 Metal/CoreML 徽章，CPU 態用中性文案）
     const checkGpuStatus = async () => {
       try {
         const env = await window?.ipc?.invoke('get-gpu-environment');
@@ -373,7 +373,7 @@ const Layout = ({ children }) => {
 
     checkGpuStatus();
 
-    // 一次性迁移通知（gpuMode 自动启用告知）
+    // 一次性遷移通知（gpuMode 自動啟用告知）
     const checkMigrationNotice = async () => {
       try {
         const settings = await window?.ipc?.invoke('getSettings');
@@ -389,7 +389,7 @@ const Layout = ({ children }) => {
     };
     checkMigrationNotice();
 
-    // 降级事件 toast（主进程已做会话内同原因去重）
+    // 降級事件 toast（主進程已做會話內同原因去重）
     const cleanupFallback = window?.ipc?.on(
       'addon-fallback',
       (event: { expected: string; actual: string; reason: string }) => {
@@ -403,7 +403,7 @@ const Layout = ({ children }) => {
       },
     );
 
-    // 后端变更推送（转写实际加载后刷新头部徽章）
+    // 後端變更推送（轉寫實際加載後刷新頭部徽章）
     const cleanupBackendChanged = window?.ipc?.on(
       'active-backend-changed',
       () => {
@@ -411,18 +411,18 @@ const Layout = ({ children }) => {
       },
     );
 
-    // 监听 GPU 设置变更事件（由设置页面触发）
+    // 監聽 GPU 設置變更事件（由設置頁面觸發）
     const handleGpuSettingsChanged = () => {
       checkGpuStatus();
     };
     window.addEventListener('gpu-settings-changed', handleGpuSettingsChanged);
 
-    // 应用菜单「查看日志」
+    // 應用菜單「查看日誌」
     const cleanupMenuLogs = window?.ipc?.on('menu-open-logs', () => {
       setShowLogs(true);
     });
 
-    // 清理函数
+    // 清理函數
     return () => {
       cleanupMessage?.();
       cleanupUpdateStatus?.();
@@ -439,7 +439,7 @@ const Layout = ({ children }) => {
     };
   }, [t, checkUpdatesManually]);
 
-  // 全局任务运行指示：轮询 + taskComplete 即时刷新
+  // 全局任務運行指示：輪詢 + taskComplete 即時刷新
   useEffect(() => {
     let disposed = false;
     const refreshTaskRunning = async () => {
@@ -462,7 +462,7 @@ const Layout = ({ children }) => {
     };
   }, []);
 
-  // 模型下载全局可见：主进程 modelDownloadDetail 是全局广播，任何页面都能收到
+  // 模型下載全局可見：主進程 modelDownloadDetail 是全局廣播，任何頁面都能收到
   useEffect(() => {
     let hideTimer: NodeJS.Timeout | null = null;
     const unsub = window?.ipc?.on(
@@ -484,7 +484,7 @@ const Layout = ({ children }) => {
           if (hideTimer) clearTimeout(hideTimer);
           hideTimer = setTimeout(() => setDownloadPill(null), 5000);
         } else {
-          setDownloadPill(null); // idle = 取消，立即隐藏
+          setDownloadPill(null); // idle = 取消，立即隱藏
         }
       },
     );
@@ -498,7 +498,7 @@ const Layout = ({ children }) => {
     setShowUpdateDialog(true);
   };
 
-  // 全局快捷键：Cmd/Ctrl+, 打开设置；? 打开快捷键速查（非输入态）
+  // 全局快捷鍵：Cmd/Ctrl+, 打開設置；? 打開快捷鍵速查（非輸入態）
   useHotkeys([
     {
       combo: 'mod+,',
@@ -516,7 +516,7 @@ const Layout = ({ children }) => {
     },
   ]);
 
-  /** 引导跳去配置页：记录暂停步骤，展示「继续引导」入口 */
+  /** 引導跳去配置頁：記錄暫停步驟，展示「繼續引導」入口 */
   const handleOnboardingPause = (step: number) => {
     onboardingPausedRef.current = true;
     setOnboardingResumeStep(step);
@@ -526,7 +526,7 @@ const Layout = ({ children }) => {
     setShowOnboarding(open);
     if (open) return;
     if (!onboardingPausedRef.current) {
-      // 正常关闭（完成/跳过/X）：清除暂停状态
+      // 正常關閉（完成/跳過/X）：清除暫停狀態
       setOnboardingResumeStep(null);
     }
     onboardingPausedRef.current = false;
@@ -541,8 +541,8 @@ const Layout = ({ children }) => {
     }
   };
 
-  // 中文标签较短（176px 足够），英文标签如「Translation Services / Proofread Subtitles」
-  // 更宽，176px 会被右边框裁断；按 UI 语言放宽展开宽度，保证标签完整可见。
+  // 中文標籤較短（176px 足夠），英文標籤如「Translation Services / Proofread Subtitles」
+  // 更寬，176px 會被右邊框裁斷；按 UI 語言放寬展開寬度，保證標籤完整可見。
   const isZhLocale = (locale || '').toLowerCase().startsWith('zh');
   const expandedSidebarWidth = isZhLocale ? 'w-[176px]' : 'w-[216px]';
   const expandedContentPad = isZhLocale ? 'pl-[176px]' : 'pl-[216px]';
@@ -700,7 +700,7 @@ const Layout = ({ children }) => {
           </TooltipProvider>
         </nav>
       </aside>
-      {/* min-w-0：阻止 grid 子项被内容最小宽度撑开，避免侧边栏展开后出现页面级横向滚动条 */}
+      {/* min-w-0：阻止 grid 子項被內容最小寬度撐開，避免側邊欄展開後出現頁面級橫向滾動條 */}
       <div className="flex min-w-0 flex-col h-screen">
         <header className="flex-shrink-0 z-10 flex h-[57px] items-center gap-1 bg-chrome px-4 overflow-hidden">
           {currentSectionLabel && (
@@ -721,7 +721,7 @@ const Layout = ({ children }) => {
             </kbd>
           </button>
           <div className="flex flex-shrink-0 items-center gap-1">
-            {/* 加速状态指示器（加速=正向绿徽章，CPU=中性灯） */}
+            {/* 加速狀態指示器（加速=正向綠徽章，CPU=中性燈） */}
             {accelBadge && (
               <TooltipProvider>
                 <Tooltip>
@@ -737,15 +737,15 @@ const Layout = ({ children }) => {
                             : 'text-muted-foreground hover:text-foreground'
                       }`}
                       onClick={() => {
-                        // GPU 加速已折叠进 builtin 引擎面板：先选中 builtin（写 EngineModelTab
-                        // 的选中态 localStorage），再跳「引擎与模型」页，落地直达 builtin 的加速区。
+                        // GPU 加速已摺疊進 builtin 引擎面板：先選中 builtin（寫 EngineModelTab
+                        // 的選中態 localStorage），再跳「引擎與模型」頁，落地直達 builtin 的加速區。
                         try {
                           localStorage.setItem(
                             'engineModelSelectedView',
                             JSON.stringify('builtin'),
                           );
                         } catch {
-                          // 忽略：localStorage 不可用时仍跳转，EngineModelTab 回落默认 builtin
+                          // 忽略：localStorage 不可用時仍跳轉，EngineModelTab 回落預設 builtin
                         }
                         router.push(`/${locale}/engines`);
                       }}
@@ -848,15 +848,15 @@ const Layout = ({ children }) => {
             </DropdownMenu>
           </div>
         </header>
-        {/* 内容区上/左发丝线：仅勾勒 chrome↔画布的内 L 边（main 起于顶栏下方，
-            故顶栏与侧栏仍为无缝同色 chrome，不复现网格与转角十字）。/60 较旧硬线更柔。 */}
+        {/* 內容區上/左髮絲線：僅勾勒 chrome↔畫布的內 L 邊（main 起於頂欄下方，
+            故頂欄與側欄仍為無縫同色 chrome，不復現網格與轉角十字）。/60 較舊硬線更柔。 */}
         <main className="flex-1 min-h-0 overflow-auto border-l border-t border-border/60">
           {children}
         </main>
         <Toaster />
       </div>
 
-      {/* 引导暂停后的「继续」悬浮入口 */}
+      {/* 引導暫停後的「繼續」懸浮入口 */}
       {onboardingResumeStep !== null && !showOnboarding && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-0.5 rounded-full border bg-background/95 px-1.5 py-1 shadow-lg backdrop-blur">
           <Button

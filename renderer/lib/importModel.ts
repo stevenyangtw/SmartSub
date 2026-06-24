@@ -1,7 +1,7 @@
 /**
- * 渲染层「从本地文件夹导入模型」的统一调用封装。
- * 负责调用主进程 importModel IPC 并把结果归一化为 ImportOutcome，
- * 文案/刷新由各引擎面板按自身 i18n 命名空间处理（避免传 t 引发的类型耦合）。
+ * 渲染層「從本地資料夾導入模型」的統一調用封裝。
+ * 負責調用主進程 importModel IPC 並把結果歸一化為 ImportOutcome，
+ * 文案/刷新由各引擎面板按自身 i18n 命名空間處理（避免傳 t 引發的類型耦合）。
  */
 export type ImportOutcome =
   | { kind: 'success' }

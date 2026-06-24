@@ -23,32 +23,32 @@ jest.mock('next-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const strings: Record<string, string> = {
-        'tabs.headers': '请求头',
-        'tabs.bodyParameters': '请求体参数',
+        'tabs.headers': '請求頭',
+        'tabs.bodyParameters': '請求體參數',
         'more.label': '更多',
-        'more.import': '导入 JSON',
-        'more.export': '导出 JSON',
-        'more.refresh': '从磁盘刷新',
-        'more.search': '搜索参数',
-        'addDialog.title': '添加新参数',
-        'table.keyColumn': '参数名',
+        'more.import': '導入 JSON',
+        'more.export': '導出 JSON',
+        'more.refresh': '從磁盤刷新',
+        'more.search': '搜索參數',
+        'addDialog.title': '添加新參數',
+        'table.keyColumn': '參數名',
         'table.valueColumn': '值',
         'table.keyPlaceholder': '例如 temperature',
         'table.valuePlaceholder': '例如 0.3',
         'table.addButton': '添加',
         'table.addHint':
-          '在下方「新参数」行填写参数名、类型和值，点击「添加」或按 Enter 可连续添加多条。',
-        'table.delete': '删除',
-        'table.duplicateKey': '该参数名已存在',
-        'table.emptyKey': '请填写参数名',
+          '在下方「新參數」行填寫參數名、類型和值，點擊「添加」或按 Enter 可連續添加多條。',
+        'table.delete': '刪除',
+        'table.duplicateKey': '該參數名已存在',
+        'table.emptyKey': '請填寫參數名',
         'types.string': '字符串',
-        'types.integer': '整数',
-        'types.float': '浮点数',
-        'types.boolean': '布尔值',
-        'types.array': '数组',
+        'types.integer': '整數',
+        'types.float': '浮點數',
+        'types.boolean': '布爾值',
+        'types.array': '數組',
         'actions.cancel': '取消',
         'unsavedChangesDialog.title': '未保存的更改',
-        'unsavedChangesDialog.description': '刷新将丢弃未保存的更改。',
+        'unsavedChangesDialog.description': '刷新將丟棄未保存的更改。',
         'unsavedChangesDialog.refreshAnyway': '仍然刷新',
       };
       return strings[key] ?? key;
@@ -374,8 +374,8 @@ describe('CustomParameterEditor', () => {
   it('renders tabs with badge counts', () => {
     render(<CustomParameterEditor providerId="openai" />);
 
-    expect(screen.getByRole('tab', { name: /请求头/ })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /请求体参数/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /請求頭/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /請求體參數/ })).toBeInTheDocument();
 
     const badges = screen.getAllByTestId('badge');
     expect(badges).toHaveLength(2);
@@ -497,10 +497,10 @@ describe('CustomParameterEditor', () => {
 
     expect(screen.getByRole('button', { name: '更多' })).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: '导入 JSON' }),
+      screen.getByRole('button', { name: '導入 JSON' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: '导出 JSON' }),
+      screen.getByRole('button', { name: '導出 JSON' }),
     ).toBeInTheDocument();
   });
 
@@ -510,7 +510,7 @@ describe('CustomParameterEditor', () => {
     expect(screen.getByRole('button', { name: '添加' })).toBeInTheDocument();
     expect(
       screen.getByText(
-        '在下方「新参数」行填写参数名、类型和值，点击「添加」或按 Enter 可连续添加多条。',
+        '在下方「新參數」行填寫參數名、類型和值，點擊「添加」或按 Enter 可連續添加多條。',
       ),
     ).toBeInTheDocument();
   });

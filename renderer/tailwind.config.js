@@ -16,7 +16,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        // 零打包：仅系统字体栈，贴近 Inter 的中性观感，CJK 回退完善
+        // 零打包：僅系統字體棧，貼近 Inter 的中性觀感，CJK 回退完善
         sans: [
           'system-ui',
           '-apple-system',
@@ -30,7 +30,7 @@ module.exports = {
           '"Microsoft YaHei"',
           'sans-serif',
         ],
-        // 技术字段（时间码/路径/尺寸/Key/版本号）等宽栈：装有 JetBrains Mono 则命中
+        // 技術字段（時間碼/路徑/尺寸/Key/版本號）等寬棧：裝有 JetBrains Mono 則命中
         mono: [
           'ui-monospace',
           '"SF Mono"',

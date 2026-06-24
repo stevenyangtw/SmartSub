@@ -5,7 +5,7 @@ export default function useIpcCommunication(
   setFiles,
   appendFiles?: (incoming: IFiles[]) => void,
 ) {
-  // 始终调用最新的 appendFiles（含去重逻辑），避免事件订阅闭包过期
+  // 始終調用最新的 appendFiles（含去重邏輯），避免事件訂閱閉包過期
   const appendFilesRef = useRef(appendFiles);
   appendFilesRef.current = appendFiles;
 
@@ -39,7 +39,7 @@ export default function useIpcCommunication(
       key: string,
       progress: number,
     ) => {
-      // 验证进度值的合理性
+      // 驗證進度值的合理性
       const normalizedProgress = Math.min(Math.max(progress || 0, 0), 100);
 
       setFiles((prevFiles) => {
@@ -48,7 +48,7 @@ export default function useIpcCommunication(
           if (file.uuid === res?.uuid) {
             const currentProgress = file[progressKey] || 0;
 
-            // 防止进度回退，除非是重新开始（进度为0）
+            // 防止進度回退，除非是重新開始（進度為0）
             if (
               normalizedProgress === 0 ||
               normalizedProgress >= currentProgress
@@ -56,7 +56,7 @@ export default function useIpcCommunication(
               return { ...file, [progressKey]: normalizedProgress };
             }
 
-            // 如果进度回退了，记录警告但仍然更新（可能是重试）
+            // 如果進度回退了，記錄警告但仍然更新（可能是重試）
             console.warn(
               `Progress rollback detected for ${key}: ${currentProgress} -> ${normalizedProgress}`,
             );
@@ -88,7 +88,7 @@ export default function useIpcCommunication(
           if (file.uuid === res?.uuid) {
             const updatedFile = { ...file, ...res };
 
-            // 状态一致性检查：如果状态变为 'done'，确保进度为100%
+            // 狀態一致性檢查：如果狀態變為 'done'，確保進度為100%
             Object.keys(res).forEach((key) => {
               if (key.endsWith('Subtitle') && res[key] === 'done') {
                 const progressKey = `${key}Progress`;
@@ -100,13 +100,13 @@ export default function useIpcCommunication(
                 }
               }
 
-              // 如果状态变为 'error'，保持当前进度不变
+              // 如果狀態變為 'error'，保持當前進度不變
               if (key.endsWith('Subtitle') && res[key] === 'error') {
                 const progressKey = `${key}Progress`;
-                // 保持原有进度，不重置
+                // 保持原有進度，不重置
               }
 
-              // 如果状态变为 'loading'，确保有初始进度
+              // 如果狀態變為 'loading'，確保有初始進度
               if (key.endsWith('Subtitle') && res[key] === 'loading') {
                 const progressKey = `${key}Progress`;
                 if (!updatedFile[progressKey]) {

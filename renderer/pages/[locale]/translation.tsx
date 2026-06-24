@@ -5,8 +5,8 @@ import ProvidersTab from '@/components/resources/ProvidersTab';
 import { getStaticPaths, makeStaticProperties } from '../../lib/get-static';
 
 /**
- * 「翻译服务」顶级页（原资源中心 providers Tab 平移为整页）。
- * 翻译服务商的增删改、密钥配置与连通性测试。
+ * 「翻譯服務」頂級頁（原資源中心 providers Tab 平移為整頁）。
+ * 翻譯服務商的增刪改、密鑰配置與連通性測試。
  */
 const TranslationPage = () => {
   const { t } = useTranslation('common');

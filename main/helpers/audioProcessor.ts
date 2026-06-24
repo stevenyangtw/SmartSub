@@ -11,14 +11,14 @@ import {
   EmbeddedSubtitleStream,
 } from './embeddedSubtitleParser';
 
-// 设置ffmpeg路径
+// 設置ffmpeg路徑
 const ffmpegPath = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-/** 正在运行的提取进程：fileUuid -> fluent-ffmpeg command（取消时 kill） */
+/** 正在運行的提取進程：fileUuid -> fluent-ffmpeg command（取消時 kill） */
 const runningCommands = new Map<string, ReturnType<typeof ffmpeg>>();
 
-/** 取消时终止指定文件的 ffmpeg 提取进程 */
+/** 取消時終止指定文件的 ffmpeg 提取進程 */
 export function killFfmpegForFiles(fileUuids: string[]) {
   for (const uuid of fileUuids) {
     const command = runningCommands.get(uuid);
@@ -37,7 +37,7 @@ export function killFfmpegForFiles(fileUuids: string[]) {
 }
 
 /**
- * 使用ffmpeg提取音频
+ * 使用ffmpeg提取音頻
  */
 export const extractAudio = (
   videoPath,
@@ -57,7 +57,7 @@ export const extractAudio = (
       );
     }
   };
-  // 同步捕获上下文：回调里不依赖 ALS 跨 emitter 传播
+  // 同步捕獲上下文：回調裡不依賴 ALS 跨 emitter 傳播
   const taskContext = getTaskContext();
   const fileUuid = file?.uuid || taskContext?.fileUuid;
   const signal = taskContext?.signal;
@@ -67,8 +67,8 @@ export const extractAudio = (
   };
 
   return new Promise((resolve, reject) => {
-    // fluent-ffmpeg 的 progress.percent 在部分平台/新版 ffmpeg 上恒为 undefined，
-    // 这里从 codecData 拿到媒体总时长，再用 progress.timemark 自算百分比（issue #291）。
+    // fluent-ffmpeg 的 progress.percent 在部分平臺/新版 ffmpeg 上恆為 undefined，
+    // 這裡從 codecData 拿到媒體總時長，再用 progress.timemark 自算百分比（issue #291）。
     let totalDurationSec = 0;
     try {
       const command = ffmpeg(`${videoPath}`)
@@ -82,7 +82,7 @@ export const extractAudio = (
         })
         .on('codecData', function (data) {
           totalDurationSec = timemarkToSeconds(data?.duration);
-          // 顺手记录媒体时长，随后续 taskFileChange 持久化供行内元信息展示
+          // 順手記錄媒體時長，隨後續 taskFileChange 持久化供行內元信息展示
           if (file && totalDurationSec > 0) {
             file.duration = totalDurationSec;
           }
@@ -111,7 +111,7 @@ export const extractAudio = (
         .on('error', function (err) {
           unregister();
           if (signal?.aborted) {
-            // 用户取消导致的 kill：清理半成品，按取消路径返回
+            // 用戶取消導致的 kill：清理半成品，按取消路徑返回
             try {
               if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
             } catch (cleanupErr) {
@@ -138,7 +138,7 @@ export const extractAudio = (
 };
 
 /**
- * 从视频中提取音频
+ * 從影片中提取音頻
  */
 export async function extractAudioFromVideo(event, file) {
   const { filePath } = file;
@@ -162,8 +162,8 @@ export async function extractAudioFromVideo(event, file) {
 }
 
 /**
- * 探测视频内封字幕流：spawn 内置 ffmpeg `-i` 解析 stderr，永不 reject。
- * ffmpeg 因无输出文件以非零码退出属正常，照常解析 stderr。带超时保护。
+ * 探測影片內封字幕流：spawn 內置 ffmpeg `-i` 解析 stderr，永不 reject。
+ * ffmpeg 因無輸出文件以非零碼退出屬正常，照常解析 stderr。帶超時保護。
  */
 export function probeEmbeddedSubtitles(
   videoPath: string,
@@ -213,8 +213,8 @@ export function probeEmbeddedSubtitles(
 }
 
 /**
- * 抽取指定内封字幕轨为 SRT（-map 0:s:N -c:s srt）。复用 runningCommands 支持取消；
- * 进度归属「提取」节点（extractAudio）。失败/取消时清理半成品。
+ * 抽取指定內封字幕軌為 SRT（-map 0:s:N -c:s srt）。複用 runningCommands 支持取消；
+ * 進度歸屬「提取」節點（extractAudio）。失敗/取消時清理半成品。
  */
 export const extractEmbeddedSubtitle = (
   videoPath: string,

@@ -5,10 +5,10 @@ import {
 } from '../../types/provider';
 
 /**
- * 服务商是否已完成必填配置。
- * 按类型模板的 required 字段逐一检查实例值；无必填字段的服务商（如本地服务）视为已配置。
- * 自定义服务商（type 为 openai）的模板在 CONFIG_TEMPLATES 中。
- * 实例不存在（如用户 store 中尚无该内置类型的数据）视为未配置。
+ * 服務商是否已完成必填配置。
+ * 按類型模板的 required 字段逐一檢查實例值；無必填字段的服務商（如本地服務）視為已配置。
+ * 自定義服務商（type 為 openai）的模板在 CONFIG_TEMPLATES 中。
+ * 實例不存在（如用戶 store 中尚無該內置類型的數據）視為未配置。
  */
 export function isProviderConfigured(provider: Provider | undefined): boolean {
   if (!provider) return false;

@@ -17,7 +17,7 @@ export { PythonRuntimeManager, PythonEngineError } from './manager';
 const NOT_READY_MSG =
   'Python engine not ready. Download the faster-whisper runtime (Resource Hub > Engines), or set PYTHON_ENGINE_CMD for local development.';
 
-/** 模型缓存环境：faster-whisper 用 HF cache（funasr 已迁移 sherpa 原生库，不再走 Python）。 */
+/** 模型緩存環境：faster-whisper 用 HF cache（funasr 已遷移 sherpa 原生庫，不再走 Python）。 */
 function resolveEngineEnv(_engineId: PyEngineId): Record<string, string> {
   const modelsPath = getFasterWhisperModelsPath();
   return {
@@ -37,7 +37,7 @@ function resolveEngineCommand(engineId: PyEngineId): EngineCommand {
     throw new Error(NOT_READY_MSG);
   }
 
-  // 自包含运行时：内嵌解释器跑同目录 main.py，PYTHONHOME=运行时根、PYTHONPATH=其 site-packages。
+  // 自包含運行時：內嵌解釋器跑同目錄 main.py，PYTHONHOME=運行時根、PYTHONPATH=其 site-packages。
   const runtimeDir = getEngineDir(engineId);
   return {
     command: getRuntimePythonPath(runtimeDir),

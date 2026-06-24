@@ -32,7 +32,7 @@ interface CompletionBannerProps {
   formData: any;
   taskStatus: string;
   dismissed: boolean;
-  /** 引导示例工程完成时给「下一步去哪」的额外指引 */
+  /** 引導示例工程完成時給「下一步去哪」的額外指引 */
   projectId?: string | null;
   onDismiss: () => void;
   onProofread: (file: any) => void;

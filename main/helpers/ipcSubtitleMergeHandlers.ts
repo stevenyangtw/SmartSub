@@ -1,5 +1,5 @@
 /**
- * 字幕合并功能 IPC 处理函数
+ * 字幕合併功能 IPC 處理函數
  */
 
 import { ipcMain, dialog, BrowserWindow, shell } from 'electron';
@@ -27,32 +27,32 @@ import type {
   SubtitleInfo,
 } from '../../types/subtitleMerge';
 
-// 存储当前进度回调
+// 存儲當前進度回調
 let currentProgressCallback: ((progress: MergeProgress) => void) | null = null;
 const SUBTITLE_MERGE_POWER_SAVE_REASON = 'subtitleMerge';
 
 /**
- * 设置字幕合并相关的 IPC 处理函数
+ * 設置字幕合併相關的 IPC 處理函數
  */
 export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
-  // 获取视频信息
+  // 獲取影片信息
   ipcMain.handle(
     'subtitleMerge:getVideoInfo',
     async (event, { videoPath }): Promise<SubtitleMergeResponse<VideoInfo>> => {
       try {
         if (!fs.existsSync(videoPath)) {
-          return { success: false, error: '视频文件不存在' };
+          return { success: false, error: '影片文件不存在' };
         }
         const info = await getVideoInfo(videoPath);
         return { success: true, data: info };
       } catch (error) {
-        logMessage(`获取视频信息失败: ${error}`, 'error');
-        return { success: false, error: `获取视频信息失败: ${error}` };
+        logMessage(`獲取影片信息失敗: ${error}`, 'error');
+        return { success: false, error: `獲取影片信息失敗: ${error}` };
       }
     },
   );
 
-  // 获取字幕文件信息
+  // 獲取字幕文件信息
   ipcMain.handle(
     'subtitleMerge:getSubtitleInfo',
     async (
@@ -77,13 +77,13 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
           },
         };
       } catch (error) {
-        logMessage(`获取字幕信息失败: ${error}`, 'error');
-        return { success: false, error: `获取字幕信息失败: ${error}` };
+        logMessage(`獲取字幕信息失敗: ${error}`, 'error');
+        return { success: false, error: `獲取字幕信息失敗: ${error}` };
       }
     },
   );
 
-  // 开始合并字幕
+  // 開始合併字幕
   ipcMain.handle(
     'subtitleMerge:startMerge',
     async (
@@ -93,23 +93,23 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
       let powerSaveAcquired = false;
       try {
         if (!fs.existsSync(config.videoPath)) {
-          return { success: false, error: '视频文件不存在' };
+          return { success: false, error: '影片文件不存在' };
         }
         if (!fs.existsSync(config.subtitlePath)) {
           return { success: false, error: '字幕文件不存在' };
         }
 
-        // 如果没有指定输出路径，自动生成
+        // 如果沒有指定輸出路徑，自動生成
         const outputPath =
           config.outputPath || generateOutputPath(config.videoPath);
 
-        // 确保输出目录存在
+        // 確保輸出目錄存在
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
           await fs.promises.mkdir(outputDir, { recursive: true });
         }
 
-        // 设置进度回调
+        // 設置進度回調
         currentProgressCallback = (progress: MergeProgress) => {
           mainWindow.webContents.send('subtitleMerge:progress', progress);
         };
@@ -130,17 +130,17 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
           }
         }
       } catch (error) {
-        // 用户主动取消不算失败
+        // 用戶主動取消不算失敗
         if (error instanceof Error && error.message === MERGE_CANCELLED) {
           return { success: true, cancelled: true };
         }
-        logMessage(`合并失败: ${error}`, 'error');
-        return { success: false, error: `合并失败: ${error}` };
+        logMessage(`合併失敗: ${error}`, 'error');
+        return { success: false, error: `合併失敗: ${error}` };
       }
     },
   );
 
-  // 取消当前合成（kill ffmpeg + 清理半成品输出）
+  // 取消當前合成（kill ffmpeg + 清理半成品輸出）
   ipcMain.handle(
     'subtitleMerge:cancelMerge',
     async (): Promise<SubtitleMergeResponse<boolean>> => {
@@ -149,13 +149,13 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
     },
   );
 
-  // 选择输出路径
+  // 選擇輸出路徑
   ipcMain.handle(
     'subtitleMerge:selectOutputPath',
     async (event, { defaultPath }): Promise<SubtitleMergeResponse<string>> => {
       try {
         const result = await dialog.showSaveDialog(mainWindow, {
-          title: '选择保存位置',
+          title: '選擇保存位置',
           defaultPath: defaultPath || undefined,
           filters: [
             { name: 'Video Files', extensions: ['mp4', 'mkv', 'avi', 'mov'] },
@@ -163,18 +163,18 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
         });
 
         if (result.canceled || !result.filePath) {
-          return { success: false, error: '用户取消选择' };
+          return { success: false, error: '用戶取消選擇' };
         }
 
         return { success: true, data: result.filePath };
       } catch (error) {
-        logMessage(`选择输出路径失败: ${error}`, 'error');
-        return { success: false, error: `选择输出路径失败: ${error}` };
+        logMessage(`選擇輸出路徑失敗: ${error}`, 'error');
+        return { success: false, error: `選擇輸出路徑失敗: ${error}` };
       }
     },
   );
 
-  // 生成默认输出路径
+  // 生成預設輸出路徑
   ipcMain.handle(
     'subtitleMerge:generateOutputPath',
     async (
@@ -185,12 +185,12 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
         const outputPath = generateOutputPath(videoPath, suffix);
         return { success: true, data: outputPath };
       } catch (error) {
-        return { success: false, error: `生成输出路径失败: ${error}` };
+        return { success: false, error: `生成輸出路徑失敗: ${error}` };
       }
     },
   );
 
-  // 打开输出文件所在目录
+  // 打開輸出文件所在目錄
   ipcMain.handle(
     'subtitleMerge:openOutputFolder',
     async (event, { filePath }): Promise<SubtitleMergeResponse<boolean>> => {
@@ -198,10 +198,10 @@ export function setupSubtitleMergeHandlers(mainWindow: BrowserWindow) {
         shell.showItemInFolder(filePath);
         return { success: true, data: true };
       } catch (error) {
-        return { success: false, error: `打开目录失败: ${error}` };
+        return { success: false, error: `打開目錄失敗: ${error}` };
       }
     },
   );
 
-  logMessage('字幕合并 IPC 处理函数已注册', 'info');
+  logMessage('字幕合併 IPC 處理函數已註冊', 'info');
 }

@@ -12,20 +12,20 @@ import DownloadSourceSelector, {
   DownloadSourceOption,
 } from '@/components/resources/engines/DownloadSourceSelector';
 
-/** 下载源配置：在「点击下载」时于气泡内选择，不常驻占位。 */
+/** 下載源配置：在「點擊下載」時於氣泡內選擇，不常駐佔位。 */
 export interface DownloadSourceConfig {
   value: string;
   options: DownloadSourceOption[];
   onChange: (value: string) => void;
-  /** 选择器标题，如「下载源」。 */
+  /** 選擇器標題，如「下載源」。 */
   label: string;
-  /** 确认按钮文案，如「开始下载」。 */
+  /** 確認按鈕文案，如「開始下載」。 */
   confirmLabel: string;
   hint?: string;
   /**
-   * 可选：按「当前所选源」返回可复制的下载链接。
-   * 提供时气泡内会在「开始下载」左侧显示复制按钮，复制内容随选中源自动切换。
-   * 返回 null/undefined 表示该源无可复制链接（复制按钮按下时给出失败提示）。
+   * 可選：按「當前所選源」返回可複製的下載鏈接。
+   * 提供時氣泡內會在「開始下載」左側顯示覆制按鈕，複製內容隨選中源自動切換。
+   * 返回 null/undefined 表示該源無可複製鏈接（複製按鈕按下時給出失敗提示）。
    */
   getCopyUrl?: (
     source: string,
@@ -33,9 +33,9 @@ export interface DownloadSourceConfig {
 }
 
 /**
- * 下载源在「点击下载时」才选择：上下文携带源配置，由真正发起下载的叶子组件
- * （DownModel / FunasrModelSection）消费并就地弹出 Popover。Provider 之外
- * （设置页 / 引导页等）取到 null，行为保持原样（直接下载）。
+ * 下載源在「點擊下載時」才選擇：上下文攜帶源配置，由真正發起下載的葉子組件
+ * （DownModel / FunasrModelSection）消費並就地彈出 Popover。Provider 之外
+ * （設置頁 / 引導頁等）取到 null，行為保持原樣（直接下載）。
  */
 const DownloadSourceContext = createContext<DownloadSourceConfig | null>(null);
 
@@ -50,21 +50,21 @@ interface DownloadSourcePopoverProps {
   onOpenChange: (open: boolean) => void;
   config: DownloadSourceConfig;
   onConfirm: () => void;
-  /** 作为锚点的触发元素（下载按钮），需可转发 ref。 */
+  /** 作為錨點的觸發元素（下載按鈕），需可轉發 ref。 */
   children: React.ReactNode;
   align?: 'start' | 'center' | 'end';
   /**
-   * 可选：按「当前所选源」返回可复制链接。优先级高于 config.getCopyUrl，
-   * 供「一份共享 config 对应多模型」的场景（ModelLibrarySection / Funasr 各行）
-   * 由叶子按本行模型就地提供。
+   * 可選：按「當前所選源」返回可複製鏈接。優先級高於 config.getCopyUrl，
+   * 供「一份共享 config 對應多模型」的場景（ModelLibrarySection / Funasr 各行）
+   * 由葉子按本行模型就地提供。
    */
   getCopyUrl?: DownloadSourceConfig['getCopyUrl'];
 }
 
 /**
- * 「下载源」气泡：以传入的触发元素为锚点，内含分段选源 + 复制链接 + 「开始下载」。
- * 点击确认即关闭并发起下载；复制按钮按当前选中源解析链接并写入剪贴板（不关闭气泡）。
- * 零常驻占位，符合「点下载再选」。
+ * 「下載源」氣泡：以傳入的觸發元素為錨點，內含分段選源 + 複製鏈接 + 「開始下載」。
+ * 點擊確認即關閉併發起下載；複製按鈕按當前選中源解析鏈接並寫入剪貼板（不關閉氣泡）。
+ * 零常駐佔位，符合「點下載再選」。
  */
 const DownloadSourcePopover: React.FC<DownloadSourcePopoverProps> = ({
   open,

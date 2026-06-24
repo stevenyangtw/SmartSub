@@ -14,7 +14,7 @@ interface TaskControlsProps {
   typeDef: TaskTypeDef;
   projectId: string | null;
   className?: string;
-  /** 可选：状态变化时上抛（任务页用于联动重试按钮/完成横幅） */
+  /** 可選：狀態變化時上拋（任務頁用於聯動重試按鈕/完成橫幅） */
   onStatusChange?: (status: string) => void;
   autoStart?: boolean;
 }
@@ -31,7 +31,7 @@ const TaskControls = ({
   autoStart,
 }: TaskControlsProps) => {
   const [taskStatus, setTaskStatusState] = useState('idle');
-  // 首次状态同步是否已完成:autostart 必须等它,否则迟到的 'idle' 会覆盖乐观 'running'
+  // 首次狀態同步是否已完成:autostart 必須等它,否則遲到的 'idle' 會覆蓋樂觀 'running'
   const [statusSynced, setStatusSynced] = useState(false);
   const { t } = useTranslation(['home', 'common']);
 
@@ -44,7 +44,7 @@ const TaskControls = ({
     setStatusSynced(false);
     if (!projectId) return;
     let disposed = false;
-    // 获取当前工程的任务状态
+    // 獲取當前工程的任務狀態
     const getCurrentTaskStatus = async () => {
       const status = await window?.ipc?.invoke('getTaskStatus', projectId);
       if (!disposed && status) setTaskStatus(status);
@@ -52,7 +52,7 @@ const TaskControls = ({
     };
     getCurrentTaskStatus();
 
-    // 监听本工程的任务完成事件
+    // 監聽本工程的任務完成事件
     const cleanup = window?.ipc?.on(
       'taskComplete',
       (payload: TaskCompletePayload) => {
@@ -77,7 +77,7 @@ const TaskControls = ({
       });
       return;
     }
-    // 带翻译的任务必须有有效翻译服务商（'-1' 为历史「不翻译」残留值）
+    // 帶翻譯的任務必須有有效翻譯服務商（'-1' 為歷史「不翻譯」殘留值）
     if (typeDef.hasTranslate) {
       const provider = formData?.translateProvider;
       if (!provider || provider === '-1') {
@@ -85,12 +85,12 @@ const TaskControls = ({
         return;
       }
     }
-    // 需要模型的任务必须已选模型：自动选择兜底后仍为空，说明确实没有可用模型，拦截并指引下载
+    // 需要模型的任務必須已選模型：自動選擇兜底後仍為空，說明確實沒有可用模型，攔截並指引下載
     if (typeDef.needsModel && !formData?.model) {
       toast.error(t('home:selectModelFirst'));
       return;
     }
-    // 只派发未完成的文件（error 不算完成，可重跑；已完成文件不重做）
+    // 只派發未完成的文件（error 不算完成，可重跑；已完成文件不重做）
     const pendingFiles = files.filter(
       (file) => !isFileDone(file, getFileStages(file, typeDef, formData)),
     );
@@ -100,7 +100,7 @@ const TaskControls = ({
       });
       return;
     }
-    // 记录"上次使用"的 (引擎,模型) 作为下次新任务默认（全局单条，二者作为整体）
+    // 記錄"上次使用"的 (引擎,模型) 作為下次新任務預設（全局單條，二者作為整體）
     if (
       typeDef.needsModel &&
       formData?.transcriptionEngine &&
@@ -121,7 +121,7 @@ const TaskControls = ({
     });
   };
 
-  // ?autostart=1 进入页面时自动开始一次(仅 idle 态,ref 防 StrictMode/重渲染重复触发)
+  // ?autostart=1 進入頁面時自動開始一次(僅 idle 態,ref 防 StrictMode/重渲染重複觸發)
   const autoStartedRef = useRef(false);
   useEffect(() => {
     if (!statusSynced) return;
@@ -153,7 +153,7 @@ const TaskControls = ({
     taskStatus === 'completed' ||
     taskStatus === 'cancelled';
 
-  // Cmd/Ctrl+Enter 等价点击「开始任务」（仅可开始状态下生效）
+  // Cmd/Ctrl+Enter 等價點擊「開始任務」（僅可開始狀態下生效）
   useHotkeys([
     {
       combo: 'mod+enter',

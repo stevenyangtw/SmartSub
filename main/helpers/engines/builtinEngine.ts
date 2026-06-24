@@ -20,7 +20,7 @@ import {
 import type { TranscribeContext, TranscriptionEngineAdapter } from './types';
 
 /**
- * 使用内置 whisper.cpp 库生成字幕。取消经 whisperParams.signal 原生中断。
+ * 使用內置 whisper.cpp 庫生成字幕。取消經 whisperParams.signal 原生中斷。
  */
 async function transcribeBuiltin(ctx: TranscribeContext): Promise<string> {
   const { event, file, formData } = ctx;
@@ -37,7 +37,7 @@ async function transcribeBuiltin(ctx: TranscribeContext): Promise<string> {
     const whisperModel = model?.toLowerCase();
     const settings = store.get('settings');
 
-    // 加载链内部按 gpuMode + 环境自动决策并逐级降级（见 addonLoader）
+    // 加載鏈內部按 gpuMode + 環境自動決策並逐級降級（見 addonLoader）
     const { whisperAsync, backend, variant } =
       await loadWhisperAddon(whisperModel);
     const backendLabels: Record<string, string> = {
@@ -51,7 +51,7 @@ async function transcribeBuiltin(ctx: TranscribeContext): Promise<string> {
       backend === 'cuda' && variant !== null && variant !== 'vulkan'
         ? `CUDA ${variant}`
         : backendLabels[backend] || backend;
-    // 把实际后端推给任务卡片（useIpcCommunication 做通用 merge）
+    // 把實際後端推給任務卡片（useIpcCommunication 做通用 merge）
     event.sender.send('taskFileChange', {
       ...file,
       extractSubtitle: 'loading',
@@ -59,7 +59,7 @@ async function transcribeBuiltin(ctx: TranscribeContext): Promise<string> {
     });
     const modelPath = `${getPath('modelsPath')}/ggml-${whisperModel}.bin`;
 
-    // VAD 模型路径 - 使用内置的 VAD 模型
+    // VAD 模型路徑 - 使用內置的 VAD 模型
     const vadModelPath = path.join(
       getExtraResourcesPath(),
       'ggml-silero-v6.2.0.bin',
@@ -81,12 +81,12 @@ async function transcribeBuiltin(ctx: TranscribeContext): Promise<string> {
       max_len: 0,
       print_progress: true,
       prompt,
-      // 抗幻觉/抗重复开启时强制 max_context=0（不携带上文，≈faster-whisper 的
-      // condition_on_previous_text=false），这是 whisper.cpp 打断重复/幻觉级联的关键杠杆。
+      // 抗幻覺/抗重複開啟時強制 max_context=0（不攜帶上文，≈faster-whisper 的
+      // condition_on_previous_text=false），這是 whisper.cpp 打斷重複/幻覺級聯的關鍵槓桿。
       max_context: isReduceRepetitionEnabled(settings)
         ? 0
         : +(maxContext ?? -1),
-      // VAD 参数
+      // VAD 參數
       vad: vad.useVAD,
       vad_model: vadModelPath,
       vad_threshold: vad.vadThreshold,
@@ -169,6 +169,6 @@ export const builtinEngineAdapter: TranscriptionEngineAdapter = {
   },
 
   cancelActive(): void {
-    // builtin 经 whisperParams.signal 原生中断，无需额外动作。
+    // builtin 經 whisperParams.signal 原生中斷，無需額外動作。
   },
 };

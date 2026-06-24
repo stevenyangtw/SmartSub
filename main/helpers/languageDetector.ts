@@ -1,75 +1,75 @@
 /**
- * 语言代码检测器
- * 从文件名中自动检测语言代码
+ * 語言代碼檢測器
+ * 從文件名中自動檢測語言代碼
  */
 
 import path from 'path';
 import { LanguageDetectionResult } from '../../types/proofread';
 
-// ISO 639-1 语言代码映射表
+// ISO 639-1 語言代碼映射表
 const LANGUAGE_MAP: Record<string, string> = {
-  // 常用语言
+  // 常用語言
   zh: '中文',
-  en: '英语',
-  ja: '日语',
-  ko: '韩语',
-  fr: '法语',
-  de: '德语',
-  es: '西班牙语',
-  ru: '俄语',
-  pt: '葡萄牙语',
-  it: '意大利语',
+  en: '英語',
+  ja: '日語',
+  ko: '韓語',
+  fr: '法語',
+  de: '德語',
+  es: '西班牙語',
+  ru: '俄語',
+  pt: '葡萄牙語',
+  it: '意大利語',
 
-  // 其他欧洲语言
-  nl: '荷兰语',
-  pl: '波兰语',
-  tr: '土耳其语',
-  sv: '瑞典语',
-  cs: '捷克语',
-  da: '丹麦语',
-  fi: '芬兰语',
-  el: '希腊语',
-  hu: '匈牙利语',
-  no: '挪威语',
-  ro: '罗马尼亚语',
-  sk: '斯洛伐克语',
-  hr: '克罗地亚语',
-  sr: '塞尔维亚语',
-  sl: '斯洛文尼亚语',
-  bg: '保加利亚语',
-  uk: '乌克兰语',
-  et: '爱沙尼亚语',
-  lv: '拉脱维亚语',
-  lt: '立陶宛语',
+  // 其他歐洲語言
+  nl: '荷蘭語',
+  pl: '波蘭語',
+  tr: '土耳其語',
+  sv: '瑞典語',
+  cs: '捷克語',
+  da: '丹麥語',
+  fi: '芬蘭語',
+  el: '希臘語',
+  hu: '匈牙利語',
+  no: '挪威語',
+  ro: '羅馬尼亞語',
+  sk: '斯洛伐克語',
+  hr: '克羅地亞語',
+  sr: '塞爾維亞語',
+  sl: '斯洛文尼亞語',
+  bg: '保加利亞語',
+  uk: '烏克蘭語',
+  et: '愛沙尼亞語',
+  lv: '拉脫維亞語',
+  lt: '立陶宛語',
 
-  // 亚洲语言
-  hi: '印地语',
-  th: '泰语',
-  vi: '越南语',
-  id: '印度尼西亚语',
-  ms: '马来语',
-  ta: '泰米尔语',
-  ur: '乌尔都语',
-  mr: '马拉地语',
+  // 亞洲語言
+  hi: '印地語',
+  th: '泰語',
+  vi: '越南語',
+  id: '印度尼西亞語',
+  ms: '馬來語',
+  ta: '泰米爾語',
+  ur: '烏爾都語',
+  mr: '馬拉地語',
 
-  // 中东语言
-  ar: '阿拉伯语',
-  he: '希伯来语',
-  fa: '波斯语',
+  // 中東語言
+  ar: '阿拉伯語',
+  he: '希伯來語',
+  fa: '波斯語',
 
-  // 其他语言
-  af: '阿非利堪斯语',
-  ca: '加泰罗尼亚语',
-  gl: '加利西亚语',
-  tl: '塔加洛语',
-  sw: '斯瓦希里语',
-  cy: '威尔士语',
-  mn: '蒙古语',
+  // 其他語言
+  af: '阿非利堪斯語',
+  ca: '加泰羅尼亞語',
+  gl: '加利西亞語',
+  tl: '塔加洛語',
+  sw: '斯瓦希里語',
+  cy: '威爾士語',
+  mn: '蒙古語',
 };
 
-// 语言代码别名映射（常见变体）
+// 語言代碼別名映射（常見變體）
 const LANGUAGE_ALIASES: Record<string, string> = {
-  // 中文变体
+  // 中文變體
   'zh-cn': 'zh',
   'zh-tw': 'zh',
   'zh-hk': 'zh',
@@ -81,68 +81,68 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   chinese: 'zh',
   cn: 'zh',
 
-  // 英语变体
+  // 英語變體
   'en-us': 'en',
   'en-gb': 'en',
   'en-au': 'en',
   eng: 'en',
   english: 'en',
 
-  // 日语变体
+  // 日語變體
   jpn: 'ja',
   jap: 'ja',
   japanese: 'ja',
   jp: 'ja',
 
-  // 韩语变体
+  // 韓語變體
   kor: 'ko',
   korean: 'ko',
   kr: 'ko',
 
-  // 法语变体
+  // 法語變體
   fra: 'fr',
   fre: 'fr',
   french: 'fr',
 
-  // 德语变体
+  // 德語變體
   ger: 'de',
   deu: 'de',
   german: 'de',
 
-  // 西班牙语变体
+  // 西班牙語變體
   spa: 'es',
   spanish: 'es',
 
-  // 俄语变体
+  // 俄語變體
   rus: 'ru',
   russian: 'ru',
 
-  // 葡萄牙语变体
+  // 葡萄牙語變體
   por: 'pt',
   'pt-br': 'pt',
   portuguese: 'pt',
 
-  // 意大利语变体
+  // 意大利語變體
   ita: 'it',
   italian: 'it',
 };
 
-// 文件名中常见的语言标记模式
+// 文件名中常見的語言標記模式
 const LANGUAGE_PATTERNS = [
-  // 标准后缀格式：video.en.srt, video.zh-CN.srt
+  // 標準後綴格式：video.en.srt, video.zh-CN.srt
   /\.([a-z]{2}(?:-[a-z]{2,4})?)\.(?:srt|vtt|ass|ssa|lrc)$/i,
-  // 下划线格式：video_en.srt, video_chinese.srt
+  // 下劃線格式：video_en.srt, video_chinese.srt
   /_([a-z]{2,10})\.(?:srt|vtt|ass|ssa|lrc)$/i,
-  // 方括号格式：video[en].srt, video[chinese].srt
+  // 方括號格式：video[en].srt, video[chinese].srt
   /\[([a-z]{2,10})\]\.(?:srt|vtt|ass|ssa|lrc)$/i,
-  // 括号格式：video(en).srt, video(chinese).srt
+  // 括號格式：video(en).srt, video(chinese).srt
   /\(([a-z]{2,10})\)\.(?:srt|vtt|ass|ssa|lrc)$/i,
-  // 点分隔但在扩展名之前：video.english.srt
+  // 點分隔但在擴展名之前：video.english.srt
   /\.([a-z]{2,10})\.(?:srt|vtt|ass|ssa|lrc)$/i,
 ];
 
 /**
- * 从文件名检测语言
+ * 從文件名檢測語言
  */
 export function detectLanguageFromFilename(
   filePath: string,
@@ -169,22 +169,22 @@ export function detectLanguageFromFilename(
 }
 
 /**
- * 标准化语言代码
+ * 標準化語言代碼
  */
 export function normalizeLanguageCode(code: string): string | null {
   const lower = code.toLowerCase();
 
-  // 直接匹配 ISO 639-1 代码
+  // 直接匹配 ISO 639-1 代碼
   if (LANGUAGE_MAP[lower]) {
     return lower;
   }
 
-  // 检查别名
+  // 檢查別名
   if (LANGUAGE_ALIASES[lower]) {
     return LANGUAGE_ALIASES[lower];
   }
 
-  // 处理带区域的代码（如 zh-CN -> zh）
+  // 處理帶區域的代碼（如 zh-CN -> zh）
   const baseLang = lower.split('-')[0];
   if (LANGUAGE_MAP[baseLang]) {
     return baseLang;
@@ -194,7 +194,7 @@ export function normalizeLanguageCode(code: string): string | null {
 }
 
 /**
- * 获取语言名称
+ * 獲取語言名稱
  */
 export function getLanguageName(code: string): string {
   const normalized = normalizeLanguageCode(code);
@@ -202,7 +202,7 @@ export function getLanguageName(code: string): string {
 }
 
 /**
- * 获取所有支持的语言列表
+ * 獲取所有支持的語言列表
  */
 export function getSupportedLanguages(): Array<{ code: string; name: string }> {
   return Object.entries(LANGUAGE_MAP).map(([code, name]) => ({
@@ -212,9 +212,9 @@ export function getSupportedLanguages(): Array<{ code: string; name: string }> {
 }
 
 /**
- * 从多个字幕文件中检测语言对
- * @param userSourceLanguage 用户任务的源语言（可选，'auto' 视为未指定）
- * @param userTargetLanguage 用户任务的目标语言（可选）
+ * 從多個字幕文件中檢測語言對
+ * @param userSourceLanguage 用戶任務的源語言（可選，'auto' 視為未指定）
+ * @param userTargetLanguage 用戶任務的目標語言（可選）
  */
 export function detectLanguagePair(
   subtitleFiles: string[],
@@ -233,9 +233,9 @@ export function detectLanguagePair(
     }
   }
 
-  // 如果检测到两种不同的语言，尝试确定源语言和目标语言
+  // 如果檢測到兩種不同的語言，嘗試確定源語言和目標語言
   if (languages.length >= 2) {
-    // 优先匹配用户任务语向：源/目标语言都在检测结果中时直接采用
+    // 優先匹配用戶任務語向：源/目標語言都在檢測結果中時直接採用
     const hasUserSource =
       userSourceLanguage &&
       userSourceLanguage !== 'auto' &&
@@ -251,7 +251,7 @@ export function detectLanguagePair(
       };
     }
 
-    // 回退启发式：英语作为源语言，中文作为目标语言
+    // 回退啟發式：英語作為源語言，中文作為目標語言
     const enIndex = languages.findIndex((l) => l.lang.code === 'en');
     const zhIndex = languages.findIndex((l) => l.lang.code === 'zh');
 
@@ -262,7 +262,7 @@ export function detectLanguagePair(
       };
     }
 
-    // 否则按检测顺序，第一个作为源语言
+    // 否則按檢測順序，第一個作為源語言
     return {
       source: languages[0].lang.code,
       target: languages[1].lang.code,
@@ -279,7 +279,7 @@ export function detectLanguagePair(
 }
 
 /**
- * 验证语言代码是否有效
+ * 驗證語言代碼是否有效
  */
 export function isValidLanguageCode(code: string): boolean {
   return normalizeLanguageCode(code) !== null;

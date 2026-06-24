@@ -1,5 +1,5 @@
 /**
- * 校对任务存储管理 —  backed by unified WorkItem store (P19)
+ * 校對任務存儲管理 —  backed by unified WorkItem store (P19)
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -22,7 +22,7 @@ function persistProofreadTask(task: ProofreadTask): void {
   saveWorkItem(proofreadTaskToWorkItem(task));
 }
 
-// ============ 任务级别操作 ============
+// ============ 任務級別操作 ============
 
 export function getProofreadTasks(): ProofreadTask[] {
   return getWorkItems()
@@ -105,7 +105,7 @@ export function clearProofreadTasks(): void {
   }
 }
 
-// ============ 项目级别操作 ============
+// ============ 項目級別操作 ============
 
 export function updateProofreadItem(
   taskId: string,
@@ -227,7 +227,7 @@ export function removeItemFromTask(
   return task;
 }
 
-// ============ 辅助函数 ============
+// ============ 輔助函數 ============
 
 function generateTaskName(
   item: Omit<
@@ -270,7 +270,7 @@ export function getCompletedTasks(): ProofreadTask[] {
   return getProofreadTasks().filter((t) => t.status === 'completed');
 }
 
-// ============ 兼容旧版本 ============
+// ============ 兼容舊版本 ============
 
 export function getProofreadHistories(): ProofreadHistory[] {
   return (store.get(HISTORY_KEY) as ProofreadHistory[]) || [];

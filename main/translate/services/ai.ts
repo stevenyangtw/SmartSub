@@ -16,22 +16,22 @@ import {
 } from '../../helpers/taskContext';
 
 function getLanguageName(code: string): string {
-  // 中文目标须向 AI 明确简/繁，避免「中文」歧义导致译文简繁混杂（issue #332）。
-  // UI 仍显示「中文」，但提示词里替换为「简体中文」/「繁体中文」以稳定输出字形。
+  // 中文目標須向 AI 明確簡/繁，避免「中文」歧義導致譯文簡繁混雜（issue #332）。
+  // UI 仍顯示「中文」，但提示詞裡替換為「簡體中文」/「繁體中文」以穩定輸出字形。
   const normalized = (code || '').toLowerCase();
   if (
     normalized === 'zh' ||
     normalized === 'zh-cn' ||
     normalized === 'zh-hans'
   ) {
-    return '简体中文';
+    return '簡體中文';
   }
   if (
     normalized === 'zh-hant' ||
     normalized === 'zh-tw' ||
     normalized === 'zh-hk'
   ) {
-    return '繁体中文';
+    return '繁體中文';
   }
   const lang = supportedLanguage.find((l) => l.value === code);
   return lang?.name || code;
@@ -53,7 +53,7 @@ export async function handleAIBatchTranslation(
   let processedSubtitles = 0;
 
   logMessage(
-    `开始AI批量翻译：总共 ${subtitles.length} 条字幕，分为 ${totalBatches} 个批次，每批次 ${batchSize} 条`,
+    `開始AI批量翻譯：總共 ${subtitles.length} 條字幕，分為 ${totalBatches} 個批次，每批次 ${batchSize} 條`,
     'info',
   );
 
@@ -68,12 +68,12 @@ export async function handleAIBatchTranslation(
     let batchResults: TranslationResult[] = [];
 
     if (requestInterval > 0 && i > 0) {
-      logMessage(`等待 ${provider.requestInterval}s (请求间隔)`, 'info');
+      logMessage(`等待 ${provider.requestInterval}s (請求間隔)`, 'info');
       await new Promise((resolve) => setTimeout(resolve, requestInterval));
     }
 
     logMessage(
-      `处理批次 ${currentBatchIndex}/${totalBatches}，包含 ${batch.length} 条字幕`,
+      `處理批次 ${currentBatchIndex}/${totalBatches}，包含 ${batch.length} 條字幕`,
       'info',
     );
 
@@ -103,17 +103,17 @@ export async function handleAIBatchTranslation(
           },
         );
 
-        // 更新配置，保持原有的结构化输出设置
+        // 更新配置，保持原有的結構化輸出設置
         const translationConfig = {
           ...provider,
           systemPrompt,
           // 保留原有的 useJsonMode 配置或 structuredOutput 配置
-          // 如果没有配置，默认启用 JSON 模式以保持向后兼容
+          // 如果沒有配置，預設啟用 JSON 模式以保持向後兼容
           useJsonMode: provider.useJsonMode !== false,
         };
 
         logMessage(
-          `AI translate batch ${currentBatchIndex}/${totalBatches} (尝试 ${retryCount + 1}/${maxRetries + 1}): \n ${translationContent}`,
+          `AI translate batch ${currentBatchIndex}/${totalBatches} (嘗試 ${retryCount + 1}/${maxRetries + 1}): \n ${translationContent}`,
           'info',
         );
         const responseOrigin = await translator(
@@ -125,24 +125,24 @@ export async function handleAIBatchTranslation(
         logMessage(`AI response: \n ${responseOrigin}`, 'info');
         const response = responseOrigin.replace(THINK_TAG_REGEX, '').trim();
 
-        // 解析响应, 从结果中提取 json 里面的内容
+        // 解析響應, 從結果中提取 json 裡面的內容
         const match = response.match(JSON_CONTENT_REGEX);
         const responseJsonString = match ? match[1] : response;
 
-        // 尝试解析JSON
+        // 嘗試解析JSON
         const parsedContent = parseJsonWithFallbacks(responseJsonString);
 
-        // 检查解析结果是否有效
+        // 檢查解析結果是否有效
         if (parsedContent && typeof parsedContent === 'object') {
           const parsedKeys = Object.keys(parsedContent);
           const parsedValues = Object.values(parsedContent);
 
-          // 校验返回条数是否与请求一致：
-          // 若数量不一致（例如请求 50 条只回 40 条），按数组索引兜底会让译文与
-          // 时间轴错位，因此视为本批次失败并触发重试，避免产生错位结果（issue #308）。
+          // 校驗返回條數是否與請求一致：
+          // 若數量不一致（例如請求 50 條只回 40 條），按數組索引兜底會讓譯文與
+          // 時間軸錯位，因此視為本批次失敗並觸發重試，避免產生錯位結果（issue #308）。
           if (parsedKeys.length !== batch.length) {
             throw new Error(
-              `翻译返回条数与请求不一致：请求 ${batch.length} 条，返回 ${parsedKeys.length} 条`,
+              `翻譯返回條數與請求不一致：請求 ${batch.length} 條，返回 ${parsedKeys.length} 條`,
             );
           }
 
@@ -152,14 +152,14 @@ export async function handleAIBatchTranslation(
             id: subtitle.id,
             startEndTime: subtitle.startEndTime,
             sourceContent: subtitle.content.join('\n'),
-            // 优先使用ID匹配；数量已校验一致，按索引兜底是安全的
+            // 優先使用ID匹配；數量已校驗一致，按索引兜底是安全的
             targetContent:
               parsedContent[subtitle.id] !== undefined
                 ? parsedContent[subtitle.id]
                 : (parsedValues[index] ?? ''),
           }));
 
-          // 如果提供了结果处理函数，则实时处理每个翻译结果
+          // 如果提供了結果處理函數，則實時處理每個翻譯結果
           if (onTranslationResult) {
             await onTranslationResult(batchResults);
           }
@@ -169,7 +169,7 @@ export async function handleAIBatchTranslation(
           batchSuccess = true;
 
           logMessage(
-            `批次 ${currentBatchIndex}/${totalBatches} 翻译成功，已处理 ${processedSubtitles}/${subtitles.length} 条字幕`,
+            `批次 ${currentBatchIndex}/${totalBatches} 翻譯成功，已處理 ${processedSubtitles}/${subtitles.length} 條字幕`,
             'info',
           );
         } else {
@@ -179,54 +179,54 @@ export async function handleAIBatchTranslation(
         }
       } catch (error) {
         if (isTaskCancelledError(error)) throw error;
-        // 检查是否是配置错误，如果是则直接抛出，不进行重试
+        // 檢查是否是配置錯誤，如果是則直接拋出，不進行重試
         if (isConfigurationError(error)) {
           throw new Error(
-            `翻译服务配置不完整，请检查相关配置: ${error.message}`,
+            `翻譯服務配置不完整，請檢查相關配置: ${error.message}`,
           );
         }
 
         retryCount++;
         if (retryCount <= maxRetries) {
           logMessage(
-            `批次 ${currentBatchIndex}/${totalBatches} 翻译失败，重试 ${retryCount}/${maxRetries}: ${error.message}`,
+            `批次 ${currentBatchIndex}/${totalBatches} 翻譯失敗，重試 ${retryCount}/${maxRetries}: ${error.message}`,
             'warning',
           );
-          // 添加短暂延迟，避免频繁重试
+          // 添加短暫延遲，避免頻繁重試
           await new Promise((resolve) =>
             setTimeout(resolve, 1000 * retryCount),
           );
         } else {
           logMessage(
-            `批次 ${currentBatchIndex}/${totalBatches} 翻译失败，已达到最大重试次数 ${maxRetries}，跳过该批次: ${error.message}`,
+            `批次 ${currentBatchIndex}/${totalBatches} 翻譯失敗，已達到最大重試次數 ${maxRetries}，跳過該批次: ${error.message}`,
             'error',
           );
-          // 如果全部重试都失败，则添加失败记录，并继续下一批
+          // 如果全部重試都失敗，則添加失敗記錄，並繼續下一批
           batchResults = batch.map((subtitle) => ({
             id: subtitle.id,
             startEndTime: subtitle.startEndTime,
             sourceContent: subtitle.content.join('\n'),
-            targetContent: `[翻译失败: ${error.message}]`,
+            targetContent: `[翻譯失敗: ${error.message}]`,
           }));
 
-          // 对失败的结果也进行处理和保存
+          // 對失敗的結果也進行處理和保存
           if (onTranslationResult) {
             await onTranslationResult(batchResults);
           }
 
           results.push(...batchResults);
           processedSubtitles += batch.length;
-          batchSuccess = true; // 标记为完成，继续下一批次
+          batchSuccess = true; // 標記為完成，繼續下一批次
 
           logMessage(
-            `批次 ${currentBatchIndex}/${totalBatches} 已标记为失败完成，继续下一批次`,
+            `批次 ${currentBatchIndex}/${totalBatches} 已標記為失敗完成，繼續下一批次`,
             'warning',
           );
         }
       }
     }
 
-    // 更新翻译进度 - 使用实际处理的字幕数量计算
+    // 更新翻譯進度 - 使用實際處理的字幕數量計算
     const progress = Math.min(
       (processedSubtitles / subtitles.length) * 100,
       100,
@@ -236,35 +236,35 @@ export async function handleAIBatchTranslation(
     }
 
     logMessage(
-      `进度更新: ${progress.toFixed(2)}% (${processedSubtitles}/${subtitles.length})`,
+      `進度更新: ${progress.toFixed(2)}% (${processedSubtitles}/${subtitles.length})`,
       'info',
     );
   }
 
   logMessage(
-    `AI批量翻译完成：共处理 ${processedSubtitles} 条字幕，成功 ${results.filter((r) => !r.targetContent.startsWith('[翻译失败:')).length} 条`,
+    `AI批量翻譯完成：共處理 ${processedSubtitles} 條字幕，成功 ${results.filter((r) => !r.targetContent.startsWith('[翻譯失敗:')).length} 條`,
     'info',
   );
 
   return results;
 }
 
-// 辅助函数：尝试多种方式解析JSON内容
+// 輔助函數：嘗試多種方式解析JSON內容
 function parseJsonWithFallbacks(jsonContent: string): any {
   try {
-    // 第一次尝试：使用标准JSON解析
+    // 第一次嘗試：使用標準JSON解析
     return JSON.parse(jsonContent);
   } catch (jsonError) {
     try {
-      // 第二次尝试：使用toJson进行更宽松的解析
+      // 第二次嘗試：使用toJson進行更寬鬆的解析
       return toJson(jsonContent);
     } catch (json5Error) {
       try {
-        // 第三次尝试：使用jsonrepair进行修复和解析
+        // 第三次嘗試：使用jsonrepair進行修復和解析
         const repairedJson = jsonrepair(jsonContent);
         return JSON.parse(repairedJson);
       } catch (jsonRepairError) {
-        throw new Error(`无法解析AI返回的JSON内容: ${jsonRepairError.message}`);
+        throw new Error(`無法解析AI返回的JSON內容: ${jsonRepairError.message}`);
       }
     }
   }

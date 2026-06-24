@@ -24,14 +24,14 @@ export function LogDialog({ open, onOpenChange }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 初始加载日志
+    // 初始加載日誌
     window.ipc.invoke('getLogs').then(setLogs);
 
-    // 监听新日志
+    // 監聽新日誌
     const handleNewLog = (log: LogEntry) => {
       setLogs((prev) => [...prev, log]);
-      // 使用 requestAnimationFrame 确保在下一帧更新滚动位置
-      // 真正可滚动的是 Radix 的 viewport，而非 ScrollArea 根节点
+      // 使用 requestAnimationFrame 確保在下一幀更新滾動位置
+      // 真正可滾動的是 Radix 的 viewport，而非 ScrollArea 根節點
       requestAnimationFrame(() => {
         const viewport = scrollRef.current?.querySelector(
           '[data-radix-scroll-area-viewport]',

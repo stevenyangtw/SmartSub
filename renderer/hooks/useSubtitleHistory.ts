@@ -1,24 +1,24 @@
 /**
- * 命令模式撤销历史：统一的连续区间 diff 命令栈。
- * 单行编辑 / 合并 / 拆分 / 批量替换都表达为同一种命令，
- * 相比整数组快照，内存占用从 O(n×历史数) 降到 O(改动行数×历史数)。
+ * 命令模式撤銷歷史：統一的連續區間 diff 命令棧。
+ * 單行編輯 / 合併 / 拆分 / 批量替換都表達為同一種命令，
+ * 相比整數組快照，內存佔用從 O(n×歷史數) 降到 O(改動行數×歷史數)。
  */
 
 import { useCallback, useRef, useState } from 'react';
 import { Subtitle } from './useSubtitles';
 
 export interface RangeCommand {
-  /** 区间起点（应用前数组中的下标） */
+  /** 區間起點（應用前數組中的下標） */
   start: number;
-  /** undo 时回填的原始行 */
+  /** undo 時回填的原始行 */
   removed: Subtitle[];
-  /** redo 时回填的新行 */
+  /** redo 時回填的新行 */
   inserted: Subtitle[];
 }
 
 const MAX_HISTORY = 200;
 
-/** 行内容等价（用于批量操作的最小区间 diff 计算） */
+/** 行內容等價（用於批量操作的最小區間 diff 計算） */
 export const subtitleRowEquals = (a: Subtitle, b: Subtitle): boolean =>
   a === b ||
   (a.id === b.id &&
@@ -27,8 +27,8 @@ export const subtitleRowEquals = (a: Subtitle, b: Subtitle): boolean =>
     (a.targetContent ?? '') === (b.targetContent ?? ''));
 
 /**
- * 计算 before → after 的最小连续区间 diff；无变化返回 null。
- * 公共前缀/后缀按行内容等价跳过，中间段作为命令区间。
+ * 計算 before → after 的最小連續區間 diff；無變化返回 null。
+ * 公共前綴/後綴按行內容等價跳過，中間段作為命令區間。
  */
 export const computeRangeDiff = (
   before: Subtitle[],
@@ -64,13 +64,13 @@ export const computeRangeDiff = (
 export function useSubtitleHistory() {
   const commandsRef = useRef<RangeCommand[]>([]);
   const cursorRef = useRef(0);
-  // 仅用于在栈变化后触发重渲染，让 canUndo/canRedo 反映最新值
+  // 僅用於在棧變化後觸發重渲染，讓 canUndo/canRedo 反映最新值
   const [, setVersion] = useState(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
 
   const push = useCallback(
     (cmd: RangeCommand) => {
-      // 新命令入栈：丢弃 redo 分支
+      // 新命令入棧：丟棄 redo 分支
       const cmds = commandsRef.current.slice(0, cursorRef.current);
       cmds.push(cmd);
       while (cmds.length > MAX_HISTORY) cmds.shift();
@@ -87,12 +87,12 @@ export function useSubtitleHistory() {
     bump();
   }, [bump]);
 
-  /** 应用撤销：返回新数组；无可撤销或数据漂移时返回 null */
+  /** 應用撤銷：返回新數組；無可撤銷或數據漂移時返回 null */
   const undo = useCallback(
     (current: Subtitle[]): Subtitle[] | null => {
       if (cursorRef.current <= 0) return null;
       const cmd = commandsRef.current[cursorRef.current - 1];
-      // 区间防御：命令与当前数组不再吻合时清栈，避免错位应用
+      // 區間防禦：命令與當前數組不再吻合時清棧，避免錯位應用
       if (cmd.start < 0 || cmd.start + cmd.inserted.length > current.length) {
         reset();
         return null;
@@ -106,7 +106,7 @@ export function useSubtitleHistory() {
     [bump, reset],
   );
 
-  /** 应用重做：返回新数组；无可重做或数据漂移时返回 null */
+  /** 應用重做：返回新數組；無可重做或數據漂移時返回 null */
   const redo = useCallback(
     (current: Subtitle[]): Subtitle[] | null => {
       if (cursorRef.current >= commandsRef.current.length) return null;

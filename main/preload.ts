@@ -12,7 +12,7 @@ const handler = {
   invoke(channel: string, ...args): Promise<any> {
     return ipcRenderer.invoke(channel, ...args);
   },
-  // Electron 32+ 移除了 File.path，统一经 webUtils 取拖拽文件的磁盘路径
+  // Electron 32+ 移除了 File.path，統一經 webUtils 取拖拽文件的磁盤路徑
   getPathForFile(file: File): string {
     return webUtils.getPathForFile(file);
   },
@@ -25,7 +25,7 @@ const handler = {
       ipcRenderer.removeListener(channel, subscription);
     };
   },
-  /** 渲染层平台判断统一来源（替代 userAgent 嗅探） */
+  /** 渲染層平臺判斷統一來源（替代 userAgent 嗅探） */
   platform: process.platform,
 };
 

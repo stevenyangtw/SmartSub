@@ -52,7 +52,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Subtitle } from '../../hooks/useSubtitles';
 import BatchAiOptimizeDialog from './BatchAiOptimizeDialog';
 
-/** 出现次数统计（支持大小写不敏感） */
+/** 出現次數統計（支持大小寫不敏感） */
 const countOccurrences = (
   text: string,
   needle: string,
@@ -70,7 +70,7 @@ const countOccurrences = (
   return count;
 };
 
-/** 全部替换（支持大小写不敏感，保留未匹配部分原样） */
+/** 全部替換（支持大小寫不敏感，保留未匹配部分原樣） */
 const replaceAllWithCase = (
   text: string,
   needle: string,
@@ -92,7 +92,7 @@ const replaceAllWithCase = (
   return result + text.slice(last);
 };
 
-/** 匹配位置：第 index 条的某个字段（替换粒度为条+字段） */
+/** 匹配位置：第 index 條的某個字段（替換粒度為條+字段） */
 interface SearchMatch {
   index: number;
   field: 'sourceContent' | 'targetContent';
@@ -113,16 +113,16 @@ interface SubtitleEditToolbarProps {
     splitTime?: number,
   ) => void;
   shouldShowTranslation: boolean;
-  getCursorPosition?: () => number; // 获取当前光标位置
-  // 外部触发器
+  getCursorPosition?: () => number; // 獲取當前光標位置
+  // 外部觸發器
   triggerAiOptimize?: boolean;
   triggerSplit?: boolean;
-  onTriggerHandled?: () => void; // 当触发器被处理后调用
-  /** 外部请求打开搜索替换（Cmd/Ctrl+F）：token 递增时展开面板并聚焦搜索框 */
+  onTriggerHandled?: () => void; // 當觸發器被處理後調用
+  /** 外部請求打開搜索替換（Cmd/Ctrl+F）：token 遞增時展開面板並聚焦搜索框 */
   searchOpenToken?: number;
-  /** 定位到某条字幕（展开行并滚动到可视区），用于搜索逐条跳转 */
+  /** 定位到某條字幕（展開行並滾動到可視區），用於搜索逐條跳轉 */
   onLocateSubtitle?: (index: number) => void;
-  /** 视图控制（从字幕列表上提，统一放右侧） */
+  /** 視圖控制（從字幕列表上提，統一放右側） */
   hasVideo?: boolean;
   videoCollapsed?: boolean;
   onToggleVideoCollapsed?: () => void;
@@ -159,7 +159,7 @@ export default function SubtitleEditToolbar({
 }: SubtitleEditToolbarProps) {
   const { t } = useTranslation('home');
 
-  // 搜索替换状态
+  // 搜索替換狀態
   const [showSearchReplace, setShowSearchReplace] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchText, setSearchText] = useState('');
@@ -168,13 +168,13 @@ export default function SubtitleEditToolbar({
     'source' | 'target' | 'both'
   >('both');
   const [caseSensitive, setCaseSensitive] = useState(false);
-  // 匹配列表（条+字段粒度）与当前导航位置（-1 表示尚未导航）
+  // 匹配列表（條+字段粒度）與當前導航位置（-1 表示尚未導航）
   const [searchMatches, setSearchMatches] = useState<SearchMatch[]>([]);
   const [totalOccurrences, setTotalOccurrences] = useState(0);
   const [matchPointer, setMatchPointer] = useState(-1);
   const matchCount = searchMatches.length;
 
-  // Cmd/Ctrl+F 外部触发：展开搜索面板并聚焦搜索框（等 Popover 挂载后聚焦）
+  // Cmd/Ctrl+F 外部觸發：展開搜索面板並聚焦搜索框（等 Popover 掛載後聚焦）
   useEffect(() => {
     if (!searchOpenToken) return;
     setShowSearchReplace(true);
@@ -182,24 +182,24 @@ export default function SubtitleEditToolbar({
     return () => clearTimeout(timer);
   }, [searchOpenToken]);
 
-  // 拆分对话框状态
+  // 拆分對話框狀態
   const [showSplit, setShowSplit] = useState(false);
   const [splitPosition, setSplitPosition] = useState(0);
-  const [splitTimePercent, setSplitTimePercent] = useState(50); // 时间拆分百分比
+  const [splitTimePercent, setSplitTimePercent] = useState(50); // 時間拆分百分比
 
-  // 时间轴偏移状态
+  // 時間軸偏移狀態
   const [showTimeOffset, setShowTimeOffset] = useState(false);
   const [timeOffset, setTimeOffset] = useState('0');
   const [offsetDirection, setOffsetDirection] = useState<
     'forward' | 'backward'
   >('forward');
 
-  // 合并状态
+  // 合併狀態
   const [showMerge, setShowMerge] = useState(false);
   const [mergeStart, setMergeStart] = useState(currentSubtitleIndex);
   const [mergeEnd, setMergeEnd] = useState(currentSubtitleIndex + 1);
 
-  // AI 优化状态
+  // AI 優化狀態
   const [showAiOptimize, setShowAiOptimize] = useState(false);
   const [aiOptimizing, setAiOptimizing] = useState(false);
   const [optimizedText, setOptimizedText] = useState('');
@@ -209,10 +209,10 @@ export default function SubtitleEditToolbar({
   const [customPrompt, setCustomPrompt] = useState('');
   const [isCustomPromptLoaded, setIsCustomPromptLoaded] = useState(false);
 
-  // 批量 AI 优化状态
+  // 批量 AI 優化狀態
   const [showBatchOptimize, setShowBatchOptimize] = useState(false);
 
-  // 默认优化/翻译提示词模板（支持条件模板）
+  // 預設優化/翻譯提示詞模板（支持條件模板）
   const defaultOptimizePrompt = `You are a professional subtitle translator and proofreader.
 
 Original text ({{sourceLanguage}}):
@@ -233,10 +233,10 @@ Please translate the original text to {{targetLanguage}}:
 
 Only respond with the translated/improved text, nothing else.`;
 
-  // 纯转写模式：优化对象是原文（修正转写错误），不做翻译
+  // 純轉寫模式：優化對象是原文（修正轉寫錯誤），不做翻譯
   const isTranscriptMode = !shouldShowTranslation;
 
-  // 转写校对默认提示词（修正识别错误，不翻译不改写）
+  // 轉寫校對預設提示詞（修正識別錯誤，不翻譯不改寫）
   const defaultProofreadPrompt = `You are a professional subtitle proofreader.
 
 The following text is an automatic speech-to-text transcription ({{sourceLanguage}}) that may contain recognition errors:
@@ -254,12 +254,12 @@ Only respond with the corrected text, nothing else.`;
     ? defaultProofreadPrompt
     : defaultOptimizePrompt;
 
-  // 提示词缓存 key（按模式区分，避免翻译/校对提示词互相覆盖）
+  // 提示詞緩存 key（按模式區分，避免翻譯/校對提示詞互相覆蓋）
   const PROMPT_CACHE_KEY = isTranscriptMode
     ? 'ai_proofread_custom_prompt'
     : 'ai_optimize_custom_prompt';
 
-  // 构建匹配列表：返回（条+字段）列表与总出现次数
+  // 構建匹配列表：返回（條+字段）列表與總出現次數
   const buildMatches = useCallback(
     (subs: Subtitle[]): { matches: SearchMatch[]; total: number } => {
       const matches: SearchMatch[] = [];
@@ -297,7 +297,7 @@ Only respond with the corrected text, nothing else.`;
     [searchText, searchTarget, caseSensitive, shouldShowTranslation],
   );
 
-  // 搜索：重建匹配列表，导航位置复位
+  // 搜索：重建匹配列表，導航位置復位
   const handleSearch = useCallback(() => {
     const { matches, total } = buildMatches(subtitles);
     setSearchMatches(matches);
@@ -305,7 +305,7 @@ Only respond with the corrected text, nothing else.`;
     setMatchPointer(-1);
   }, [buildMatches, subtitles]);
 
-  // 逐处导航：循环跳转并定位该条字幕
+  // 逐處導航：循環跳轉並定位該條字幕
   const handleNavigateMatch = useCallback(
     (dir: 1 | -1) => {
       if (!searchMatches.length) return;
@@ -322,12 +322,12 @@ Only respond with the corrected text, nothing else.`;
     [searchMatches, matchPointer, onLocateSubtitle],
   );
 
-  // 替换当前定位的一条（该条该字段内全部出现）
+  // 替換當前定位的一條（該條該字段內全部出現）
   const handleReplaceCurrent = useCallback(() => {
     if (matchPointer < 0 || matchPointer >= searchMatches.length) return;
     const m = searchMatches[matchPointer];
     const target = subtitles[m.index]?.[m.field] || '';
-    // 文本已被手动改动导致不再匹配：重算列表，不做替换
+    // 文本已被手動改動導致不再匹配：重算列表，不做替換
     if (countOccurrences(target, searchText, caseSensitive) === 0) {
       handleSearch();
       return;
@@ -346,7 +346,7 @@ Only respond with the corrected text, nothing else.`;
         : sub,
     );
     onSubtitlesChange(newSubtitles);
-    // 基于替换后的内容重建列表，停留在原位置的下一处
+    // 基於替換後的內容重建列表，停留在原位置的下一處
     const { matches, total } = buildMatches(newSubtitles);
     setSearchMatches(matches);
     setTotalOccurrences(total);
@@ -372,7 +372,7 @@ Only respond with the corrected text, nothing else.`;
     t,
   ]);
 
-  // 全部替换
+  // 全部替換
   const handleReplace = useCallback(() => {
     if (!searchText) return;
 
@@ -407,7 +407,7 @@ Only respond with the corrected text, nothing else.`;
     onSubtitlesChange(newSubtitles);
     toast.success(
       t('replaceSuccess', { count: totalOccurrences }) ||
-        `已替换 ${totalOccurrences} 处`,
+        `已替換 ${totalOccurrences} 處`,
     );
     setShowSearchReplace(false);
     setSearchText('');
@@ -427,7 +427,7 @@ Only respond with the corrected text, nothing else.`;
     t,
   ]);
 
-  // 时间戳字符串转秒数
+  // 時間戳字符串轉秒數
   const timeToSeconds = (timeStr: string): number => {
     const parts = timeStr.replace(',', '.').split(':');
     if (parts.length !== 3) return 0;
@@ -437,7 +437,7 @@ Only respond with the corrected text, nothing else.`;
     return hours * 3600 + minutes * 60 + seconds;
   };
 
-  // 秒数转时间戳字符串
+  // 秒數轉時間戳字符串
   const secondsToTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -445,7 +445,7 @@ Only respond with the corrected text, nothing else.`;
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.padStart(6, '0').replace('.', ',')}`;
   };
 
-  // 执行时间偏移
+  // 執行時間偏移
   const handleTimeOffset = useCallback(() => {
     const offsetSeconds =
       parseFloat(timeOffset) * (offsetDirection === 'forward' ? 1 : -1);
@@ -454,7 +454,7 @@ Only respond with the corrected text, nothing else.`;
     const newSubtitles = subtitles.map((sub) => {
       const newSub = { ...sub };
 
-      // 解析时间范围
+      // 解析時間範圍
       const times = sub.startEndTime.split(' --> ');
       if (times.length === 2) {
         const startSeconds = Math.max(
@@ -476,7 +476,7 @@ Only respond with the corrected text, nothing else.`;
     setShowTimeOffset(false);
   }, [timeOffset, offsetDirection, subtitles, onSubtitlesChange, t]);
 
-  // 执行合并
+  // 執行合併
   const handleMerge = useCallback(() => {
     if (
       mergeStart >= mergeEnd ||
@@ -490,13 +490,13 @@ Only respond with the corrected text, nothing else.`;
     setShowMerge(false);
   }, [mergeStart, mergeEnd, subtitles.length, onMergeSubtitles, t]);
 
-  // 加载 AI 服务商列表
+  // 加載 AI 服務商列表
   const loadAiProviders = useCallback(async () => {
     try {
       const result = await window.ipc.invoke('getAiTranslationProviders');
       if (result.success && result.data) {
         setAiProviders(result.data);
-        // 默认选择第一个服务商
+        // 預設選擇第一個服務商
         if (result.data.length > 0 && !selectedProviderId) {
           setSelectedProviderId(result.data[0].id);
         }
@@ -506,7 +506,7 @@ Only respond with the corrected text, nothing else.`;
     }
   }, [selectedProviderId]);
 
-  // 加载缓存的自定义提示词
+  // 加載緩存的自定義提示詞
   const loadCachedPrompt = useCallback(() => {
     if (isCustomPromptLoaded) return;
 
@@ -514,7 +514,7 @@ Only respond with the corrected text, nothing else.`;
       const cached = localStorage.getItem(PROMPT_CACHE_KEY);
       if (cached) {
         setCustomPrompt(cached);
-        setShowCustomPrompt(true); // 如果有缓存的提示词，自动展开
+        setShowCustomPrompt(true); // 如果有緩存的提示詞，自動展開
       } else {
         setCustomPrompt(activeDefaultPrompt);
       }
@@ -526,15 +526,15 @@ Only respond with the corrected text, nothing else.`;
     }
   }, [isCustomPromptLoaded, activeDefaultPrompt, PROMPT_CACHE_KEY]);
 
-  // 保存自定义提示词到缓存
+  // 保存自定義提示詞到緩存
   const savePromptToCache = useCallback(
     (prompt: string) => {
       try {
-        // 只有当提示词与默认不同时才缓存
+        // 只有當提示詞與預設不同時才緩存
         if (prompt.trim() !== activeDefaultPrompt.trim()) {
           localStorage.setItem(PROMPT_CACHE_KEY, prompt);
         } else {
-          // 如果恢复为默认，清除缓存
+          // 如果恢復為預設，清除緩存
           localStorage.removeItem(PROMPT_CACHE_KEY);
         }
       } catch (error) {
@@ -544,7 +544,7 @@ Only respond with the corrected text, nothing else.`;
     [activeDefaultPrompt, PROMPT_CACHE_KEY],
   );
 
-  // 处理提示词变化
+  // 處理提示詞變化
   const handlePromptChange = useCallback(
     (value: string) => {
       setCustomPrompt(value);
@@ -553,13 +553,13 @@ Only respond with the corrected text, nothing else.`;
     [savePromptToCache],
   );
 
-  // 重置为默认提示词
+  // 重置為預設提示詞
   const handleResetPrompt = useCallback(() => {
     setCustomPrompt(activeDefaultPrompt);
     localStorage.removeItem(PROMPT_CACHE_KEY);
   }, [activeDefaultPrompt, PROMPT_CACHE_KEY]);
 
-  // 打开 AI 优化对话框时加载服务商
+  // 打開 AI 優化對話框時加載服務商
   const handleOpenAiOptimize = useCallback(() => {
     if (currentSubtitleIndex >= 0) {
       setOptimizedText('');
@@ -569,7 +569,7 @@ Only respond with the corrected text, nothing else.`;
     }
   }, [currentSubtitleIndex, loadAiProviders, loadCachedPrompt]);
 
-  // 打开拆分对话框
+  // 打開拆分對話框
   const handleOpenSplit = useCallback(() => {
     if (currentSubtitleIndex >= 0 && currentSubtitleIndex < subtitles.length) {
       const subtitle = subtitles[currentSubtitleIndex];
@@ -583,7 +583,7 @@ Only respond with the corrected text, nothing else.`;
     }
   }, [currentSubtitleIndex, subtitles, getCursorPosition]);
 
-  // 处理外部触发
+  // 處理外部觸發
   useEffect(() => {
     if (triggerAiOptimize && currentSubtitleIndex >= 0) {
       handleOpenAiOptimize();
@@ -603,7 +603,7 @@ Only respond with the corrected text, nothing else.`;
     }
   }, [triggerSplit, currentSubtitleIndex, handleOpenSplit, onTriggerHandled]);
 
-  // AI 优化当前字幕
+  // AI 優化當前字幕
   const handleAiOptimize = useCallback(async () => {
     if (currentSubtitleIndex < 0 || currentSubtitleIndex >= subtitles.length) {
       return;
@@ -613,7 +613,7 @@ Only respond with the corrected text, nothing else.`;
     const sourceText = subtitle.sourceContent || '';
     const targetText = subtitle.targetContent || '';
 
-    // 如果没有翻译内容，也可以使用 AI 生成翻译
+    // 如果沒有翻譯內容，也可以使用 AI 生成翻譯
 
     if (aiProviders.length === 0) {
       toast.error(t('noAiProviderConfigured'));
@@ -624,8 +624,8 @@ Only respond with the corrected text, nothing else.`;
     setOptimizedText('');
 
     try {
-      // 调用 AI 优化服务（始终传递提示词）
-      // 纯转写模式必须带校对提示词，否则主进程会退化为翻译提示词
+      // 調用 AI 優化服務（始終傳遞提示詞）
+      // 純轉寫模式必須帶校對提示詞，否則主進程會退化為翻譯提示詞
       const result = await window.ipc.invoke('optimizeSubtitle', {
         sourceText,
         targetText: isTranscriptMode ? '' : targetText,
@@ -657,7 +657,7 @@ Only respond with the corrected text, nothing else.`;
     defaultProofreadPrompt,
   ]);
 
-  // 采纳 AI 优化结果（纯转写模式写回原文）
+  // 採納 AI 優化結果（純轉寫模式寫回原文）
   const handleAcceptOptimization = useCallback(() => {
     if (!optimizedText || currentSubtitleIndex < 0) return;
 
@@ -681,7 +681,7 @@ Only respond with the corrected text, nothing else.`;
     t,
   ]);
 
-  // 应用批量优化结果（纯转写模式写回原文）
+  // 應用批量優化結果（純轉寫模式寫回原文）
   const handleApplyBatchOptimizations = useCallback(
     (optimizations: Array<{ index: number; targetContent: string }>) => {
       const newSubtitles = [...subtitles];
@@ -702,7 +702,7 @@ Only respond with the corrected text, nothing else.`;
 
   return (
     <div className="flex flex-wrap items-center gap-x-1 gap-y-1 p-2 border-b bg-muted/30">
-      {/* 撤销/重做 */}
+      {/* 撤銷/重做 */}
       <Button
         variant="ghost"
         size="icon"
@@ -726,7 +726,7 @@ Only respond with the corrected text, nothing else.`;
 
       <div className="w-px h-6 bg-border mx-1" />
 
-      {/* 搜索替换 */}
+      {/* 搜索替換 */}
       <Popover open={showSearchReplace} onOpenChange={setShowSearchReplace}>
         <PopoverTrigger asChild>
           <Button
@@ -846,7 +846,7 @@ Only respond with the corrected text, nothing else.`;
         </PopoverContent>
       </Popover>
 
-      {/* 时间轴微调 */}
+      {/* 時間軸微調 */}
       <Popover open={showTimeOffset} onOpenChange={setShowTimeOffset}>
         <PopoverTrigger asChild>
           <Button
@@ -897,7 +897,7 @@ Only respond with the corrected text, nothing else.`;
         </PopoverContent>
       </Popover>
 
-      {/* 合并字幕 */}
+      {/* 合併字幕 */}
       <Dialog open={showMerge} onOpenChange={setShowMerge}>
         <Button
           variant="ghost"
@@ -987,7 +987,7 @@ Only respond with the corrected text, nothing else.`;
             <DialogTitle>{t('splitSubtitle')}</DialogTitle>
             <DialogDescription>{t('splitSubtitleDesc')}</DialogDescription>
           </DialogHeader>
-          {/* 长字幕时预览区可滚动，确保底部的确认按钮始终可见 */}
+          {/* 長字幕時預覽區可滾動，確保底部的確認按鈕始終可見 */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             {currentSubtitleIndex >= 0 &&
               currentSubtitleIndex < subtitles.length && (
@@ -1037,7 +1037,7 @@ Only respond with the corrected text, nothing else.`;
         </DialogContent>
       </Dialog>
 
-      {/* AI 单条优化按钮和对话框（纯转写模式下为原文校对） */}
+      {/* AI 單條優化按鈕和對話框（純轉寫模式下為原文校對） */}
       <Dialog open={showAiOptimize} onOpenChange={setShowAiOptimize}>
         <Button
           variant="ghost"
@@ -1062,7 +1062,7 @@ Only respond with the corrected text, nothing else.`;
           {currentSubtitleIndex >= 0 &&
             currentSubtitleIndex < subtitles.length && (
               <div className="space-y-4 py-4">
-                {/* AI 服务商选择 */}
+                {/* AI 服務商選擇 */}
                 <div className="space-y-2">
                   <Label>{t('selectAiProvider')}</Label>
                   {aiProviders.length === 0 ? (
@@ -1100,7 +1100,7 @@ Only respond with the corrected text, nothing else.`;
                   </div>
                 </div>
 
-                {/* 当前翻译（纯转写模式无此区块） */}
+                {/* 當前翻譯（純轉寫模式無此區塊） */}
                 {!isTranscriptMode && (
                   <div className="space-y-2">
                     <Label>{t('currentTranslation')}</Label>
@@ -1114,7 +1114,7 @@ Only respond with the corrected text, nothing else.`;
                   </div>
                 )}
 
-                {/* 自定义提示词 */}
+                {/* 自定義提示詞 */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>{t('customPrompt')}</Label>
@@ -1161,7 +1161,7 @@ Only respond with the corrected text, nothing else.`;
                   )}
                 </div>
 
-                {/* AI 优化结果 */}
+                {/* AI 優化結果 */}
                 <div className="space-y-2">
                   <Label>{t('aiOptimizedResult')}</Label>
                   {aiOptimizing ? (
@@ -1220,7 +1220,7 @@ Only respond with the corrected text, nothing else.`;
         </DialogContent>
       </Dialog>
 
-      {/* 批量 AI 优化按钮（纯转写模式下为全文校对） */}
+      {/* 批量 AI 優化按鈕（純轉寫模式下為全文校對） */}
       <Button
         variant="ghost"
         size="sm"
@@ -1241,7 +1241,7 @@ Only respond with the corrected text, nothing else.`;
         shouldShowTranslation={shouldShowTranslation}
       />
 
-      {/* 视图控制（右对齐）：折叠左侧面板 / 展开全部 / 字号 */}
+      {/* 視圖控制（右對齊）：摺疊左側面板 / 展開全部 / 字號 */}
       <div className="ml-auto flex flex-shrink-0 items-center gap-1">
         {hasVideo && onToggleVideoCollapsed && (
           <Button
@@ -1302,7 +1302,7 @@ Only respond with the corrected text, nothing else.`;
   );
 }
 
-// 拆分预览组件
+// 拆分預覽組件
 interface SplitPreviewProps {
   subtitle: Subtitle;
   splitPosition: number;
@@ -1328,21 +1328,21 @@ function SplitPreview({
   const endTime = subtitle.endTimeInSeconds || 0;
   const duration = endTime - startTime;
 
-  // 计算拆分后的内容
+  // 計算拆分後的內容
   const part1 = content.slice(0, splitPosition);
   const part2 = content.slice(splitPosition);
 
-  // 按比例计算翻译拆分点
+  // 按比例計算翻譯拆分點
   const targetSplitPos = Math.floor(
     targetContent.length * (splitPosition / Math.max(content.length, 1)),
   );
   const targetPart1 = targetContent.slice(0, targetSplitPos);
   const targetPart2 = targetContent.slice(targetSplitPos);
 
-  // 计算时间
+  // 計算時間
   const splitTime = startTime + duration * (splitTimePercent / 100);
 
-  // 格式化时间显示
+  // 格式化時間顯示
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = (seconds % 60).toFixed(2);
@@ -1369,7 +1369,7 @@ function SplitPreview({
         </div>
       </div>
 
-      {/* 原文预览 */}
+      {/* 原文預覽 */}
       <div className="space-y-2">
         <Label>{t('sourcePreview')}</Label>
         <div className="grid grid-cols-2 gap-2">
@@ -1392,7 +1392,7 @@ function SplitPreview({
         </div>
       </div>
 
-      {/* 翻译预览 */}
+      {/* 翻譯預覽 */}
       {shouldShowTranslation && targetContent && (
         <div className="space-y-2">
           <Label>{t('translationPreview')}</Label>
@@ -1415,7 +1415,7 @@ function SplitPreview({
         </div>
       )}
 
-      {/* 时间拆分 */}
+      {/* 時間拆分 */}
       <div className="space-y-2">
         <Label>{t('timeSplitPosition')}</Label>
         <div className="flex items-center gap-2">

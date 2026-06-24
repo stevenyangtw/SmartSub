@@ -5,27 +5,27 @@ import * as path from 'path';
 import decompress from 'decompress';
 import { logMessage } from '../storeManager';
 
-/** 与各下载器一致的取消错误信息，便于上层用 `=== CANCELLED` 判定。 */
+/** 與各下載器一致的取消錯誤信息，便於上層用 `=== CANCELLED` 判定。 */
 const CANCELLED = 'Download cancelled';
 
 export interface ExtractArchiveOptions {
-  /** 待解压的归档文件（.tar.bz2 / .tar.gz / .zip 等，system tar 自动识别压缩格式）。 */
+  /** 待解壓的歸檔文件（.tar.bz2 / .tar.gz / .zip 等，system tar 自動識別壓縮格式）。 */
   archivePath: string;
-  /** 解压目标目录（不存在会自动创建）。 */
+  /** 解壓目標目錄（不存在會自動創建）。 */
   destDir: string;
-  /** 剥离归档内顶层目录层数（等价 tar --strip-components / decompress strip）。 */
+  /** 剝離歸檔內頂層目錄層數（等價 tar --strip-components / decompress strip）。 */
   strip?: number;
-  /** 路径包含该子串的条目跳过（如 'test_wavs'），两种后端均生效。 */
+  /** 路徑包含該子串的條目跳過（如 'test_wavs'），兩種後端均生效。 */
   excludeContains?: string;
-  /** 安装完成后的近似总字节数，用于按「目标目录已写入大小」估算解包进度。 */
+  /** 安裝完成後的近似總字節數，用於按「目標目錄已寫入大小」估算解包進度。 */
   approxTotalBytes?: number;
-  /** 解包进度回调（0..1，已按 approxTotalBytes 估算并封顶 0.99）。 */
+  /** 解包進度回調（0..1，已按 approxTotalBytes 估算並封頂 0.99）。 */
   onProgress?: (ratio: number) => void;
-  /** 取消信号：触发后会 kill system tar 子进程并以 CANCELLED 抛错。 */
+  /** 取消信號：觸發後會 kill system tar 子進程並以 CANCELLED 拋錯。 */
   signal?: AbortSignal;
 }
 
-/** 递归统计目录已写入的字节数（用于解包进度估算）。 */
+/** 遞歸統計目錄已寫入的字節數（用於解包進度估算）。 */
 async function getDirSize(dir: string): Promise<number> {
   let total = 0;
   let entries: fs.Dirent[];
@@ -43,13 +43,13 @@ async function getDirSize(dir: string): Promise<number> {
         total += (await fsp.stat(full)).size;
       }
     } catch {
-      // 文件解包过程中可能瞬时不可读，忽略。
+      // 文件解包過程中可能瞬時不可讀，忽略。
     }
   }
   return total;
 }
 
-/** 轮询目标目录大小上报解包进度；返回停止函数。 */
+/** 輪詢目標目錄大小上報解包進度；返回停止函數。 */
 function startProgressPoller(
   destDir: string,
   approxTotalBytes: number | undefined,
@@ -75,9 +75,9 @@ function startProgressPoller(
 }
 
 /**
- * 用系统 `tar` 解包（独立 OS 进程，不阻塞 Electron 主线程事件循环）。
- * macOS/Windows 为 bsdtar(libarchive)、Linux 多为 GNU tar，`-xf` 均自动识别 bz2/gz。
- * 解析失败（无 tar / 老旧 Windows / 非零退出）时 reject，由上层回退 decompress。
+ * 用系統 `tar` 解包（獨立 OS 進程，不阻塞 Electron 主線程事件循環）。
+ * macOS/Windows 為 bsdtar(libarchive)、Linux 多為 GNU tar，`-xf` 均自動識別 bz2/gz。
+ * 解析失敗（無 tar / 老舊 Windows / 非零退出）時 reject，由上層回退 decompress。
  */
 function extractWithSystemTar(opts: ExtractArchiveOptions): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -117,7 +117,7 @@ function extractWithSystemTar(opts: ExtractArchiveOptions): Promise<void> {
   });
 }
 
-/** 回退：用 bundled 的 decompress（纯 JS，同步 CPU 重，会短暂阻塞主线程）。 */
+/** 回退：用 bundled 的 decompress（純 JS，同步 CPU 重，會短暫阻塞主線程）。 */
 async function extractWithDecompress(
   opts: ExtractArchiveOptions,
 ): Promise<void> {
@@ -130,8 +130,8 @@ async function extractWithDecompress(
 }
 
 /**
- * 解压归档到目标目录：优先 system tar（独立进程，主线程不卡），失败回退 decompress。
- * 解包期间按目标目录写入大小估算进度（approxTotalBytes 提供时）。
+ * 解壓歸檔到目標目錄：優先 system tar（獨立進程，主線程不卡），失敗回退 decompress。
+ * 解包期間按目標目錄寫入大小估算進度（approxTotalBytes 提供時）。
  */
 export async function extractArchive(
   opts: ExtractArchiveOptions,

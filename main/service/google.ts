@@ -10,11 +10,11 @@ export default async function google(
 ) {
   const { apiKey } = proof || {};
   if (!apiKey) {
-    console.log('请先配置 Google Translate API Key');
+    console.log('請先配置 Google Translate API Key');
     throw new Error('missingApiKey');
   }
 
-  // 支持字符串数组输入
+  // 支持字符串數組輸入
   const queryText = Array.isArray(query) ? query : [query];
 
   const formatSourceLanguage = convertLanguageCode(sourceLanguage, 'google');
@@ -27,7 +27,7 @@ export default async function google(
     targetLanguage,
   );
   if (!formatSourceLanguage || !formatTargetLanguage) {
-    console.log('不支持的语言');
+    console.log('不支持的語言');
     throw new Error('not supported language');
   }
 
@@ -49,14 +49,14 @@ export default async function google(
     );
 
     if (!response?.data?.data?.translations) {
-      throw new Error(response?.data?.error?.message || '翻译失败');
+      throw new Error(response?.data?.error?.message || '翻譯失敗');
     }
 
     const translations = response.data.data.translations.map(
       (translation) => translation.translatedText,
     );
 
-    // 如果输入是数组，返回结果也转换为数组
+    // 如果輸入是數組，返回結果也轉換為數組
     if (Array.isArray(query)) {
       return translations;
     }
@@ -64,15 +64,15 @@ export default async function google(
   } catch (error) {
     console.log(error, 'google error');
     if (error.response) {
-      // API 返回错误
-      const errorMsg = error.response.data?.error?.message || '翻译请求失败';
+      // API 返回錯誤
+      const errorMsg = error.response.data?.error?.message || '翻譯請求失敗';
       throw new Error(errorMsg);
     } else if (error.request) {
-      // 网络错误
-      throw new Error('网络连接失败');
+      // 網絡錯誤
+      throw new Error('網絡連接失敗');
     } else {
-      // 其他错误
-      throw new Error(error.message || '未知错误');
+      // 其他錯誤
+      throw new Error(error.message || '未知錯誤');
     }
   }
 }

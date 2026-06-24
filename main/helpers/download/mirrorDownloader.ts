@@ -24,7 +24,7 @@ export interface MirrorProgress {
   error?: string;
 }
 
-/** 下载过程中回报字节，供适配层持久化各自的续传 state 形状。 */
+/** 下載過程中回報字節，供適配層持久化各自的續傳 state 形狀。 */
 export interface DownloadFileHooks {
   onBytes?: (downloaded: number, total: number) => void;
 }
@@ -32,8 +32,8 @@ export interface DownloadFileHooks {
 type LogFn = (msg: string, level: 'info' | 'warning' | 'error') => void;
 
 /**
- * 镜像下载核心：进度数学 + 多源回退 + 断点续传单文件下载（Range/重定向/206/
- * 60s 无活动超时/30s 连接超时/abort）。不感知 addon/py 的产物语义。
+ * 鏡像下載核心：進度數學 + 多源回退 + 斷點續傳單文件下載（Range/重定向/206/
+ * 60s 無活動超時/30s 連接超時/abort）。不感知 addon/py 的產物語義。
  */
 export class MirrorDownloader {
   private abortController: AbortController | null = null;
@@ -54,7 +54,7 @@ export class MirrorDownloader {
     return { ...this.progress };
   }
 
-  /** 每次下载前重置 abort 控制器与速度基线。 */
+  /** 每次下載前重置 abort 控制器與速度基線。 */
   resetForDownload(): void {
     this.abortController = new AbortController();
     this.lastSpeedCalcTime = Date.now();
@@ -97,7 +97,7 @@ export class MirrorDownloader {
   }
 
   /**
-   * 按所选源 + 回退顺序依次尝试 attempt；isTerminalError 命中时不再换源（取消/协议）。
+   * 按所選源 + 回退順序依次嘗試 attempt；isTerminalError 命中時不再換源（取消/協議）。
    */
   async runWithFallback<T>(
     source: BinaryDownloadSource,
@@ -128,7 +128,7 @@ export class MirrorDownloader {
     throw lastError instanceof Error ? lastError : new Error(String(lastError));
   }
 
-  /** 断点续传单文件下载。resolve 为 destPath。取消时 reject('Download cancelled')。 */
+  /** 斷點續傳單文件下載。resolve 為 destPath。取消時 reject('Download cancelled')。 */
   downloadFile(
     url: string,
     destPath: string,
@@ -149,8 +149,8 @@ export class MirrorDownloader {
       const INACTIVITY_TIMEOUT = 60000;
       let inactivityTimer: NodeJS.Timeout | null = null;
       let isCompleted = false;
-      // 持有写流引用，确保任何失败路径都能释放文件句柄；
-      // 否则 Windows 上残留句柄会锁住 .tar.gz，下次下载 open 时报 EPERM。
+      // 持有寫流引用，確保任何失敗路徑都能釋放文件句柄；
+      // 否則 Windows 上殘留句柄會鎖住 .tar.gz，下次下載 open 時報 EPERM。
       let writeStream: fs.WriteStream | null = null;
 
       const destroyWriteStream = () => {
@@ -205,10 +205,10 @@ export class MirrorDownloader {
           return;
         }
 
-        // 仅当服务器以 206 响应时才是真正的断点续传。
-        // 若请求了 Range 却收到 200（部分代理 / 镜像忽略 Range，返回全量），
-        // 必须按全量覆盖处理：否则会把完整文件追加到已有部分字节之后，
-        // 造成文件损坏、体积偏大，最终 sha 校验失败。
+        // 僅當服務器以 206 響應時才是真正的斷點續傳。
+        // 若請求了 Range 卻收到 200（部分代理 / 鏡像忽略 Range，返回全量），
+        // 必須按全量覆蓋處理：否則會把完整文件追加到已有部分字節之後，
+        // 造成文件損壞、體積偏大，最終 sha 校驗失敗。
         const isResume = startByte > 0 && response.statusCode === 206;
         const effectiveStart = isResume ? startByte : 0;
 
@@ -281,7 +281,7 @@ export class MirrorDownloader {
       });
 
       request.setTimeout(30000, () => {
-        // 仅用于建立连接；一旦开始接收数据由 inactivityTimer 接管
+        // 僅用於建立連接；一旦開始接收數據由 inactivityTimer 接管
       });
 
       resetInactivityTimer();

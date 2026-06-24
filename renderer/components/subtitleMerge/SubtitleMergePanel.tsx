@@ -1,6 +1,6 @@
 /**
- * 字幕合并主面板组件
- * 左栏：文件 + 样式 + 输出控件（滚动）；右栏：预览独占并最大化，处理状态以浮层呈现
+ * 字幕合併主面板組件
+ * 左欄：文件 + 樣式 + 輸出控件（滾動）；右欄：預覽獨佔並最大化，處理狀態以浮層呈現
  */
 
 import React from 'react';
@@ -20,17 +20,17 @@ import {
 } from './hooks/useSubtitleMerge';
 
 interface SubtitleMergePanelProps extends UseSubtitleMergeOptions {
-  /** 面板标题 */
+  /** 面板標題 */
   title?: string;
-  /** 是否显示标题 */
+  /** 是否顯示標題 */
   showTitle?: boolean;
-  /** 自定义类名 */
+  /** 自定義類名 */
   className?: string;
 }
 
 /**
- * 字幕合并主面板
- * 可独立使用，也可嵌入到其他页面中
+ * 字幕合併主面板
+ * 可獨立使用，也可嵌入到其他頁面中
  */
 export default function SubtitleMergePanel({
   title,
@@ -41,22 +41,22 @@ export default function SubtitleMergePanel({
   const { t } = useTranslation('subtitleMerge');
 
   const {
-    // 文件状态
+    // 文件狀態
     videoPath,
     subtitlePath,
     videoInfo,
     subtitleInfo,
 
-    // 样式状态
+    // 樣式狀態
     style,
     activePresetId,
 
-    // 输出状态
+    // 輸出狀態
     outputPath,
     outputMode,
     videoQuality,
 
-    // 进度状态
+    // 進度狀態
     progress,
     status,
 
@@ -66,16 +66,16 @@ export default function SubtitleMergePanel({
     clearVideo,
     clearSubtitle,
 
-    // 样式操作方法
+    // 樣式操作方法
     updateStyle,
     applyPreset,
 
-    // 输出操作方法
+    // 輸出操作方法
     selectOutputPath,
     setOutputMode,
     setVideoQuality,
 
-    // 合并操作方法
+    // 合併操作方法
     startMerge,
     cancelMerge,
     isCancelling,
@@ -86,7 +86,7 @@ export default function SubtitleMergePanel({
   } = useSubtitleMerge(hookOptions);
 
   const isProcessing = status === 'processing';
-  // 软字幕样式由播放器决定，样式设置仅对烧录生效
+  // 軟字幕樣式由播放器決定，樣式設置僅對燒錄生效
   const isSoftMux = outputMode === 'softmux';
   const styleDisabled = isProcessing || isSoftMux;
 
@@ -97,7 +97,7 @@ export default function SubtitleMergePanel({
           {t('outputPathRequiredHint')}
         </div>
       )}
-      {/* 文件选择区域 - 紧凑型，置顶全宽 */}
+      {/* 文件選擇區域 - 緊湊型，置頂全寬 */}
       <div className="flex-shrink-0 mb-3">
         <FileSelector
           videoPath={videoPath}
@@ -112,21 +112,21 @@ export default function SubtitleMergePanel({
         />
       </div>
 
-      {/* 主内容区域 - 左：设置+输出（窄栏滚动）；右：预览独占（最大化） */}
+      {/* 主內容區域 - 左：設置+輸出（窄欄滾動）；右：預覽獨佔（最大化） */}
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[minmax(340px,400px)_1fr] gap-3">
-        {/* 左侧：样式设置 + 输出控件 */}
+        {/* 左側：樣式設置 + 輸出控件 */}
         <Card className="flex flex-col min-h-0 overflow-hidden">
           <CardContent className="flex-1 min-h-0 p-0">
             <ScrollArea className="h-full">
               <div className="space-y-3 p-4">
-                {/* 软字幕模式提示：样式仅对烧录生效 */}
+                {/* 軟字幕模式提示：樣式僅對燒錄生效 */}
                 {isSoftMux && (
                   <p className="rounded-md bg-muted/60 p-2 text-xs text-muted-foreground">
                     {t('styleOnlyForHardcode')}
                   </p>
                 )}
 
-                {/* 预设样式 */}
+                {/* 預設樣式 */}
                 <StylePresets
                   activePresetId={activePresetId}
                   onSelectPreset={applyPreset}
@@ -135,7 +135,7 @@ export default function SubtitleMergePanel({
 
                 <Separator />
 
-                {/* 基础设置 */}
+                {/* 基礎設置 */}
                 <div>
                   <h3 className="label-caps mb-2">{t('basicSettings')}</h3>
                   <BasicStyleSettings
@@ -147,7 +147,7 @@ export default function SubtitleMergePanel({
 
                 <Separator />
 
-                {/* 高级设置 */}
+                {/* 高級設置 */}
                 <AdvancedStyleSettings
                   style={style}
                   onUpdateStyle={updateStyle}
@@ -158,7 +158,7 @@ export default function SubtitleMergePanel({
           </CardContent>
         </Card>
 
-        {/* 右侧：上=预览（最大化），下=输出控件，填满预览之外的竖向空间 */}
+        {/* 右側：上=預覽（最大化），下=輸出控件，填滿預覽之外的豎向空間 */}
         <div className="flex flex-col min-h-0 gap-3">
           <Card className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <CardContent className="flex-1 min-h-0 p-3 overflow-hidden">
@@ -176,7 +176,7 @@ export default function SubtitleMergePanel({
             </CardContent>
           </Card>
 
-          {/* 输出方式 + 画质 + 路径 + 生成 */}
+          {/* 輸出方式 + 畫質 + 路徑 + 生成 */}
           <Card className="flex-shrink-0">
             <CardContent className="p-4">
               <MergeButton

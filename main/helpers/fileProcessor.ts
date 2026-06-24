@@ -33,15 +33,15 @@ import {
 } from './taskContext';
 
 /**
- * 处理任务错误
+ * 處理任務錯誤
  */
 function onError(event, file, key, error) {
-  const errorMsg = error?.message || error?.toString() || '未知错误';
+  const errorMsg = error?.message || error?.toString() || '未知錯誤';
   logMessage(`${key} error: ${errorMsg}`, 'error');
   event.sender.send('taskStatusChange', file, key, 'error');
   event.sender.send('taskErrorChange', file, key, errorMsg);
 
-  // 发送错误消息通知
+  // 發送錯誤消息通知
   createMessageSender(event.sender).send('message', {
     type: 'error',
     message: errorMsg,
@@ -71,12 +71,12 @@ async function generateSubtitle(
         : new TaskCancelledError();
     }
     onError(event, file, 'extractSubtitle', error);
-    throw error; // 继续抛出错误，以便上层函数知道发生了错误
+    throw error; // 繼續拋出錯誤，以便上層函數知道發生了錯誤
   }
 }
 
 /**
- * 解析用户选择的输出字幕格式，非法值回退为 srt。
+ * 解析用戶選擇的輸出字幕格式，非法值回退為 srt。
  */
 function resolveOutputFormat(formData): SubtitleFormat {
   const fmt = formData?.subtitleOutputFormat;
@@ -84,10 +84,10 @@ function resolveOutputFormat(formData): SubtitleFormat {
 }
 
 /**
- * 将规范 SRT 交付字幕转换为目标格式，写入新扩展名文件并删除原 .srt。
- * 整个处理流程内部始终使用 SRT，仅在最终交付物上做一次格式转换，
- * 以隔离各格式差异、最大限度降低对既有流程的影响。
- * 返回转换后的新文件路径。
+ * 將規範 SRT 交付字幕轉換為目標格式，寫入新擴展名文件並刪除原 .srt。
+ * 整個處理流程內部始終使用 SRT，僅在最終交付物上做一次格式轉換，
+ * 以隔離各格式差異、最大限度降低對既有流程的影響。
+ * 返回轉換後的新文件路徑。
  */
 async function convertDeliverable(
   srtPath: string,
@@ -102,15 +102,15 @@ async function convertDeliverable(
     try {
       fs.unlinkSync(srtPath);
     } catch (err) {
-      logMessage(`删除中间 srt 文件失败: ${err}`, 'warning');
+      logMessage(`刪除中間 srt 文件失敗: ${err}`, 'warning');
     }
   }
   return newPath;
 }
 
 /**
- * 源字幕中文标点去除（issue #330）：把中文标点替换为空格并清理空白，原位写回。
- * 仅清理文本；SRT 序号/时间码为 ASCII，不受 CJK 标点正则影响。失败仅告警，不阻断主流程。
+ * 源字幕中文標點去除（issue #330）：把中文標點替換為空格並清理空白，原位寫回。
+ * 僅清理文本；SRT 序號/時間碼為 ASCII，不受 CJK 標點正則影響。失敗僅告警，不阻斷主流程。
  */
 async function stripSourceSubtitlePunctuation(
   srtFile: string,
@@ -134,17 +134,17 @@ async function stripSourceSubtitlePunctuation(
 }
 
 /**
- * 翻译字幕
+ * 翻譯字幕
  */
 async function translateSubtitle(event, file: IFiles, formData, provider) {
-  // 强制发送翻译开始状态
+  // 強制發送翻譯開始狀態
   event.sender.send('taskFileChange', {
     ...file,
     translateSubtitle: 'loading',
     translateSubtitleProgress: 0,
   });
 
-  // 强制发送初始进度
+  // 強制發送初始進度
   event.sender.send('taskProgressChange', file, 'translateSubtitle', 0);
 
   const onProgress = (progress) => {
@@ -160,7 +160,7 @@ async function translateSubtitle(event, file: IFiles, formData, provider) {
   try {
     await translate(event, file, formData, provider, onProgress);
 
-    // 确保最终状态的正确发送
+    // 確保最終狀態的正確發送
     event.sender.send('taskProgressChange', file, 'translateSubtitle', 100);
     event.sender.send('taskFileChange', {
       ...file,
@@ -174,7 +174,7 @@ async function translateSubtitle(event, file: IFiles, formData, provider) {
     );
   } catch (error) {
     if (isTaskCancelledError(error) || isTaskCancelled()) {
-      // 用户取消：翻译阶段回退为待处理，不计错误，并中止后续流程
+      // 用戶取消：翻譯階段回退為待處理，不計錯誤，並中止後續流程
       event.sender.send('taskFileChange', {
         ...file,
         translateSubtitle: '',
@@ -182,13 +182,13 @@ async function translateSubtitle(event, file: IFiles, formData, provider) {
       });
       throw new TaskCancelledError();
     }
-    // 确保错误状态下也发送当前进度（从文件状态获取）
+    // 確保錯誤狀態下也發送當前進度（從文件狀態獲取）
     onError(event, file, 'translateSubtitle', error);
   }
 }
 
 /**
- * 处理文件
+ * 處理文件
  */
 export async function processFile(
   event,
@@ -208,10 +208,10 @@ export async function processFile(
     taskType,
   } = formData || {};
 
-  // 进入处理前清理上一轮残留的阶段状态/进度/错误。后续 taskFileChange 习惯铺开整个 file
-  // （`{ ...file, extractSubtitle: 'loading' }`），若 file 仍带着旧值——尤其取消时回灌的空串
-  // ——渲染层 `{ ...prev, ...res }` 合并会把刚置好的新状态覆盖回去，造成「取消→重启」时
-  // 提取格子被打回灰色、进度永远卡 50%。清成「无此键」后，铺开就不会再携带陈旧阶段状态。
+  // 進入處理前清理上一輪殘留的階段狀態/進度/錯誤。後續 taskFileChange 習慣鋪開整個 file
+  // （`{ ...file, extractSubtitle: 'loading' }`），若 file 仍帶著舊值——尤其取消時回灌的空串
+  // ——渲染層 `{ ...prev, ...res }` 合併會把剛置好的新狀態覆蓋回去，造成「取消→重啟」時
+  // 提取格子被打回灰色、進度永遠卡 50%。清成「無此鍵」後，鋪開就不會再攜帶陳舊階段狀態。
   for (const k of [
     'extractAudio',
     'extractSubtitle',
@@ -236,15 +236,15 @@ export async function processFile(
     );
     logMessage(`begin process ${fileName} with task type: ${taskType}`, 'info');
 
-    // 确定是否需要生成字幕
+    // 確定是否需要生成字幕
     const shouldGenerateSubtitle =
       taskType === 'generateAndTranslate' || taskType === 'generateOnly';
 
-    // 确定是否需要翻译字幕
+    // 確定是否需要翻譯字幕
     const shouldTranslateSubtitle =
       taskType === 'generateAndTranslate' || taskType === 'translateOnly';
 
-    // 处理非字幕文件 - 需要生成字幕的情况
+    // 處理非字幕文件 - 需要生成字幕的情況
     if (!isSubtitleFile && shouldGenerateSubtitle) {
       const templateData = {
         fileName,
@@ -264,7 +264,7 @@ export async function processFile(
 
       file.srtFile = path.join(directory, `${sourceSrtFileName}.srt`);
 
-      // 优先尝试直接抽取内封文本软字幕：命中则复用「提取/听写」两节点、跳过抽音频 + ASR
+      // 優先嚐試直接抽取內封文本軟字幕：命中則複用「提取/聽寫」兩節點、跳過抽音頻 + ASR
       let usedEmbedded = false;
       if (canHaveEmbeddedSubtitle(fileExtension)) {
         try {
@@ -278,7 +278,7 @@ export async function processFile(
               `found ${textTracks.length} embedded text subtitle(s) in ${fileName}, extracting track s:${picked.subIndex} (${picked.codec})`,
               'info',
             );
-            // 提取节点：抽第一条文本轨
+            // 提取節點：抽第一條文本軌
             event.sender.send('taskFileChange', {
               ...file,
               extractAudio: 'loading',
@@ -298,7 +298,7 @@ export async function processFile(
               ...file,
               extractAudio: 'done',
             });
-            // 听写节点：字幕文件已就绪
+            // 聽寫節點：字幕文件已就緒
             event.sender.send('taskFileChange', {
               ...file,
               extractSubtitle: 'loading',
@@ -328,7 +328,7 @@ export async function processFile(
 
       if (!usedEmbedded) {
         try {
-          // 提取音频
+          // 提取音頻
           logMessage(`extract audio for ${fileName}`, 'info');
           event.sender.send('taskFileChange', {
             ...file,
@@ -342,7 +342,7 @@ export async function processFile(
             extractAudio: 'done',
           });
 
-          // 如果开启了保存音频选项，则复制一份到视频同目录
+          // 如果開啟了保存音頻選項，則複製一份到影片同目錄
           if (saveAudio) {
             const audioFileName = `${fileName}.wav`;
             const targetAudioPath = path.join(directory, audioFileName);
@@ -357,7 +357,7 @@ export async function processFile(
           await generateSubtitle(event, file, formData, hasOpenAiWhisper);
         } catch (error) {
           if (isTaskCancelledError(error) || isTaskCancelled()) {
-            // 用户取消：把本轮 loading 阶段回退为待处理
+            // 用戶取消：把本輪 loading 階段回退為待處理
             event.sender.send('taskFileChange', {
               ...file,
               extractAudio: '',
@@ -365,20 +365,20 @@ export async function processFile(
             });
             throw new TaskCancelledError();
           }
-          // 如果是提取音频或生成字幕过程中出错，已经在各自的函数中处理了错误状态
-          // 这里只需要继续抛出错误，中断后续流程
+          // 如果是提取音頻或生成字幕過程中出錯，已經在各自的函數中處理了錯誤狀態
+          // 這裡只需要繼續拋出錯誤，中斷後續流程
           throw error;
         }
       }
     } else if (isSubtitleFile) {
-      // 处理字幕文件
+      // 處理字幕文件
       file.srtFile = filePath;
       try {
         event.sender.send('taskFileChange', {
           ...file,
           prepareSubtitle: 'loading',
         });
-        // 这里可以添加字幕格式转换的逻辑，如果需要的话
+        // 這裡可以添加字幕格式轉換的邏輯，如果需要的話
         event.sender.send('taskFileChange', {
           ...file,
           prepareSubtitle: 'done',
@@ -388,14 +388,14 @@ export async function processFile(
         throw error;
       }
     } else if (!isSubtitleFile && !shouldGenerateSubtitle) {
-      // 非字幕文件且不需要生成字幕的情况（只翻译模式下传入了视频文件）
-      const errorMsg = '只翻译模式下不能处理视频文件，请提供字幕文件';
+      // 非字幕文件且不需要生成字幕的情況（只翻譯模式下傳入了影片文件）
+      const errorMsg = '只翻譯模式下不能處理影片文件，請提供字幕文件';
       onError(event, file, 'processFile', new Error(errorMsg));
       throw new Error(errorMsg);
     }
 
-    // 中文简繁归一：仅对「转写/内封提取生成」的源字幕生效（不动用户导入的字幕文件）。
-    // 源语言选中文时，按其简/繁取向把产物统一字形；检测到相反字形才实际改写。
+    // 中文簡繁歸一：僅對「轉寫/內封提取生成」的源字幕生效（不動用戶導入的字幕文件）。
+    // 源語言選中文時，按其簡/繁取向把產物統一字形；檢測到相反字形才實際改寫。
     if (!isSubtitleFile && shouldGenerateSubtitle && file.srtFile) {
       const desiredScript = getDesiredChineseScript(sourceLanguage);
       if (desiredScript) {
@@ -415,7 +415,7 @@ export async function processFile(
           }
         } catch (error) {
           if (isTaskCancelledError(error) || isTaskCancelled()) throw error;
-          // 转换失败不应阻断主流程：记录告警并沿用原始字幕
+          // 轉換失敗不應阻斷主流程：記錄告警並沿用原始字幕
           logMessage(
             `chinese script normalization failed: ${error}`,
             'warning',
@@ -424,7 +424,7 @@ export async function processFile(
       }
     }
 
-    // 源字幕中文标点去除 · generateOnly：转写后即剥离（无翻译下游，零风险）
+    // 源字幕中文標點去除 · generateOnly：轉寫後即剝離（無翻譯下游，零風險）
     if (
       !isSubtitleFile &&
       shouldGenerateSubtitle &&
@@ -436,11 +436,11 @@ export async function processFile(
       await stripSourceSubtitlePunctuation(file.srtFile, fileName);
     }
 
-    // 翻译字幕（取消后不再进入）
+    // 翻譯字幕（取消後不再進入）
     throwIfTaskCancelled();
     if (shouldTranslateSubtitle && translateProvider !== '-1') {
       if (!provider) {
-        // '-1' 历史残留或服务商已被删除：明确报错而非深层崩溃
+        // '-1' 歷史殘留或服務商已被刪除：明確報錯而非深層崩潰
         const errorMsg = `translate provider not found: ${translateProvider}`;
         onError(event, file, 'translateSubtitle', new Error(errorMsg));
         throw new Error(errorMsg);
@@ -449,8 +449,8 @@ export async function processFile(
       await translateSubtitle(event, file, formData, provider);
     }
 
-    // 源字幕中文标点去除 · generateAndTranslate：翻译完成后再剥离源交付物，
-    // 保留翻译输入的标点以护断句；noSave 时源字幕随后会被清理，无需处理。
+    // 源字幕中文標點去除 · generateAndTranslate：翻譯完成後再剝離源交付物，
+    // 保留翻譯輸入的標點以護斷句；noSave 時源字幕隨後會被清理，無需處理。
     if (
       !isSubtitleFile &&
       shouldGenerateSubtitle &&
@@ -464,10 +464,10 @@ export async function processFile(
       await stripSourceSubtitlePunctuation(file.srtFile, fileName);
     }
 
-    // 将交付字幕转换为用户选择的输出格式（内部流程始终为 SRT，此处仅转换最终交付物）
+    // 將交付字幕轉換為用戶選擇的輸出格式（內部流程始終為 SRT，此處僅轉換最終交付物）
     const outputFormat = resolveOutputFormat(formData);
     if (outputFormat !== 'srt') {
-      // 源字幕：仅在由 ASR 生成且需要保存时转换（noSave 时源字幕会被清理，保持 srt）
+      // 源字幕：僅在由 ASR 生成且需要保存時轉換（noSave 時源字幕會被清理，保持 srt）
       if (
         !isSubtitleFile &&
         shouldGenerateSubtitle &&
@@ -479,10 +479,10 @@ export async function processFile(
           file.srtFile = await convertDeliverable(file.srtFile, outputFormat);
           logMessage(`source subtitle converted to ${outputFormat}`, 'info');
         } catch (err) {
-          logMessage(`转换源字幕格式失败: ${err}`, 'error');
+          logMessage(`轉換源字幕格式失敗: ${err}`, 'error');
         }
       }
-      // 翻译字幕交付物
+      // 翻譯字幕交付物
       if (
         shouldTranslateSubtitle &&
         translateProvider !== '-1' &&
@@ -499,14 +499,14 @@ export async function processFile(
             'info',
           );
         } catch (err) {
-          logMessage(`转换翻译字幕格式失败: ${err}`, 'error');
+          logMessage(`轉換翻譯字幕格式失敗: ${err}`, 'error');
         }
       }
       event.sender.send('taskFileChange', file);
     }
 
-    // 清理临时文件：仅在「生成并翻译」且确实产生了译文交付物时才删除源字幕。
-    // 「仅生成字幕」任务的源字幕是最终交付物，绝不能因 noSave 而被删除。
+    // 清理臨時文件：僅在「生成並翻譯」且確實產生了譯文交付物時才刪除源字幕。
+    // 「僅生成字幕」任務的源字幕是最終交付物，絕不能因 noSave 而被刪除。
     if (
       !isSubtitleFile &&
       sourceSrtSaveOption === 'noSave' &&
@@ -516,12 +516,12 @@ export async function processFile(
     ) {
       const { srtFile } = file;
       logMessage(`delete temp subtitle ${srtFile}`, 'warning');
-      // 缓存一份到临时文件，用于字幕校对
+      // 緩存一份到臨時文件，用於字幕校對
       const tempDir = ensureTempDir();
       const md5FileName = getMd5(filePath);
       const tempSrtFile = path.join(tempDir, `${md5FileName}.srt`);
       file.tempSrtFile = tempSrtFile;
-      // 清除已删除文件的路径，确保校对时使用临时目录的文件
+      // 清除已刪除文件的路徑，確保校對時使用臨時目錄的文件
       file.srtFile = undefined;
       event.sender.send('taskFileChange', file);
       fs.copyFileSync(srtFile, tempSrtFile);
@@ -542,7 +542,7 @@ export async function processFile(
       });
       return;
     }
-    // 使用通用错误处理方法
+    // 使用通用錯誤處理方法
     createMessageSender(event.sender).send('message', {
       type: 'error',
       message: error,

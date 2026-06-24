@@ -27,7 +27,7 @@ type FunasrAsrSelection = NonNullable<
   ReturnType<typeof resolveFunasrAsrSelection>
 >;
 
-/** 组装 worker 模型请求（不含 audio_file）。transcribe 与 prewarm 共用，缓存 key 一致。 */
+/** 組裝 worker 模型請求（不含 audio_file）。transcribe 與 prewarm 共用，緩存 key 一致。 */
 function buildModelRequest(
   selection: FunasrAsrSelection,
   settings: Record<string, unknown>,
@@ -44,8 +44,8 @@ function buildModelRequest(
 }
 
 /**
- * 批次预热：在音频抽取的同时，让 worker 预加载所选 ASR/VAD 模型并写满识别器缓存，
- * 使首个 transcribe 直接命中。模型加载在 worker 线程进行，不阻塞主/UI 线程。失败非致命。
+ * 批次預熱：在音頻抽取的同時，讓 worker 預加載所選 ASR/VAD 模型並寫滿識別器緩存，
+ * 使首個 transcribe 直接命中。模型加載在 worker 線程進行，不阻塞主/UI 線程。失敗非致命。
  */
 function prewarmFunasr(formData: Record<string, unknown>): void {
   try {
@@ -68,8 +68,8 @@ function prewarmFunasr(formData: Record<string, unknown>): void {
 }
 
 /**
- * 用 sherpa-onnx Node 原生 addon（worker 线程）生成字幕。
- * 取消与 faster-whisper 一致走 AbortSignal：信号触发即通知 worker 逐段取消。
+ * 用 sherpa-onnx Node 原生 addon（worker 線程）生成字幕。
+ * 取消與 faster-whisper 一致走 AbortSignal：信號觸發即通知 worker 逐段取消。
  */
 async function transcribeFunasr(ctx: TranscribeContext): Promise<string> {
   const { event, file, formData } = ctx;

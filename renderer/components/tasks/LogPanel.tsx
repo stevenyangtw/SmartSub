@@ -12,7 +12,7 @@ type LogEntry = {
 
 const LogPanel: React.FC<{
   className?: string;
-  /** 提供时只显示该工程的日志（系统/Updater 日志不再混入） */
+  /** 提供時只顯示該工程的日誌（系統/Updater 日誌不再混入） */
   projectId?: string | null;
 }> = ({ className, projectId }) => {
   const { t } = useTranslation('tasks');
@@ -54,7 +54,7 @@ const LogPanel: React.FC<{
   };
 
   const lastLog = logs[logs.length - 1];
-  // 折叠态预览压成单行，避免换行/超长内容把页面撑出横向滚动条
+  // 摺疊態預覽壓成單行，避免換行/超長內容把頁面撐出橫向滾動條
   const lastLogPreview = lastLog
     ? lastLog.message.replace(/\s+/g, ' ').trim()
     : '';

@@ -1,6 +1,6 @@
 /**
- * 字幕样式工具函数
- * 用于前端 CSS 预览模拟
+ * 字幕樣式工具函數
+ * 用於前端 CSS 預覽模擬
  */
 
 import type {
@@ -9,22 +9,22 @@ import type {
 } from '../../../../types/subtitleMerge';
 
 /**
- * libass 烧录字幕的「等效脚本高度」：FontSize 以它为基准，再等比缩放到视频实际高度。
- * 预览里把「预览盒高 / 该值」作为缩放系数，CSS 模拟字号即≈烧录后字号，
- * 与预览框大小、视频分辨率均无关地保持所见即所得。
+ * libass 燒錄字幕的「等效腳本高度」：FontSize 以它為基準，再等比縮放到影片實際高度。
+ * 預覽裡把「預覽盒高 / 該值」作為縮放係數，CSS 模擬字號即≈燒錄後字號，
+ * 與預覽框大小、影片分辨率均無關地保持所見即所得。
  *
- * 该值由「字形墨迹高度」实测标定（比按 em 反推更可靠，整块字符 █ 会超出 em 导致偏差）：
- *   - libass：Hiragino「中/字」FontSize=72、帧高 720 → 墨迹高 ≈141px，占帧高 ≈19.6%；
- *   - 浏览器 canvas measureText：CJK 字形墨迹高 ≈ 0.91·font-size（中文字体几乎填满 em）。
- *   令两者占比相等 → 等效高度 = 72 × 0.91 / 0.196 ≈ 333（与字体、分辨率基本无关）。
- * 实测 K=333 时预览(PingFang)与烧录(Hiragino)字号在 24/72 档均吻合（偏差 <1%）。
+ * 該值由「字形墨跡高度」實測標定（比按 em 反推更可靠，整塊字符 █ 會超出 em 導致偏差）：
+ *   - libass：Hiragino「中/字」FontSize=72、幀高 720 → 墨跡高 ≈141px，佔幀高 ≈19.6%；
+ *   - 瀏覽器 canvas measureText：CJK 字形墨跡高 ≈ 0.91·font-size（中文字體幾乎填滿 em）。
+ *   令兩者佔比相等 → 等效高度 = 72 × 0.91 / 0.196 ≈ 333（與字體、分辨率基本無關）。
+ * 實測 K=333 時預覽(PingFang)與燒錄(Hiragino)字號在 24/72 檔均吻合（偏差 <1%）。
  */
 export const LIBASS_SRT_PLAYRES_Y = 333;
 
 /**
- * 将字幕样式转换为 CSS 样式对象
- * 用于前端实时预览
- * @param scale 预览盒相对 libass 脚本高度的缩放系数（盒高/288），默认 1
+ * 將字幕樣式轉換為 CSS 樣式對象
+ * 用於前端實時預覽
+ * @param scale 預覽盒相對 libass 腳本高度的縮放係數（盒高/288），預設 1
  */
 export function subtitleStyleToCSS(
   style: SubtitleStyle,
@@ -40,29 +40,29 @@ export function subtitleStyleToCSS(
     textDecoration: style.underline ? 'underline' : 'none',
     textAlign: getTextAlign(style.alignment),
     padding: `${4 * s}px ${8 * s}px`,
-    // libass 行距≈1.2em，预览与之对齐，避免多行字幕预览比烧录结果偏高
+    // libass 行距≈1.2em，預覽與之對齊，避免多行字幕預覽比燒錄結果偏高
     lineHeight: 1.2,
-    // 折行行为对齐 libass（force_style 未设 WrapStyle，默认仅在空格处断行）：
-    //   - pre-wrap：保留显式换行与空格，并在空格处提供软换行点（英文/含空格文本会折行）；
-    //   - word-break: keep-all：禁止在 CJK 字符间断行，纯中文（无空格）长行不折行而是
-    //     溢出帧、由预览框 overflow-hidden 居中裁剪；
-    //   - overflow-wrap: normal：不强制打断长串。
-    // 效果：仅中文不换行、含空格按空格换行，与烧录结果一致（所见即所得）。
+    // 折行行為對齊 libass（force_style 未設 WrapStyle，預設僅在空格處斷行）：
+    //   - pre-wrap：保留顯式換行與空格，並在空格處提供軟換行點（英文/含空格文本會折行）；
+    //   - word-break: keep-all：禁止在 CJK 字符間斷行，純中文（無空格）長行不折行而是
+    //     溢出幀、由預覽框 overflow-hidden 居中裁剪；
+    //   - overflow-wrap: normal：不強制打斷長串。
+    // 效果：僅中文不換行、含空格按空格換行，與燒錄結果一致（所見即所得）。
     whiteSpace: 'pre-wrap',
     wordBreak: 'keep-all',
     overflowWrap: 'normal',
   };
 
-  // 根据边框样式处理
+  // 根據邊框樣式處理
   if (style.borderStyle === 3) {
     // 背景框模式
     css.backgroundColor = hexToRgba(style.backColor, 0.7);
     css.borderRadius = `${4 * s}px`;
   } else {
-    // 边框 + 阴影模式
+    // 邊框 + 陰影模式
     const shadows: string[] = [];
 
-    // 文字描边效果（描边偏移按比例缩放，保持与字号一致的视觉粗细）
+    // 文字描邊效果（描邊偏移按比例縮放，保持與字號一致的視覺粗細）
     if (style.outline > 0) {
       const outlineSize = Math.min(style.outline, 4);
       for (let x = -outlineSize; x <= outlineSize; x++) {
@@ -74,7 +74,7 @@ export function subtitleStyleToCSS(
       }
     }
 
-    // 阴影效果
+    // 陰影效果
     if (style.shadow > 0) {
       shadows.push(
         `${style.shadow * s}px ${style.shadow * s}px ${style.shadow * s}px ${style.backColor}`,
@@ -90,8 +90,8 @@ export function subtitleStyleToCSS(
 }
 
 /**
- * 获取字幕容器的定位样式
- * @param scale 预览盒相对 libass 脚本高度的缩放系数（盒高/288），默认 1
+ * 獲取字幕容器的定位樣式
+ * @param scale 預覽盒相對 libass 腳本高度的縮放係數（盒高/288），預設 1
  */
 export function getSubtitleContainerStyle(
   style: SubtitleStyle,
@@ -111,7 +111,7 @@ export function getSubtitleContainerStyle(
     pointerEvents: 'none',
   };
 
-  // 根据垂直对齐设置位置
+  // 根據垂直對齊設置位置
   const verticalPosition = getVerticalPosition(style.alignment);
   if (verticalPosition === 'top') {
     css.top = 0;
@@ -126,7 +126,7 @@ export function getSubtitleContainerStyle(
 }
 
 /**
- * 根据对齐方式获取文本对齐
+ * 根據對齊方式獲取文本對齊
  */
 function getTextAlign(
   alignment: SubtitleAlignment,
@@ -141,7 +141,7 @@ function getTextAlign(
 }
 
 /**
- * 获取水平 flex 对齐
+ * 獲取水平 flex 對齊
  */
 function getJustifyContent(
   alignment: SubtitleAlignment,
@@ -153,26 +153,26 @@ function getJustifyContent(
 }
 
 /**
- * 获取垂直 flex 对齐
+ * 獲取垂直 flex 對齊
  */
 function getAlignItems(
   alignment: SubtitleAlignment,
 ): 'flex-start' | 'center' | 'flex-end' {
   const row = Math.floor((alignment - 1) / 3);
   if (row === 0) return 'flex-end'; // 1,2,3 底部
-  if (row === 1) return 'center'; // 4,5,6 中间
-  return 'flex-start'; // 7,8,9 顶部
+  if (row === 1) return 'center'; // 4,5,6 中間
+  return 'flex-start'; // 7,8,9 頂部
 }
 
 /**
- * 获取垂直位置
+ * 獲取垂直位置
  */
 function getVerticalPosition(
   alignment: SubtitleAlignment,
 ): 'top' | 'middle' | 'bottom' {
   // 1,2,3 = 底部
-  // 4,5,6 = 中间
-  // 7,8,9 = 顶部
+  // 4,5,6 = 中間
+  // 7,8,9 = 頂部
   const row = Math.floor((alignment - 1) / 3);
   if (row === 0) return 'bottom';
   if (row === 1) return 'middle';
@@ -180,10 +180,10 @@ function getVerticalPosition(
 }
 
 /**
- * 十六进制颜色转 rgba
+ * 十六進制顏色轉 rgba
  */
 function hexToRgba(hex: string, alpha: number = 1): string {
-  // 移除 # 前缀
+  // 移除 # 前綴
   const cleanHex = hex.replace('#', '');
 
   // 解析 RGB 值
@@ -195,7 +195,7 @@ function hexToRgba(hex: string, alpha: number = 1): string {
 }
 
 /**
- * 格式化时长
+ * 格式化時長
  */
 export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);

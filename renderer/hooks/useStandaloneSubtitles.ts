@@ -1,6 +1,6 @@
 /**
- * 独立校对模式的字幕管理 Hook
- * 不依赖 IFiles，直接接收文件路径
+ * 獨立校對模式的字幕管理 Hook
+ * 不依賴 IFiles，直接接收文件路徑
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -16,11 +16,11 @@ interface StandaloneSubtitlesConfig {
   targetSubtitlePath?: string;
   sourceLanguage?: string;
   targetLanguage?: string;
-  finalTargetSubtitlePath?: string; // 目标翻译文件（用户配置格式，可能是双语）
-  translateContent?: string; // 翻译内容格式设置
+  finalTargetSubtitlePath?: string; // 目標翻譯文件（用戶配置格式，可能是雙語）
+  translateContent?: string; // 翻譯內容格式設置
 }
 
-// 将时间字符串转换为秒
+// 將時間字符串轉換為秒
 const timeToSeconds = (timeStr: string): number => {
   const parts = timeStr.replace(',', '.').split(':');
   if (parts.length !== 3) return 0;
@@ -30,7 +30,7 @@ const timeToSeconds = (timeStr: string): number => {
   return hours * 3600 + minutes * 60 + seconds;
 };
 
-// 从时间范围字符串中提取开始和结束时间
+// 從時間範圍字符串中提取開始和結束時間
 const parseTimeRange = (timeRange: string): { start: number; end: number } => {
   const times = timeRange.split(' --> ');
   if (times.length !== 2) return { start: 0, end: 0 };
@@ -40,14 +40,14 @@ const parseTimeRange = (timeRange: string): { start: number; end: number } => {
   };
 };
 
-// id 归一化为「下标+1」：仅克隆 id 变化的行（合并/拆分/撤销重做后调用）
+// id 歸一化為「下標+1」：僅克隆 id 變化的行（合併/拆分/撤銷重做後調用）
 const renormalizeIds = (arr: Subtitle[]): Subtitle[] =>
   arr.map((sub, idx) => {
     const id = String(idx + 1);
     return sub.id === id ? sub : { ...sub, id };
   });
 
-// 秒数转 SRT 时间戳字符串（HH:MM:SS,mmm）
+// 秒數轉 SRT 時間戳字符串（HH:MM:SS,mmm）
 const secondsToTime = (seconds: number): string => {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -55,7 +55,7 @@ const secondsToTime = (seconds: number): string => {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.padStart(6, '0').replace('.', ',')}`;
 };
 
-// 时间相等容差（SRT 精度为毫秒）
+// 時間相等容差（SRT 精度為毫秒）
 const TIME_EPSILON = 0.0005;
 
 export const useStandaloneSubtitles = (
@@ -74,39 +74,39 @@ export const useStandaloneSubtitles = (
   >([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 撤销/重做历史（命令模式：区间 diff 命令栈）
+  // 撤銷/重做歷史（命令模式：區間 diff 命令棧）
   const history = useSubtitleHistory();
 
-  // 字幕数组的同步镜像：所有变更经 applySubtitles 落盘，
-  // 命令构造/合并窗口等同步逻辑读它，避免依赖异步 setState
+  // 字幕數組的同步鏡像：所有變更經 applySubtitles 落盤，
+  // 命令構造/合併窗口等同步邏輯讀它，避免依賴異步 setState
   const subtitlesRef = useRef<Subtitle[]>([]);
 
-  // 逐字编辑合并窗口：同行同字段的连续输入合并为一条撤销命令
+  // 逐字編輯合併窗口：同行同字段的連續輸入合併為一條撤銷命令
   const pendingEditRef = useRef<{
     index: number;
     field: 'sourceContent' | 'targetContent';
     before: Subtitle;
   } | null>(null);
 
-  // 自上次保存以来是否有未保存修改
+  // 自上次保存以來是否有未保存修改
   const [isDirty, setIsDirty] = useState(false);
 
-  // 光标位置（用于拆分功能）
+  // 光標位置（用於拆分功能）
   const cursorPositionRef = useRef(0);
 
-  // 是否有翻译字幕
+  // 是否有翻譯字幕
   const shouldShowTranslation = !!config.targetSubtitlePath;
 
-  // 统一落盘：镜像 ref 与 state 同步更新
+  // 統一落盤：鏡像 ref 與 state 同步更新
   const applySubtitles = useCallback((next: Subtitle[]) => {
     subtitlesRef.current = next;
     setMergedSubtitles(next);
   }, []);
 
-  // 读取最新字幕数组（异步流程结束后回填用，避免拿到过期快照）
+  // 讀取最新字幕數組（異步流程結束後回填用，避免拿到過期快照）
   const getSubtitles = useCallback(() => subtitlesRef.current, []);
 
-  // 读取字幕文件
+  // 讀取字幕文件
   const readSubtitleFile = async (filePath: string): Promise<Subtitle[]> => {
     try {
       const result: Subtitle[] = await window.ipc.invoke('readSubtitleFile', {
@@ -119,7 +119,7 @@ export const useStandaloneSubtitles = (
     }
   };
 
-  // 创建播放器字幕轨道
+  // 創建播放器字幕軌道
   const createPlayerTrack = async (
     srtPath: string | undefined,
     language: string,
@@ -131,7 +131,7 @@ export const useStandaloneSubtitles = (
         filePath: srtPath,
       });
       if (result.error || !result.content) {
-        console.error(`无法读取字幕文件 ${srtPath}:`, result.error);
+        console.error(`無法讀取字幕文件 ${srtPath}:`, result.error);
         return null;
       }
       const vttBlob = new Blob([result.content], { type: 'text/vtt' });
@@ -144,25 +144,25 @@ export const useStandaloneSubtitles = (
         default: isDefault,
       };
     } catch (error) {
-      console.error(`转换字幕到 VTT 失败:`, error);
+      console.error(`轉換字幕到 VTT 失敗:`, error);
       return null;
     }
   };
 
-  // 加载文件
+  // 加載文件
   const loadFiles = useCallback(async () => {
     if (!config.sourceSubtitlePath) return;
 
     setIsLoading(true);
     try {
-      // 设置视频路径
+      // 設置影片路徑
       if (config.videoPath) {
         setVideoPath(config.videoPath);
       }
 
       const playerTracks: PlayerSubtitleTrack[] = [];
 
-      // 读取源字幕
+      // 讀取源字幕
       const sourceSubtitles = await readSubtitleFile(config.sourceSubtitlePath);
       if (config.sourceLanguage) {
         const track = await createPlayerTrack(
@@ -173,7 +173,7 @@ export const useStandaloneSubtitles = (
         if (track) playerTracks.push(track);
       }
 
-      // 读取翻译字幕
+      // 讀取翻譯字幕
       let translatedSubtitles: Subtitle[] = [];
       if (config.targetSubtitlePath) {
         translatedSubtitles = await readSubtitleFile(config.targetSubtitlePath);
@@ -191,7 +191,7 @@ export const useStandaloneSubtitles = (
 
       setSubtitleTracksForPlayer(playerTracks);
 
-      // 合并字幕
+      // 合併字幕
       if (sourceSubtitles.length > 0) {
         const translatedMap = new Map();
         translatedSubtitles.forEach((sub) => {
@@ -219,7 +219,7 @@ export const useStandaloneSubtitles = (
 
         applySubtitles(merged);
       }
-      // 重新加载即新的编辑起点：清空历史与合并窗口
+      // 重新加載即新的編輯起點：清空歷史與合併窗口
       history.reset();
       pendingEditRef.current = null;
       setIsDirty(false);
@@ -231,7 +231,7 @@ export const useStandaloneSubtitles = (
     }
   }, [config, shouldShowTranslation, t, applySubtitles, history.reset]);
 
-  // 加载文件
+  // 加載文件
   useEffect(() => {
     if (isOpen && config.sourceSubtitlePath) {
       loadFiles();
@@ -247,7 +247,7 @@ export const useStandaloneSubtitles = (
     };
   }, [isOpen, config.sourceSubtitlePath, config.targetSubtitlePath]);
 
-  // 更新视频信息
+  // 更新影片信息
   useEffect(() => {
     if (videoPath) {
       const fileName = path.basename(videoPath, path.extname(videoPath));
@@ -262,7 +262,7 @@ export const useStandaloneSubtitles = (
     }
   }, [videoPath, config.sourceSubtitlePath]);
 
-  // 把合并窗口中的逐字编辑提交为一条撤销命令
+  // 把合併窗口中的逐字編輯提交為一條撤銷命令
   const flushPendingEdit = useCallback(() => {
     const pending = pendingEditRef.current;
     if (!pending) return;
@@ -278,7 +278,7 @@ export const useStandaloneSubtitles = (
     });
   }, [history.push]);
 
-  // 更新字幕内容（行级克隆，连续输入合并为一条命令）
+  // 更新字幕內容（行級克隆，連續輸入合併為一條命令）
   const handleSubtitleChange = useCallback(
     (
       index: number,
@@ -290,7 +290,7 @@ export const useStandaloneSubtitles = (
       if (!row) return;
 
       const pending = pendingEditRef.current;
-      // 换行或换字段：先提交上一个合并窗口
+      // 換行或換字段：先提交上一個合併窗口
       if (pending && (pending.index !== index || pending.field !== field)) {
         flushPendingEdit();
       }
@@ -310,9 +310,9 @@ export const useStandaloneSubtitles = (
     [applySubtitles, flushPendingEdit],
   );
 
-  // 保存字幕文件；返回是否全部写入成功
+  // 保存字幕文件；返回是否全部寫入成功
   const handleSave = async (): Promise<boolean> => {
-    // 先把未提交的逐字编辑补入撤销历史，保证保存后仍可撤销
+    // 先把未提交的逐字編輯補入撤銷歷史，保證保存後仍可撤銷
     flushPendingEdit();
     try {
       const results: { error?: string }[] = [];
@@ -328,7 +328,7 @@ export const useStandaloneSubtitles = (
         );
       }
 
-      // 保存翻译字幕（纯翻译内容到临时文件）
+      // 保存翻譯字幕（純翻譯內容到臨時文件）
       if (config.targetSubtitlePath && shouldShowTranslation) {
         results.push(
           await window.ipc.invoke('saveSubtitleFile', {
@@ -339,7 +339,7 @@ export const useStandaloneSubtitles = (
         );
       }
 
-      // 保存到目标翻译文件（按用户配置格式，可能是双语）
+      // 保存到目標翻譯文件（按用戶配置格式，可能是雙語）
       if (config.finalTargetSubtitlePath && shouldShowTranslation) {
         const contentType = config.translateContent || 'onlyTranslate';
         results.push(
@@ -368,7 +368,7 @@ export const useStandaloneSubtitles = (
     }
   };
 
-  // 字幕统计
+  // 字幕統計
   const getSubtitleStats = (): SubtitleStats => {
     const total = mergedSubtitles.length;
     const withTranslation = shouldShowTranslation
@@ -383,7 +383,7 @@ export const useStandaloneSubtitles = (
     return { total, withTranslation, percent };
   };
 
-  // 检查翻译是否失败
+  // 檢查翻譯是否失敗
   const isTranslationFailed = (subtitle: Subtitle): boolean => {
     if (!shouldShowTranslation) return false;
     return (
@@ -393,7 +393,7 @@ export const useStandaloneSubtitles = (
     );
   };
 
-  // 获取翻译失败的索引
+  // 獲取翻譯失敗的索引
   const getFailedTranslationIndices = (): number[] => {
     if (!shouldShowTranslation) return [];
     return mergedSubtitles
@@ -401,7 +401,7 @@ export const useStandaloneSubtitles = (
       .filter((index) => index !== -1);
   };
 
-  // 导航到下一条失败的翻译
+  // 導航到下一條失敗的翻譯
   const goToNextFailedTranslation = (): void => {
     const failedIndices = getFailedTranslationIndices();
     if (failedIndices.length === 0) return;
@@ -415,7 +415,7 @@ export const useStandaloneSubtitles = (
     }
   };
 
-  // 导航到上一条失败的翻译
+  // 導航到上一條失敗的翻譯
   const goToPreviousFailedTranslation = (): void => {
     const failedIndices = getFailedTranslationIndices();
     if (failedIndices.length === 0) return;
@@ -430,7 +430,7 @@ export const useStandaloneSubtitles = (
     }
   };
 
-  // 更新字幕（批量操作入口：计算最小区间 diff 入栈）
+  // 更新字幕（批量操作入口：計算最小區間 diff 入棧）
   const updateSubtitles = useCallback(
     (newSubtitles: Subtitle[]) => {
       flushPendingEdit();
@@ -442,7 +442,7 @@ export const useStandaloneSubtitles = (
     [applySubtitles, flushPendingEdit, history.push],
   );
 
-  // 撤销：先提交合并窗口（保证「最后一次输入」也可撤销），再应用区间命令
+  // 撤銷：先提交合並窗口（保證「最後一次輸入」也可撤銷），再應用區間命令
   const handleUndo = useCallback(() => {
     flushPendingEdit();
     const next = history.undo(subtitlesRef.current);
@@ -452,7 +452,7 @@ export const useStandaloneSubtitles = (
     }
   }, [applySubtitles, flushPendingEdit, history.undo]);
 
-  // 重做：合并窗口若有内容会作为新命令清空 redo 分支（与主流编辑器一致）
+  // 重做：合併窗口若有內容會作為新命令清空 redo 分支（與主流編輯器一致）
   const handleRedo = useCallback(() => {
     flushPendingEdit();
     const next = history.redo(subtitlesRef.current);
@@ -462,11 +462,11 @@ export const useStandaloneSubtitles = (
     }
   }, [applySubtitles, flushPendingEdit, history.redo]);
 
-  // 是否可以撤销/重做（合并窗口中有未提交输入也算可撤销）
+  // 是否可以撤銷/重做（合併窗口中有未提交輸入也算可撤銷）
   const canUndo = history.canUndo || pendingEditRef.current !== null;
   const canRedo = history.canRedo;
 
-  // 失焦记录：当切换字幕时，如果有编辑过，保存到历史
+  // 失焦記錄：當切換字幕時，如果有編輯過，保存到歷史
   useEffect(() => {
     if (
       previousSubtitleIndex !== -1 &&
@@ -477,7 +477,7 @@ export const useStandaloneSubtitles = (
     setPreviousSubtitleIndex(currentSubtitleIndex);
   }, [currentSubtitleIndex, flushPendingEdit]);
 
-  // 行内编辑起止时间：邻行钳制校验，通过则单行命令入栈；返回错误文案或 null
+  // 行內編輯起止時間：鄰行鉗制校驗，通過則單行命令入棧；返回錯誤文案或 null
   const handleTimeChange = useCallback(
     (index: number, startSec: number, endSec: number): string | null => {
       const current = subtitlesRef.current;
@@ -502,7 +502,7 @@ export const useStandaloneSubtitles = (
         return t('timeEditOverlapNext');
       }
 
-      // 无实际变化
+      // 無實際變化
       if (
         Math.abs((row.startTimeInSeconds ?? 0) - startSec) < TIME_EPSILON &&
         Math.abs((row.endTimeInSeconds ?? 0) - endSec) < TIME_EPSILON
@@ -528,7 +528,7 @@ export const useStandaloneSubtitles = (
     [applySubtitles, flushPendingEdit, history.push, t],
   );
 
-  // 合并字幕（区间命令：N 行 → 1 行；id 由 renormalize 统一归位）
+  // 合併字幕（區間命令：N 行 → 1 行；id 由 renormalize 統一歸位）
   const handleMergeSubtitles = useCallback(
     (startIndex: number, endIndex: number) => {
       const current = subtitlesRef.current;
@@ -540,7 +540,7 @@ export const useStandaloneSubtitles = (
 
       flushPendingEdit();
 
-      // 合并内容
+      // 合併內容
       const mergedContent = toMerge
         .map((s) => s.sourceContent)
         .filter(Boolean)
@@ -550,7 +550,7 @@ export const useStandaloneSubtitles = (
         .filter(Boolean)
         .join('\n');
 
-      // 使用第一条的开始时间和最后一条的结束时间
+      // 使用第一條的開始時間和最後一條的結束時間
       const startTime = toMerge[0].startTimeInSeconds || 0;
       const endTime = toMerge[toMerge.length - 1].endTimeInSeconds || 0;
 
@@ -575,7 +575,7 @@ export const useStandaloneSubtitles = (
     [applySubtitles, flushPendingEdit, history.push, t],
   );
 
-  // 拆分字幕（区间命令：1 行 → 2 行；支持自定义时间拆分点）
+  // 拆分字幕（區間命令：1 行 → 2 行；支持自定義時間拆分點）
   const handleSplitSubtitle = useCallback(
     (index: number, splitPoint: number, splitTime?: number) => {
       const current = subtitlesRef.current;
@@ -589,7 +589,7 @@ export const useStandaloneSubtitles = (
 
       flushPendingEdit();
 
-      // 计算拆分后的内容
+      // 計算拆分後的內容
       const content1 = content.slice(0, splitPoint);
       const content2 = content.slice(splitPoint);
       const targetSplitPoint = Math.floor(
@@ -598,7 +598,7 @@ export const useStandaloneSubtitles = (
       const target1 = targetContent.slice(0, targetSplitPoint);
       const target2 = targetContent.slice(targetSplitPoint);
 
-      // 计算拆分后的时间（支持自定义时间拆分点）
+      // 計算拆分後的時間（支持自定義時間拆分點）
       const startTime = subtitle.startTimeInSeconds || 0;
       const endTime = subtitle.endTimeInSeconds || 0;
       const midTime =
@@ -640,12 +640,12 @@ export const useStandaloneSubtitles = (
     [applySubtitles, flushPendingEdit, history.push, t],
   );
 
-  // 更新光标位置
+  // 更新光標位置
   const handleCursorPositionChange = useCallback((position: number) => {
     cursorPositionRef.current = position;
   }, []);
 
-  // 获取当前光标位置
+  // 獲取當前光標位置
   const getCursorPosition = useCallback(() => {
     return cursorPositionRef.current;
   }, []);
@@ -672,7 +672,7 @@ export const useStandaloneSubtitles = (
     getFailedTranslationIndices,
     goToNextFailedTranslation,
     goToPreviousFailedTranslation,
-    // 编辑增强功能
+    // 編輯增強功能
     handleUndo,
     handleRedo,
     canUndo,
@@ -680,7 +680,7 @@ export const useStandaloneSubtitles = (
     handleMergeSubtitles,
     handleSplitSubtitle,
     handleTimeChange,
-    // 光标位置
+    // 光標位置
     handleCursorPositionChange,
     getCursorPosition,
   };

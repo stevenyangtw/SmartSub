@@ -1,6 +1,6 @@
 /**
- * 字幕预览叠加层组件
- * 使用 CSS 模拟字幕效果
+ * 字幕預覽疊加層組件
+ * 使用 CSS 模擬字幕效果
  */
 
 import React from 'react';
@@ -13,7 +13,7 @@ import {
 interface SubtitlePreviewOverlayProps {
   style: SubtitleStyle;
   text: string;
-  /** 预览盒缩放系数（盒高/333），用于让 CSS 模拟字号≈烧录后字号 */
+  /** 預覽盒縮放係數（盒高/333），用於讓 CSS 模擬字號≈燒錄後字號 */
   scale?: number;
 }
 

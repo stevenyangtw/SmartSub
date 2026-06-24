@@ -1,4 +1,4 @@
-// 在最开始加载环境变量（仅开发模式；路径相对 app/ 编译产物）
+// 在最開始加載環境變量（僅開發模式；路徑相對 app/ 編譯產物）
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config({
     path: require('path').join(__dirname, '../../.env.development.local'),
@@ -46,11 +46,11 @@ import {
 } from './helpers/appBranding';
 import { getDevSimulationConfig, getGpuEnvironment } from './helpers/cudaUtils';
 
-//控制台出现中文乱码，需要去node_modules\electron\cli.js中修改启动代码页
+//控制台出現中文亂碼，需要去node_modules\electron\cli.js中修改啟動代碼頁
 
 const isProd = process.env.NODE_ENV === 'production';
 
-// media:// 需在 webSecurity:true 下注册为 privileged scheme（必须在 app ready 之前）
+// media:// 需在 webSecurity:true 下注冊為 privileged scheme（必須在 app ready 之前）
 protocol.registerSchemesAsPrivileged([
   {
     scheme: 'media',
@@ -63,11 +63,11 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-/** 回退开关：SMARTSUB_LEGACY_WEB_SECURITY=true 恢复旧行为 */
+/** 回退開關：SMARTSUB_LEGACY_WEB_SECURITY=true 恢復舊行為 */
 const useLegacyWebSecurity =
   process.env.SMARTSUB_LEGACY_WEB_SECURITY === 'true';
 
-// macOS 开发态：须在 ready 前设置，否则菜单栏仍显示 Electron
+// macOS 開發態：須在 ready 前設置，否則菜單欄仍顯示 Electron
 setAppDisplayNameEarly();
 
 if (isProd) {
@@ -78,7 +78,7 @@ if (isProd) {
 
 let runtimeShutdownDone = false;
 app.on('before-quit', (event) => {
-  // 真退出标记集中在 windowClose 模块，close 监听据此放行
+  // 真退出標記集中在 windowClose 模塊，close 監聽據此放行
   markQuitting();
   if (!runtimeShutdownDone) {
     event.preventDefault();
@@ -100,7 +100,7 @@ app.on('before-quit', (event) => {
     );
   }
 
-  // 注册自定义协议处理本地媒体文件
+  // 註冊自定義協議處理本地媒體文件
   protocol.registerFileProtocol('media', (request, callback) => {
     const url = request.url.substr(8); // 移除 "media://" 部分
     try {
@@ -113,7 +113,7 @@ app.on('before-quit', (event) => {
   });
 
   setupStoreHandlers();
-  // 代理须在任何联网（providers 初始化 / 下载 / 更新检测）前生效
+  // 代理須在任何聯網（providers 初始化 / 下載 / 更新檢測）前生效
   applyProxyFromSettings();
   setupParameterHandlers();
   setupProofreadHandlers();
@@ -128,7 +128,7 @@ app.on('before-quit', (event) => {
   }
 
   const settings = store.get('settings');
-  const userLanguage = settings?.language || 'zh'; // 默认为中文
+  const userLanguage = settings?.language || 'zh'; // 預設為中文
 
   const mainWindow = createWindow('main', {
     width: 1280,
@@ -138,7 +138,7 @@ app.on('before-quit', (event) => {
     icon: resolveAppIcon(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      // 本地媒体经 media:// 协议加载；紧急回退 SMARTSUB_LEGACY_WEB_SECURITY=true
+      // 本地媒體經 media:// 協議加載；緊急回退 SMARTSUB_LEGACY_WEB_SECURITY=true
       webSecurity: !useLegacyWebSecurity,
     },
   });
@@ -147,7 +147,7 @@ app.on('before-quit', (event) => {
     e.preventDefault();
   });
 
-  // 关窗行为（macOS 智能模式 / Win·Linux 防误杀）+ Dock 激活恢复
+  // 關窗行為（macOS 智能模式 / Win·Linux 防誤殺）+ Dock 激活恢復
   setupWindowCloseBehavior(mainWindow);
 
   if (isProd) {
@@ -172,17 +172,17 @@ app.on('before-quit', (event) => {
   setMainWindowForAddon(mainWindow);
   registerEngineIpcHandlers();
   setMainWindowForEngine(mainWindow);
-  // 清理三层架构改造前遗留的旧 py-engine 目录/状态文件（幂等，失败静默）。
+  // 清理三層架構改造前遺留的舊 py-engine 目錄/狀態文件（冪等，失敗靜默）。
   cleanupLegacyPyEngine();
-  // 启动后每日一次的节流静默检查 faster-whisper 运行时更新（非阻塞，失败静默）。
+  // 啟動後每日一次的節流靜默檢查 faster-whisper 運行時更新（非阻塞，失敗靜默）。
   void maybeAutoCheckPyEngineUpdate(mainWindow);
-  // 后台预热 GPU/CUDA 环境检测缓存：首次探测（nvcc / nvidia-smi）较慢，提前异步完成并写入
-  // 会话缓存，用户进入「引擎与模型」页时直接命中，避免首屏等待。非阻塞，失败静默。
+  // 後臺預熱 GPU/CUDA 環境檢測緩存：首次探測（nvcc / nvidia-smi）較慢，提前異步完成並寫入
+  // 會話緩存，用戶進入「引擎與模型」頁時直接命中，避免首屏等待。非阻塞，失敗靜默。
   void getGpuEnvironment().catch(() => {});
 })();
 
 app.on('window-all-closed', () => {
-  // macOS 惯例：关窗不退出（任务保活），其余平台正常退出
+  // macOS 慣例：關窗不退出（任務保活），其餘平臺正常退出
   if (process.platform !== 'darwin') {
     app.quit();
   }

@@ -23,7 +23,7 @@ import { resolveModelDownloadUrl } from 'lib/resolveModelDownloadUrl';
 
 type FireRedModelId = 'fire-red-asr-large-zh-en';
 
-/** fireRed 模型下载源（与主进程 FireRedModelSource 一致）：国内优先 ModelScope。 */
+/** fireRed 模型下載源（與主進程 FireRedModelSource 一致）：國內優先 ModelScope。 */
 type FireRedModelSource = 'modelscope' | 'ghproxy' | 'github';
 const FIRERED_MODEL_SOURCES: FireRedModelSource[] = [
   'modelscope',
@@ -77,7 +77,7 @@ const FireRedModelSection: React.FC<{ onUpdate?: () => void }> = ({
       const r = await window?.ipc?.invoke('getFireRedModelStatus');
       if (r?.success) setStatus(r as FireRedModelStatus);
     } catch {
-      // 保持上次状态
+      // 保持上次狀態
     }
   }, []);
 
@@ -114,7 +114,7 @@ const FireRedModelSection: React.FC<{ onUpdate?: () => void }> = ({
     status?.models.find((m) => m.id === 'fire-red-asr-large-zh-en')
       ?.installed ?? false;
 
-  // 下载源在「点击下载时」于气泡内选择（与各引擎统一）。
+  // 下載源在「點擊下載時」於氣泡內選擇（與各引擎統一）。
   const sourceConfig: DownloadSourceConfig = {
     value: source,
     options: FIRERED_MODEL_SOURCES.map((s) => ({

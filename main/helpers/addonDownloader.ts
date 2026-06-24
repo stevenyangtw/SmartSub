@@ -17,32 +17,32 @@ import { resolveReleaseBaseUrl } from './download/sources';
 import { MirrorDownloader } from './download/mirrorDownloader';
 
 /**
- * 加速包发布仓库（注意：GitCode 镜像用的是 whisper.node 仓库，与 GitHub 不同）。
+ * 加速包發佈倉庫（注意：GitCode 鏡像用的是 whisper.node 倉庫，與 GitHub 不同）。
  */
 const ADDON_REPO_SLUGS = {
   github: 'buxuku/whisper.cpp',
   gitcode: 'buxuku1/whisper.node',
 };
 
-/** addon release 基础 URL（保留末尾斜杠，兼容旧的拼接方式）。 */
+/** addon release 基礎 URL（保留末尾斜槓，兼容舊的拼接方式）。 */
 function addonBaseUrl(source: DownloadSource): string {
   return `${resolveReleaseBaseUrl(source, ADDON_REPO_SLUGS, 'latest')}/`;
 }
 
-/** addon-versions.json 的下载地址（按源） */
+/** addon-versions.json 的下載地址（按源） */
 export function getAddonVersionsUrl(source: DownloadSource): string {
   return `${addonBaseUrl(source)}addon-versions.json`;
 }
 
 /**
- * 获取下载状态文件路径
+ * 獲取下載狀態文件路徑
  */
 function getDownloadStatePath(): string {
   return path.join(app.getPath('userData'), 'addon-download-state.json');
 }
 
 /**
- * 读取下载状态
+ * 讀取下載狀態
  */
 export function readDownloadState(): DownloadState | null {
   try {
@@ -50,7 +50,7 @@ export function readDownloadState(): DownloadState | null {
     if (fs.existsSync(statePath)) {
       const content = fs.readFileSync(statePath, 'utf8');
       const parsed = JSON.parse(content);
-      // 兼容旧版字段名 cudaVersion（v2.16 之前的断点续传状态文件）
+      // 兼容舊版字段名 cudaVersion（v2.16 之前的斷點續傳狀態文件）
       if (parsed && parsed.cudaVersion && !parsed.variant) {
         parsed.variant = parsed.cudaVersion;
         delete parsed.cudaVersion;
@@ -64,7 +64,7 @@ export function readDownloadState(): DownloadState | null {
 }
 
 /**
- * 保存下载状态
+ * 保存下載狀態
  */
 function saveDownloadState(state: DownloadState | null): void {
   try {
@@ -82,7 +82,7 @@ function saveDownloadState(state: DownloadState | null): void {
 }
 
 /**
- * 获取加速包文件名
+ * 獲取加速包文件名
  */
 export function getAddonFileName(
   variant: AddonVariant,
@@ -95,7 +95,7 @@ export function getAddonFileName(
   const osName = platform === 'win32' ? 'windows' : 'linux';
 
   if (variant === 'vulkan') {
-    // Vulkan 无运行时依赖，仅提供 node.gz 单文件包
+    // Vulkan 無運行時依賴，僅提供 node.gz 單文件包
     if (downloadType === 'tar.gz') {
       throw new Error('Vulkan addon only provides node.gz package');
     }
@@ -109,7 +109,7 @@ export function getAddonFileName(
 }
 
 /**
- * 获取完整下载 URL
+ * 獲取完整下載 URL
  */
 export function getDownloadUrl(
   source: DownloadSource,
@@ -122,7 +122,7 @@ export function getDownloadUrl(
 }
 
 /**
- * 加速包下载器类
+ * 加速包下載器類
  */
 export class AddonDownloader {
   private mainWindow: BrowserWindow | null = null;
@@ -153,8 +153,8 @@ export class AddonDownloader {
   }
 
   /**
-   * 执行下载：按所选源 + 回退顺序依次尝试，任一源成功即返回。
-   * 用户取消（Download cancelled）不回退，直接抛出。
+   * 執行下載：按所選源 + 回退順序依次嘗試，任一源成功即返回。
+   * 用戶取消（Download cancelled）不回退，直接拋出。
    */
   async download(
     source: DownloadSource,
@@ -173,7 +173,7 @@ export class AddonDownloader {
   }
 
   /**
-   * 从单一源执行下载（断点续传 + 进度走共享核心；解压沿用 addon 专属逻辑）
+   * 從單一源執行下載（斷點續傳 + 進度走共享核心；解壓沿用 addon 專屬邏輯）
    */
   private async downloadFromSource(
     source: DownloadSource,
@@ -289,7 +289,7 @@ export class AddonDownloader {
   }
 
   /**
-   * 清理版本目录中的旧文件，保留目录本身
+   * 清理版本目錄中的舊文件，保留目錄本身
    */
   private cleanVersionDir(destDir: string): void {
     try {
@@ -310,7 +310,7 @@ export class AddonDownloader {
   }
 
   /**
-   * 解压文件
+   * 解壓文件
    */
   private async extractFile(
     filePath: string,
@@ -335,11 +335,11 @@ export class AddonDownloader {
   }
 
   /**
-   * 查找并重命名 .node 文件为 addon.node
-   * 支持在根目录和一级子目录中查找
+   * 查找並重命名 .node 文件為 addon.node
+   * 支持在根目錄和一級子目錄中查找
    */
   private async renameNodeFile(destDir: string): Promise<void> {
-    // 首先在根目录查找
+    // 首先在根目錄查找
     const files = fs.readdirSync(destDir);
     logMessage(`Files in ${destDir}: ${files.join(', ')}`, 'info');
 
@@ -349,7 +349,7 @@ export class AddonDownloader {
       const oldPath = path.join(destDir, nodeFile);
       const newPath = path.join(destDir, 'addon.node');
 
-      // 如果已存在 addon.node，先删除
+      // 如果已存在 addon.node，先刪除
       if (fs.existsSync(newPath)) {
         fs.unlinkSync(newPath);
       }
@@ -359,7 +359,7 @@ export class AddonDownloader {
       return;
     }
 
-    // 如果根目录没找到，检查一级子目录（tar 可能解压到子目录）
+    // 如果根目錄沒找到，檢查一級子目錄（tar 可能解壓到子目錄）
     for (const item of files) {
       const itemPath = path.join(destDir, item);
       const stat = fs.statSync(itemPath);
@@ -377,7 +377,7 @@ export class AddonDownloader {
         );
 
         if (nodeFile) {
-          // 将子目录中的所有文件移动到根目录
+          // 將子目錄中的所有文件移動到根目錄
           for (const subFile of subFiles) {
             const srcPath = path.join(itemPath, subFile);
             const destPath = path.join(
@@ -385,7 +385,7 @@ export class AddonDownloader {
               subFile === nodeFile ? 'addon.node' : subFile,
             );
 
-            // 如果目标文件已存在，先删除
+            // 如果目標文件已存在，先刪除
             if (fs.existsSync(destPath)) {
               fs.unlinkSync(destPath);
             }
@@ -397,7 +397,7 @@ export class AddonDownloader {
             );
           }
 
-          // 删除空的子目录
+          // 刪除空的子目錄
           fs.rmdirSync(itemPath);
           logMessage(`Removed empty subdirectory: ${item}`, 'info');
           return;
@@ -405,7 +405,7 @@ export class AddonDownloader {
       }
     }
 
-    // 检查是否已经有 addon.node 文件
+    // 檢查是否已經有 addon.node 文件
     if (files.includes('addon.node')) {
       logMessage('addon.node already exists', 'info');
       return;
@@ -415,7 +415,7 @@ export class AddonDownloader {
   }
 
   /**
-   * 解压 gzip 文件
+   * 解壓 gzip 文件
    */
   private gunzipFile(srcPath: string, destPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -433,7 +433,7 @@ export class AddonDownloader {
 }
 
 /**
- * 计算文件的 SHA256 校验和
+ * 計算文件的 SHA256 校驗和
  */
 export async function calculateFileChecksum(filePath: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -447,7 +447,7 @@ export async function calculateFileChecksum(filePath: string): Promise<string> {
 }
 
 /**
- * 验证文件校验和
+ * 驗證文件校驗和
  */
 export async function verifyChecksum(
   filePath: string,
@@ -461,7 +461,7 @@ export async function verifyChecksum(
   }
 }
 
-// 导出单例实例
+// 導出單例實例
 let downloaderInstance: AddonDownloader | null = null;
 
 export function getAddonDownloader(

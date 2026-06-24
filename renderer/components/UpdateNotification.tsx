@@ -25,24 +25,24 @@ export function UpdateNotification() {
   const [showProgressIndicator, setShowProgressIndicator] = useState(false);
 
   useEffect(() => {
-    // 监听来自主进程的更新状态消息
+    // 監聽來自主進程的更新狀態消息
     const removeListener = window?.ipc?.on(
       'update-status',
       (status: UpdateStatus) => {
         console.log('Update status:', status);
         setUpdateStatus(status);
 
-        // 当开始下载更新时，显示进度指示器
+        // 當開始下載更新時，顯示進度指示器
         if (status.status === 'downloading') {
           setShowProgressIndicator(true);
         }
 
-        // 当下载结束（完成或错误）时，隐藏进度指示器
+        // 當下載結束（完成或錯誤）時，隱藏進度指示器
         if (status.status === 'downloaded' || status.status === 'error') {
           setShowProgressIndicator(false);
         }
 
-        // 当更新下载完成时，显示通知
+        // 當更新下載完成時，顯示通知
         if (status.status === 'downloaded') {
           toast(t('updateReady'), {
             description: t('updateReadyDesc', { version: status.version }),
@@ -53,7 +53,7 @@ export function UpdateNotification() {
           });
         }
 
-        // 当更新出错时，显示通知
+        // 當更新出錯時，顯示通知
         if (status.status === 'error') {
           toast.error(t('updateError'), {
             description: status.error,
@@ -62,13 +62,13 @@ export function UpdateNotification() {
       },
     );
 
-    // 组件卸载时移除监听器
+    // 組件卸載時移除監聽器
     return () => {
       if (removeListener) removeListener();
     };
   }, [t]);
 
-  // 安装更新
+  // 安裝更新
   const installUpdate = async () => {
     try {
       await window?.ipc?.invoke('install-update');
@@ -82,7 +82,7 @@ export function UpdateNotification() {
 
   return (
     <>
-      {/* 下载进度指示器 */}
+      {/* 下載進度指示器 */}
       {showProgressIndicator && updateStatus?.status === 'downloading' && (
         <div className="fixed bottom-4 right-4 z-50 w-80 rounded-lg bg-background p-4 shadow-lg border border-accent animate-in slide-in-from-bottom-5">
           <div className="flex items-center justify-between mb-2">

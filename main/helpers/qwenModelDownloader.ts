@@ -28,7 +28,7 @@ import { extractArchive } from './download/extractArchive';
 const CONNECT_TIMEOUT = 30_000;
 const CANCELLED = 'Download cancelled';
 
-/** 进度 key：qwen:<modelId>，与 funasr:<id> / ct2:<id> 同构，渲染层按前缀路由。 */
+/** 進度 key：qwen:<modelId>，與 funasr:<id> / ct2:<id> 同構，渲染層按前綴路由。 */
 export function getQwenProgressKey(id: QwenModelId): string {
   return `qwen:${id}`;
 }
@@ -37,14 +37,14 @@ function resolveRedirectUrl(currentUrl: string, location: string): string {
   return new URL(location, currentUrl).href;
 }
 
-/** ModelScope 文件树条目（仅取所需字段）。 */
+/** ModelScope 文件樹條目（僅取所需字段）。 */
 interface MsFileEntry {
   Path: string;
   Size: number;
   Type: string;
 }
 
-/** 拉取 JSON（跟随 3xx 重定向），用于 ModelScope 文件树 API。 */
+/** 拉取 JSON（跟隨 3xx 重定向），用於 ModelScope 文件樹 API。 */
 function fetchJson<T>(url: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url);
@@ -85,9 +85,9 @@ function fetchJson<T>(url: string): Promise<T> {
 }
 
 /**
- * Qwen 模型下载器：整包（tar.bz2）下载 + 解包到 userData/models/qwen/<id>/。
- * 复用 downloadFileParallel（断点续传 + 多连接 + 取消），解包用 decompress（含 tarbz2 插件）。
- * 与 FunasrModelDownloader 同构（同事件名 downloadProgress / modelDownloadDetail）。
+ * Qwen 模型下載器：整包（tar.bz2）下載 + 解包到 userData/models/qwen/<id>/。
+ * 複用 downloadFileParallel（斷點續傳 + 多連接 + 取消），解包用 decompress（含 tarbz2 插件）。
+ * 與 FunasrModelDownloader 同構（同事件名 downloadProgress / modelDownloadDetail）。
  */
 export class QwenModelDownloader {
   private abortController: AbortController | null = null;
@@ -158,7 +158,7 @@ export class QwenModelDownloader {
     }
   }
 
-  /** 解包阶段进度：复用 downloadProgress 让进度条继续走，status='extracting' 供 UI 显示「解包中」。 */
+  /** 解包階段進度：複用 downloadProgress 讓進度條繼續走，status='extracting' 供 UI 顯示「解包中」。 */
   private sendExtract(ratio: number): void {
     const capped = Math.min(ratio, 0.99);
     this.progress = {
@@ -199,7 +199,7 @@ export class QwenModelDownloader {
     });
 
     let lastError: unknown = null;
-    // 按所选源优先、其余按国内优先顺序回退（modelscope → ghproxy → github）。
+    // 按所選源優先、其餘按國內優先順序回退（modelscope → ghproxy → github）。
     for (const src of getQwenSourceOrder(source)) {
       try {
         if (src === 'modelscope') {
@@ -246,8 +246,8 @@ export class QwenModelDownloader {
   }
 
   /**
-   * ModelScope 国内源：逐文件直下到模型目录，免解包（国内 CDN 最快）。
-   * 先拉文件树拿各文件大小以计算总进度；已存在且大小吻合的文件跳过（续传友好）。
+   * ModelScope 國內源：逐文件直下到模型目錄，免解包（國內 CDN 最快）。
+   * 先拉文件樹拿各文件大小以計算總進度；已存在且大小吻合的文件跳過（續傳友好）。
    */
   private async downloadFromModelScope(spec: QwenModelSpec): Promise<void> {
     const destDir = getQwenModelDir(spec.id);
@@ -263,7 +263,7 @@ export class QwenModelDownloader {
           .map((e) => [e.Path, e.Size ?? 0]),
       );
     } catch (e) {
-      // 树拉取失败仅导致进度退化（按 0 计），不阻断逐文件下载。
+      // 樹拉取失敗僅導致進度退化（按 0 計），不阻斷逐文件下載。
       logMessage(`qwen modelscope tree fetch failed: ${String(e)}`, 'warning');
     }
 
@@ -318,7 +318,7 @@ export class QwenModelDownloader {
     }
   }
 
-  /** 整包源（ghproxy/github）：下载 tar.bz2 → 解包到模型目录（独立进程 system tar）。 */
+  /** 整包源（ghproxy/github）：下載 tar.bz2 → 解包到模型目錄（獨立進程 system tar）。 */
   private async downloadFromArchive(
     spec: QwenModelSpec,
     source: 'ghproxy' | 'github',
@@ -339,8 +339,8 @@ export class QwenModelDownloader {
       if (fs.existsSync(tmp)) fs.rmSync(tmp, { force: true });
       await this.downloadArchive(url, tmp);
 
-      // 解包到独立进程（system tar），主进程事件循环不阻塞 → 不再「卡住」；
-      // 失败回退 bundled decompress。strip 顶层目录、过滤 test_wavs。
+      // 解包到獨立進程（system tar），主進程事件循環不阻塞 → 不再「卡住」；
+      // 失敗回退 bundled decompress。strip 頂層目錄、過濾 test_wavs。
       this.progress = { ...this.progress, status: 'extracting' };
       this.sendExtract(0);
       await extractArchive({
@@ -353,12 +353,12 @@ export class QwenModelDownloader {
         onProgress: (ratio) => this.sendExtract(ratio),
       });
     } finally {
-      // 无论成功/失败/取消都清理临时整包，避免污染 models 根目录。
+      // 無論成功/失敗/取消都清理臨時整包，避免汙染 models 根目錄。
       if (fs.existsSync(tmp)) fs.rmSync(tmp, { force: true });
     }
   }
 
-  /** 并行续传下载整包；服务端不支持 Range 时回退单连接。 */
+  /** 並行續傳下載整包；服務端不支持 Range 時回退單連接。 */
   private async downloadArchive(url: string, dest: string): Promise<void> {
     try {
       await downloadFileParallel({

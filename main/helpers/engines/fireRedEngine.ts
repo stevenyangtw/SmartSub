@@ -24,7 +24,7 @@ let activeTranscribeId: string | null = null;
 
 type FireRedSelection = NonNullable<ReturnType<typeof resolveFireRedSelection>>;
 
-/** 组装 worker 模型请求（不含 audio_file）。transcribe 与 prewarm 共用，缓存 key 一致。 */
+/** 組裝 worker 模型請求（不含 audio_file）。transcribe 與 prewarm 共用，緩存 key 一致。 */
 function buildModelRequest(
   selection: FireRedSelection,
   settings: Record<string, unknown>,
@@ -40,8 +40,8 @@ function buildModelRequest(
 }
 
 /**
- * 批次预热：在音频抽取的同时，让 worker 预加载 FireRedASR 两件套 + 共享 VAD 并写满识别器缓存，
- * 使首个 transcribe 直接命中。模型加载在 worker 线程进行，不阻塞主/UI 线程。失败非致命。
+ * 批次預熱：在音頻抽取的同時，讓 worker 預加載 FireRedASR 兩件套 + 共享 VAD 並寫滿識別器緩存，
+ * 使首個 transcribe 直接命中。模型加載在 worker 線程進行，不阻塞主/UI 線程。失敗非致命。
  */
 function prewarmFireRed(formData: Record<string, unknown>): void {
   try {
@@ -60,8 +60,8 @@ function prewarmFireRed(formData: Record<string, unknown>): void {
 }
 
 /**
- * 用 sherpa-onnx Node 原生 addon（worker 线程）跑 FireRedASR-AED 生成字幕。
- * 段级时间戳来自 silero VAD 分段边界（段长安全闸钳到 ≤60s）；取消走 AbortSignal。
+ * 用 sherpa-onnx Node 原生 addon（worker 線程）跑 FireRedASR-AED 生成字幕。
+ * 段級時間戳來自 silero VAD 分段邊界（段長安全閘鉗到 ≤60s）；取消走 AbortSignal。
  */
 async function transcribeFireRed(ctx: TranscribeContext): Promise<string> {
   const { event, file, formData } = ctx;

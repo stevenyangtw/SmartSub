@@ -6,17 +6,17 @@ interface TimeRangeEditorLabels {
 }
 
 interface TimeRangeEditorProps {
-  /** 行号展示（#id） */
+  /** 行號展示（#id） */
   rowId: string;
   startEndTime: string;
-  /** 确认修改；返回错误文案（不应用）或 null（已应用） */
+  /** 確認修改；返回錯誤文案（不應用）或 null（已應用） */
   onCommit: (startSec: number, endSec: number) => string | null;
   labels: TimeRangeEditorLabels;
-  /** 时间文本后的附加说明（当前播放/失败标签） */
+  /** 時間文本後的附加說明（當前播放/失敗標籤） */
   suffix?: string;
 }
 
-// SRT 时间文本 → 秒；非法返回 null
+// SRT 時間文本 → 秒；非法返回 null
 const parseTimeText = (text: string): number | null => {
   const trimmed = text.trim();
   if (!/^(\d{1,2}:)?\d{1,2}:\d{1,2}([.,]\d{1,3})?$/.test(trimmed)) return null;
@@ -36,7 +36,7 @@ const parseTimeText = (text: string): number | null => {
   return h * 3600 + m * 60 + s;
 };
 
-// 秒 → SRT 时间文本（HH:MM:SS,mmm）
+// 秒 → SRT 時間文本（HH:MM:SS,mmm）
 const formatTimeText = (seconds: number): string => {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -45,8 +45,8 @@ const formatTimeText = (seconds: number): string => {
 };
 
 /**
- * 展开行时间头的行内编辑器：
- * 点击文本进入编辑态（起/止两个输入框），Enter 确认、Esc 取消、整体失焦确认。
+ * 展開行時間頭的行內編輯器：
+ * 點擊文本進入編輯態（起/止兩個輸入框），Enter 確認、Esc 取消、整體失焦確認。
  */
 export default function TimeRangeEditor({
   rowId,
@@ -60,7 +60,7 @@ export default function TimeRangeEditor({
   const [endText, setEndText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLSpanElement>(null);
-  // Esc 取消时跳过 focusout 触发的提交
+  // Esc 取消時跳過 focusout 觸發的提交
   const cancelledRef = useRef(false);
 
   const beginEdit = () => {
@@ -107,7 +107,7 @@ export default function TimeRangeEditor({
     }
   };
 
-  // 焦点离开整个编辑器时提交（在起/止输入框间移动不触发）
+  // 焦點離開整個編輯器時提交（在起/止輸入框間移動不觸發）
   const handleFocusOut = (e: React.FocusEvent) => {
     if (cancelledRef.current) return;
     if (

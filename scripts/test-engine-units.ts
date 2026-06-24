@@ -1,15 +1,15 @@
 /// <reference path="./test-globals.d.ts" />
 /**
- * 引擎纯逻辑单元测试（无 Electron / 无模型依赖）。
+ * 引擎純邏輯單元測試（無 Electron / 無模型依賴）。
  *
- * 覆盖 Phase 4 重构中抽取/搬迁的共享逻辑（回归风险最高的部分）：
- *  - transcribeShared: 时间格式化 / 语言归一 / 数值兜底 / VAD 设置
- *  - modelMap: ggml→CT2 显式映射（含 large-v3-turbo、量化后缀）
- *  - protocolSupport: 协议区间校验（安装/启动门禁）
+ * 覆蓋 Phase 4 重構中抽取/搬遷的共享邏輯（迴歸風險最高的部分）：
+ *  - transcribeShared: 時間格式化 / 語言歸一 / 數值兜底 / VAD 設置
+ *  - modelMap: ggml→CT2 顯式映射（含 large-v3-turbo、量化後綴）
+ *  - protocolSupport: 協議區間校驗（安裝/啟動門禁）
  *
- * 运行：npm run test:engines
- * 注意：真实「whisper.cpp / faster-whisper 端到端转写」需模型+运行时，
- *       属手动冒烟（见 README 的 docs 说明 / 设计文档 §8），本脚本不覆盖。
+ * 運行：npm run test:engines
+ * 注意：真實「whisper.cpp / faster-whisper 端到端轉寫」需模型+運行時，
+ *       屬手動冒煙（見 README 的 docs 說明 / 設計文檔 §8），本腳本不覆蓋。
  */
 import {
   getNumericSetting,
@@ -142,7 +142,7 @@ eq(toFasterWhisperModel('base'), 'base', 'model: base');
 eq(toFasterWhisperModel(undefined), 'base', 'model: undefined -> base');
 eq(toFasterWhisperModel('LARGE-V3'), 'large-v3', 'model: uppercase normalized');
 eq(toFasterWhisperModel('tiny.en'), 'tiny.en', 'model: tiny.en');
-// 未命中映射回退原值（去后缀），fallback 会 console.warn，这里临时静音保持输出整洁
+// 未命中映射回退原值（去後綴），fallback 會 console.warn，這裡臨時靜音保持輸出整潔
 {
   const orig = console.warn;
   console.warn = () => {};
@@ -404,7 +404,7 @@ eq(
 eq(srtHasCues(''), false, 'embed: empty srt no cue');
 eq(srtHasCues('   \n  \n'), false, 'embed: whitespace srt no cue');
 
-// --- decideCloseIntent (关闭窗口行为矩阵) ---
+// --- decideCloseIntent (關閉窗口行為矩陣) ---
 eq(
   decideCloseIntent({ platform: 'darwin', closeAction: 'smart', busy: true }),
   'background',
@@ -595,7 +595,7 @@ eq(
   'engineModels: qwen not ready without model',
 );
 
-// --- sherpaConfig: VAD/recognizer 映射 + 段时间/进度 ---
+// --- sherpaConfig: VAD/recognizer 映射 + 段時間/進度 ---
 const SHERPA_P = {
   language: 'auto',
   use_itn: true,
@@ -697,14 +697,14 @@ eq(
   '',
   'sherpa: qwen3_asr uses empty tokens (tokenizer dir instead)',
 );
-// VAD 配置在 funasr / qwen 间共享（结构兼容）
+// VAD 配置在 funasr / qwen 間共享（結構兼容）
 eq(
   buildVadConfig('/m/silero_vad.onnx', QWEN_RP).sileroVad.windowSize,
   512,
   'sherpa: qwen reuses shared VAD config builder',
 );
 
-// --- qwenParams: 默认值对齐 sherpa 上游 ---
+// --- qwenParams: 默認值對齊 sherpa 上游 ---
 eq(
   buildQwenParams({}),
   {
@@ -810,7 +810,7 @@ eq(
   'sherpa: fire_red_asr has no qwen3Asr block',
 );
 
-// --- fireRedParams: 默认值 + 段长安全闸（design D8） ---
+// --- fireRedParams: 默認值 + 段長安全閘（design D8） ---
 eq(
   buildFireRedParams({}),
   {
@@ -834,7 +834,7 @@ eq(
   'cpu',
   'fireRed: unknown provider falls back to cpu',
 );
-// 段长安全闸：0/未设/超限 → 60s 硬上限或 30s 默认；合法值原样。
+// 段長安全閘：0/未設/超限 → 60s 硬上限或 30s 默認；合法值原樣。
 eq(
   clampFireRedMaxSpeech(0),
   FIRERED_HARD_MAX_SPEECH_S,
@@ -857,7 +857,7 @@ eq(
   'fireRed: buildFireRedParams overrides 0=unlimited convention (clamps to 60)',
 );
 
-// --- modelImport: validateModelLayout（含嵌套相对路径） ---
+// --- modelImport: validateModelLayout（含嵌套相對路徑） ---
 {
   const tmp = fs.mkdtempSync(nodePath.join(os.tmpdir(), 'modelimport-'));
   fs.writeFileSync(nodePath.join(tmp, 'encoder.int8.onnx'), 'x');
@@ -887,7 +887,7 @@ eq(
   fs.rmSync(tmp, { recursive: true, force: true });
 }
 
-// --- modelImport: resolveOverridePath（覆盖优先/空值回退） ---
+// --- modelImport: resolveOverridePath（覆蓋優先/空值回退） ---
 eq(
   resolveOverridePath('/custom/models', '/default/models'),
   '/custom/models',
@@ -909,7 +909,7 @@ eq(
   'path: whitespace -> fallback',
 );
 
-// --- modelImport: 内置共享 VAD 路径（随包内置，与引擎模型根解耦） ---
+// --- modelImport: 內置共享 VAD 路徑（隨包內置，與引擎模型根解耦） ---
 eq(
   SHERPA_VAD_SUBPATH,
   nodePath.join('sherpa', 'vad', 'silero_vad.onnx'),
@@ -921,7 +921,7 @@ eq(
   'vad: resolveBundledVadPath joins extraResources root (engine-root independent)',
 );
 
-// --- catalog requiredFiles（导入消歧/嵌套校验集来源） ---
+// --- catalog requiredFiles（導入消歧/嵌套校驗集來源） ---
 eq(
   FUNASR_MODELS['sensevoice-small'].requiredFiles,
   FUNASR_MODELS['paraformer-zh'].requiredFiles,

@@ -47,9 +47,9 @@ enum DownSource {
 interface OnboardingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** 打开时定位到的步骤（从「继续引导」入口恢复） */
+  /** 打開時定位到的步驟（從「繼續引導」入口恢復） */
   initialStep?: number;
-  /** 用户从引导跳去配置页时触发：引导未完成，只是暂停 */
+  /** 用戶從引導跳去配置頁時觸發：引導未完成，只是暫停 */
   onPause?: (step: number) => void;
 }
 
@@ -89,9 +89,10 @@ function FlowNode({
   );
 }
 
-/** 引导内的语言切换项（语言名用本地写法，方便不识别当前界面语言的新用户辨认）。 */
+/** 引導內的語言切換項（語言名用本地寫法，方便不識別當前界面語言的新用戶辨認）。 */
 const ONBOARDING_LANGS = [
-  { value: 'zh', label: '中文' },
+  { value: 'zh', label: '簡體中文' },
+  { value: 'zh-TW', label: '繁體中文' },
   { value: 'en', label: 'English' },
 ];
 
@@ -109,9 +110,9 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
     : 'en';
 
   /**
-   * 引导内切换界面语言：持久化到设置，并只替换当前路由的 locale 段（保留页面与查询），
-   * 避免跳回首页；界面语言随路由 locale 由 next-i18next 切换。引导面板状态在 Layout 持有，
-   * 路由变化不会卸载，弹窗保持打开。
+   * 引導內切換界面語言：持久化到設置，並只替換當前路由的 locale 段（保留頁面與查詢），
+   * 避免跳回首頁；界面語言隨路由 locale 由 next-i18next 切換。引導面板狀態在 Layout 持有，
+   * 路由變化不會卸載，彈窗保持打開。
    */
   const switchLanguage = async (value: string) => {
     if (value === currentLang) return;
@@ -148,8 +149,8 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
       try {
         const info = await window?.ipc?.invoke('getSystemInfo', null);
         setTotalMemoryGB(info?.totalMemoryGB);
-        // 按当前转写引擎统计已安装模型：faster-whisper 用自己的模型目录，
-        // 本地命令行引擎自备模型，避免“已下载模型却提示无模型”
+        // 按當前轉寫引擎統計已安裝模型：faster-whisper 用自己的模型目錄，
+        // 本地命令行引擎自備模型，避免“已下載模型卻提示無模型”
         const currentEngine = resolveEngine(info);
         setEngine(currentEngine);
         const modelCount =
@@ -207,7 +208,7 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
     onOpenChange(next);
   };
 
-  /** 跳去配置页：不算完成，记为暂停，由外层提供「继续引导」入口 */
+  /** 跳去配置頁：不算完成，記為暫停，由外層提供「繼續引導」入口 */
   const closeAndGo = (url: string) => {
     onPause?.(step);
     onOpenChange(false);
@@ -215,8 +216,8 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
   };
 
   /**
-   * 一键示例任务：固定 id，存在即删除重建——示例音频仅 10s，
-   * 重建保证每次都是干净的演示，语义最简单。
+   * 一鍵示例任務：固定 id，存在即刪除重建——示例音頻僅 10s，
+   * 重建保證每次都是乾淨的演示，語義最簡單。
    */
   const SAMPLE_PROJECT_ID = 'sample-onboarding';
   const runSample = async () => {
@@ -228,19 +229,19 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
       );
       const providers = await window?.ipc?.invoke('getTranslationProviders');
       const userConfig = await window?.ipc?.invoke('getUserConfig');
-      // 任务实际使用的是 userConfig.translateProvider,必须判它本身是否已配置,
-      // 而不是「任何服务商已配置」——否则示例会拿未配置的默认服务商去翻译而报错
+      // 任務實際使用的是 userConfig.translateProvider,必須判它本身是否已配置,
+      // 而不是「任何服務商已配置」——否則示例會拿未配置的預設服務商去翻譯而報錯
       const activeProvider = (providers || []).find(
         (p: any) => p.id === userConfig?.translateProvider,
       );
       const hasProvider = activeProvider
         ? isProviderConfigured(activeProvider)
         : false;
-      // 已配翻译服务 → 完整链路；未配 → 纯转写，零配置可跑
+      // 已配翻譯服務 → 完整鏈路；未配 → 純轉寫，零配置可跑
       const taskType = hasProvider ? 'generateAndTranslate' : 'generateOnly';
       const slug = hasProvider ? 'generate-translate' : 'generate';
 
-      // 删除旧示例工程后重建（deleteTaskProject 对不存在的 id 是安全 no-op）
+      // 刪除舊示例工程後重建（deleteTaskProject 對不存在的 id 是安全 no-op）
       await window?.ipc?.invoke('deleteTaskProject', SAMPLE_PROJECT_ID);
       const dropped = await window?.ipc?.invoke('getDroppedFiles', {
         files: [samplePath],
@@ -327,7 +328,7 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
               {t('onboarding.modelReady')}
             </div>
           ) : engine === 'fasterWhisper' || engine === 'funasr' ? (
-            // faster-whisper / FunASR 模型走专属下载流程（资源中心-模型页），不复用 ggml 一键下载
+            // faster-whisper / FunASR 模型走專屬下載流程（資源中心-模型頁），不復用 ggml 一鍵下載
             <div className="flex items-center gap-3 rounded-lg border px-3 py-3">
               <Bot className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -448,14 +449,14 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
                 size="sm"
                 className="h-8 gap-1.5 text-xs flex-shrink-0"
                 onClick={() => {
-                  // GPU 加速已折叠进 builtin 引擎面板：先选中 builtin 再跳引擎 Tab，直达加速区。
+                  // GPU 加速已摺疊進 builtin 引擎面板：先選中 builtin 再跳引擎 Tab，直達加速區。
                   try {
                     localStorage.setItem(
                       'engineModelSelectedView',
                       JSON.stringify('builtin'),
                     );
                   } catch {
-                    // 忽略：localStorage 不可用时仍跳转，EngineModelTab 回落默认 builtin
+                    // 忽略：localStorage 不可用時仍跳轉，EngineModelTab 回落預設 builtin
                   }
                   closeAndGo(`/${locale}/engines`);
                 }}
@@ -512,7 +513,7 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
         className="max-w-2xl"
         onInteractOutside={(e) => e.preventDefault()}
       >
-        {/* 语言切换：置于右上角（关闭按钮左侧），让英文用户首启即可切换、避免无从下手 */}
+        {/* 語言切換：置於右上角（關閉按鈕左側），讓英文用戶首啟即可切換、避免無從下手 */}
         <div className="absolute right-12 top-3.5 z-10 flex items-center gap-0.5 rounded-md border bg-background p-0.5">
           {ONBOARDING_LANGS.map((lang) => (
             <button

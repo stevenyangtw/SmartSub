@@ -17,8 +17,8 @@ interface SherpaModelRowProps {
 }
 
 /**
- * FunASR / Qwen 模型清单的统一行：左侧图标+名称+描述+下载进度，右侧动作槽（trailing）。
- * 动作各引擎不同（下载/删除/取消/已安装徽标），由调用方通过 trailing 注入。
+ * FunASR / Qwen 模型清單的統一行：左側圖標+名稱+描述+下載進度，右側動作槽（trailing）。
+ * 動作各引擎不同（下載/刪除/取消/已安裝徽標），由調用方通過 trailing 注入。
  */
 const SherpaModelRow: React.FC<SherpaModelRowProps> = ({
   icon: Icon,

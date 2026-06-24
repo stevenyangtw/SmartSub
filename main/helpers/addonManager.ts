@@ -11,21 +11,21 @@ import { ALL_ADDON_VARIANTS } from '../../types/addon';
 import { getEffectivePlatform } from './cudaUtils';
 
 /**
- * 获取 addons 目录路径
+ * 獲取 addons 目錄路徑
  */
 export function getAddonsDir(): string {
   return path.join(app.getPath('userData'), 'addons');
 }
 
 /**
- * 获取配置文件路径
+ * 獲取配置文件路徑
  */
 function getConfigPath(): string {
   return path.join(app.getPath('userData'), 'addon-config.json');
 }
 
 /**
- * 读取加速包配置
+ * 讀取加速包配置
  */
 export function getAddonConfig(): AddonConfig {
   try {
@@ -58,21 +58,21 @@ export function saveAddonConfig(config: AddonConfig): void {
 }
 
 /**
- * 变体目录名：cuda-1240 / vulkan
+ * 變體目錄名：cuda-1240 / vulkan
  */
 export function getVariantDirName(variant: AddonVariant): string {
   return variant === 'vulkan' ? 'vulkan' : `cuda-${variant.replace(/\./g, '')}`;
 }
 
 /**
- * 获取特定变体的 addon 目录路径
+ * 獲取特定變體的 addon 目錄路徑
  */
 export function getAddonVersionDir(variant: AddonVariant): string {
   return path.join(getAddonsDir(), getVariantDirName(variant));
 }
 
 /**
- * 检查特定版本的 addon 是否已安装
+ * 檢查特定版本的 addon 是否已安裝
  */
 export function isAddonInstalled(version: AddonVariant): boolean {
   const versionDir = getAddonVersionDir(version);
@@ -81,7 +81,7 @@ export function isAddonInstalled(version: AddonVariant): boolean {
 }
 
 /**
- * 检查目录下是否有依赖的动态链接库
+ * 檢查目錄下是否有依賴的動態鏈接庫
  */
 export function hasDependentLibs(versionDir: string): boolean {
   const platform = getEffectivePlatform();
@@ -95,14 +95,14 @@ export function hasDependentLibs(versionDir: string): boolean {
       return files.some((f) => f.includes('.so'));
     }
   } catch {
-    // 目录不存在或无法读取
+    // 目錄不存在或無法讀取
   }
 
   return false;
 }
 
 /**
- * 获取已安装的加速包列表
+ * 獲取已安裝的加速包列表
  */
 export function getInstalledAddons(): Array<{
   version: AddonVariant;
@@ -111,7 +111,7 @@ export function getInstalledAddons(): Array<{
   const config = getAddonConfig();
   const result: Array<{ version: AddonVariant; info: InstalledAddon }> = [];
 
-  // 遍历所有可用变体
+  // 遍歷所有可用變體
   for (const version of ALL_ADDON_VARIANTS) {
     if (isAddonInstalled(version)) {
       const info = config.installed[version] || {
@@ -128,7 +128,7 @@ export function getInstalledAddons(): Array<{
 }
 
 /**
- * 获取 addon 大小
+ * 獲取 addon 大小
  */
 function getAddonSize(version: AddonVariant): number {
   const versionDir = getAddonVersionDir(version);
@@ -144,14 +144,14 @@ function getAddonSize(version: AddonVariant): number {
       }
     }
   } catch {
-    // 忽略错误
+    // 忽略錯誤
   }
 
   return totalSize;
 }
 
 /**
- * 注册已安装的加速包
+ * 註冊已安裝的加速包
  */
 export function registerInstalledAddon(
   version: AddonVariant,
@@ -169,7 +169,7 @@ export function registerInstalledAddon(
     checksum,
   };
 
-  // 如果没有选中版本，自动选中新安装的
+  // 如果沒有選中版本，自動選中新安裝的
   if (!config.selectedVersion) {
     config.selectedVersion = version;
   }
@@ -178,18 +178,18 @@ export function registerInstalledAddon(
 }
 
 /**
- * 选择加速包版本（与自定义路径互斥）
+ * 選擇加速包版本（與自定義路徑互斥）
  */
 export function selectAddonVersion(version: AddonVariant | null): void {
   const config = getAddonConfig();
 
-  // 如果指定了版本，检查是否已安装
+  // 如果指定了版本，檢查是否已安裝
   if (version && !isAddonInstalled(version)) {
     throw new Error(`Addon version ${version} is not installed`);
   }
 
   config.selectedVersion = version;
-  // 选择版本时清除自定义路径（互斥）
+  // 選擇版本時清除自定義路徑（互斥）
   if (version) {
     config.customAddonPath = null;
   }
@@ -198,24 +198,24 @@ export function selectAddonVersion(version: AddonVariant | null): void {
 }
 
 /**
- * 设置自定义 addon.node 文件路径（与版本选择互斥）
+ * 設置自定義 addon.node 文件路徑（與版本選擇互斥）
  */
 export function setCustomAddonPath(filePath: string | null): void {
   const config = getAddonConfig();
 
   if (filePath) {
-    // 验证文件是否存在
+    // 驗證文件是否存在
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
-    // 验证文件扩展名
+    // 驗證文件擴展名
     if (!filePath.endsWith('.node')) {
       throw new Error('File must have .node extension');
     }
   }
 
   config.customAddonPath = filePath;
-  // 设置自定义路径时清除版本选择（互斥）
+  // 設置自定義路徑時清除版本選擇（互斥）
   if (filePath) {
     config.selectedVersion = null;
   }
@@ -224,30 +224,30 @@ export function setCustomAddonPath(filePath: string | null): void {
 }
 
 /**
- * 获取自定义 addon.node 文件路径
+ * 獲取自定義 addon.node 文件路徑
  */
 export function getCustomAddonPath(): string | null {
   const config = getAddonConfig();
   const customPath = config.customAddonPath;
 
-  // 验证路径是否仍然有效
+  // 驗證路徑是否仍然有效
   if (customPath && !fs.existsSync(customPath)) {
     logMessage(`Custom addon path no longer exists: ${customPath}`, 'warning');
-    return customPath; // 仍然返回路径，让 UI 层决定如何处理
+    return customPath; // 仍然返回路徑，讓 UI 層決定如何處理
   }
 
   return customPath || null;
 }
 
 /**
- * 获取当前选中的加速包版本
+ * 獲取當前選中的加速包版本
  */
 export function getSelectedAddonVersion(): AddonVariant | null {
   const config = getAddonConfig();
 
-  // 验证选中的版本是否仍然存在
+  // 驗證選中的版本是否仍然存在
   if (config.selectedVersion && !isAddonInstalled(config.selectedVersion)) {
-    // 版本不存在，清除选择
+    // 版本不存在，清除選擇
     config.selectedVersion = null;
     saveAddonConfig(config);
   }
@@ -256,7 +256,7 @@ export function getSelectedAddonVersion(): AddonVariant | null {
 }
 
 /**
- * 获取 addon.node 文件路径
+ * 獲取 addon.node 文件路徑
  */
 export function getAddonPath(version: AddonVariant): string | null {
   const versionDir = getAddonVersionDir(version);
@@ -270,22 +270,22 @@ export function getAddonPath(version: AddonVariant): string | null {
 }
 
 /**
- * 删除加速包
+ * 刪除加速包
  */
 export async function removeAddon(version: AddonVariant): Promise<void> {
   const config = getAddonConfig();
   const versionDir = getAddonVersionDir(version);
 
-  // 检查是否是当前选中的版本
+  // 檢查是否是當前選中的版本
   if (config.selectedVersion === version) {
     config.selectedVersion = null;
   }
 
-  // 从配置中移除
+  // 從配置中移除
   delete config.installed[version];
   saveAddonConfig(config);
 
-  // 删除文件
+  // 刪除文件
   if (fs.existsSync(versionDir)) {
     await fs.promises.rm(versionDir, { recursive: true, force: true });
     logMessage(`Removed addon version ${version}`, 'info');
@@ -293,7 +293,7 @@ export async function removeAddon(version: AddonVariant): Promise<void> {
 }
 
 /**
- * 备份加速包（更新前）
+ * 備份加速包（更新前）
  */
 export async function backupAddon(
   version: AddonVariant,
@@ -310,15 +310,15 @@ export async function backupAddon(
     `${getVariantDirName(version)}_backup`,
   );
 
-  // 确保备份目录存在
+  // 確保備份目錄存在
   fs.mkdirSync(backupDir, { recursive: true });
 
-  // 删除旧备份
+  // 刪除舊備份
   if (fs.existsSync(backupPath)) {
     await fs.promises.rm(backupPath, { recursive: true, force: true });
   }
 
-  // 复制文件
+  // 複製文件
   await copyDir(versionDir, backupPath);
 
   logMessage(`Backed up addon ${version} to ${backupPath}`, 'info');
@@ -326,7 +326,7 @@ export async function backupAddon(
 }
 
 /**
- * 恢复加速包备份
+ * 恢復加速包備份
  */
 export async function restoreAddonBackup(
   version: AddonVariant,
@@ -343,12 +343,12 @@ export async function restoreAddonBackup(
     return false;
   }
 
-  // 删除当前版本
+  // 刪除當前版本
   if (fs.existsSync(versionDir)) {
     await fs.promises.rm(versionDir, { recursive: true, force: true });
   }
 
-  // 恢复备份
+  // 恢復備份
   await copyDir(backupPath, versionDir);
 
   logMessage(`Restored addon ${version} from backup`, 'info');
@@ -356,7 +356,7 @@ export async function restoreAddonBackup(
 }
 
 /**
- * 清理备份
+ * 清理備份
  */
 export async function cleanupBackup(version: AddonVariant): Promise<void> {
   const backupDir = path.join(getAddonsDir(), 'backup');
@@ -372,7 +372,7 @@ export async function cleanupBackup(version: AddonVariant): Promise<void> {
 }
 
 /**
- * 复制目录
+ * 複製目錄
  */
 async function copyDir(src: string, dest: string): Promise<void> {
   fs.mkdirSync(dest, { recursive: true });
@@ -392,7 +392,7 @@ async function copyDir(src: string, dest: string): Promise<void> {
 }
 
 /**
- * 检查是否有任何已安装的加速包
+ * 檢查是否有任何已安裝的加速包
  */
 export function hasAnyAddonInstalled(): boolean {
   const installed = getInstalledAddons();
@@ -400,7 +400,7 @@ export function hasAnyAddonInstalled(): boolean {
 }
 
 /**
- * 获取加速包摘要信息
+ * 獲取加速包摘要信息
  */
 export function getAddonSummary(): {
   hasInstalled: boolean;

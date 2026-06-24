@@ -13,18 +13,18 @@ type OpenAIProvider = {
   modelName?: string;
   prompt?: string;
   systemPrompt?: string;
-  useJsonMode?: boolean; // 保留向后兼容
+  useJsonMode?: boolean; // 保留向後兼容
   structuredOutput?: 'disabled' | 'json_object' | 'json_schema';
   providerType?: string;
   id?: string;
 };
 
 /**
- * OpenAI 兼容服务的健壮性增强：Base URL 规范化 + 结构化输出失败自动回退。
+ * OpenAI 兼容服務的健壯性增強：Base URL 規範化 + 結構化輸出失敗自動回退。
  *
- * 本段实现借鉴并移植自 @nightt5879 的贡献 PR #328（修复 issue #326）。
- * 因项目近期对服务商配置做了大量重构，其 PR 无法直接合并，故在此重新落地，
- * 并保留署名，向原作者的思路与付出致以诚挚的感谢与尊重。
+ * 本段實現借鑑並移植自 @nightt5879 的貢獻 PR #328（修復 issue #326）。
+ * 因項目近期對服務商配置做了大量重構，其 PR 無法直接合並，故在此重新落地，
+ * 並保留署名，向原作者的思路與付出致以誠摯的感謝與尊重。
  * Credit & sincere thanks to @nightt5879.
  * Adapted from https://github.com/buxuku/SmartSub/pull/328 (fixes #326).
  */
@@ -36,9 +36,9 @@ function getErrorMessage(error: unknown): string {
 }
 
 /**
- * 规范化 OpenAI 兼容服务的 Base URL：
- * - 去除误粘的 /chat/completions 后缀（SDK 会自动拼接）
- * - 对模型详情页 / 模型端点（/models、/models/xxx）给出可读报错
+ * 規範化 OpenAI 兼容服務的 Base URL：
+ * - 去除誤粘的 /chat/completions 後綴（SDK 會自動拼接）
+ * - 對模型詳情頁 / 模型端點（/models、/models/xxx）給出可讀報錯
  */
 function normalizeOpenAIBaseURL(apiUrl?: string): string {
   const trimmedUrl = apiUrl?.trim();
@@ -81,8 +81,8 @@ function normalizeOpenAIBaseURL(apiUrl?: string): string {
 }
 
 /**
- * 判断错误是否为「服务不支持结构化输出（response_format）」，
- * 用于在第三方 OpenAI 兼容服务拒绝结构化输出时自动降级重试。
+ * 判斷錯誤是否為「服務不支持結構化輸出（response_format）」，
+ * 用於在第三方 OpenAI 兼容服務拒絕結構化輸出時自動降級重試。
  */
 function isStructuredOutputUnsupportedError(error: unknown): boolean {
   const message = getErrorMessage(error).toLowerCase();
@@ -105,9 +105,9 @@ function isStructuredOutputUnsupportedError(error: unknown): boolean {
     'not allowed',
     'extra_forbidden',
     '不支持',
-    '无效',
+    '無效',
     '未知',
-    '不允许',
+    '不允許',
   ].some((keyword) => message.includes(keyword));
 }
 
@@ -129,7 +129,7 @@ function toExtendedProvider(provider: OpenAIProvider): ExtendedProvider {
 }
 
 /**
- * 获取特定provider的额外参数 (Enhanced with Parameter Processor)
+ * 獲取特定provider的額外參數 (Enhanced with Parameter Processor)
  */
 function getProviderSpecificParams(
   provider: OpenAIProvider,
@@ -141,7 +141,7 @@ function getProviderSpecificParams(
   const baseParams: Record<string, any> = {};
 
   // Original hard-coded logic (maintained for backward compatibility)
-  // 通义千问需要禁用thinking模式
+  // 通義千問需要禁用thinking模式
   if (
     provider.id === 'qwen' ||
     provider.apiUrl?.includes('dashscope.aliyuncs.com')
@@ -177,22 +177,22 @@ function getProviderSpecificParams(
 }
 
 /**
- * 获取结构化输出配置
+ * 獲取結構化輸出配置
  */
 function getStructuredOutputMode(
   provider: OpenAIProvider,
 ): 'disabled' | 'json_object' | 'json_schema' {
-  // 优先使用新的structuredOutput配置
+  // 優先使用新的structuredOutput配置
   if (provider.structuredOutput) {
     return provider.structuredOutput;
   }
 
-  // 兼容旧的useJsonMode配置
+  // 兼容舊的useJsonMode配置
   if (provider.useJsonMode === false) {
     return 'disabled';
   }
 
-  // 根据provider类型设置默认值，保持向后兼容
+  // 根據provider類型設置預設值，保持向後兼容
   if (
     provider.providerType === 'gemini' ||
     provider.id === 'Gemini' ||
@@ -205,12 +205,12 @@ function getStructuredOutputMode(
     return 'json_object';
   }
 
-  // 默认使用json_object
+  // 預設使用json_object
   return 'json_object';
 }
 
 /**
- * 获取自定义HTTP头部参数
+ * 獲取自定義HTTP頭部參數
  */
 function getCustomHeaders(provider: OpenAIProvider): Record<string, string> {
   const extendedProvider = toExtendedProvider(provider);
@@ -234,7 +234,7 @@ function getCustomHeaders(provider: OpenAIProvider): Record<string, string> {
 }
 
 /**
- * 创建基础请求参数 (Enhanced with Parameter Processor)
+ * 創建基礎請求參數 (Enhanced with Parameter Processor)
  */
 function createBaseParams(text: string[], provider: OpenAIProvider) {
   const sysPrompt =
@@ -256,7 +256,7 @@ function createBaseParams(text: string[], provider: OpenAIProvider) {
 }
 
 /**
- * 使用JSON Schema方式调用API（支持结构化解析）
+ * 使用JSON Schema方式調用API（支持結構化解析）
  */
 async function callWithJsonSchema(
   openai: OpenAI,
@@ -304,7 +304,7 @@ async function callWithJsonSchema(
 }
 
 /**
- * 使用标准OpenAI API（支持json_object和disabled模式）
+ * 使用標準OpenAI API（支持json_object和disabled模式）
  */
 async function callWithStandardAPI(
   openai: OpenAI,
@@ -317,15 +317,15 @@ async function callWithStandardAPI(
 
   const requestParams: any = { ...baseParams };
 
-  // 根据结构化输出模式设置response_format
+  // 根據結構化輸出模式設置response_format
   if (structuredOutputMode === 'json_object') {
     requestParams.response_format = { type: 'json_object' };
     console.log('Using json_object response format');
   } else if (structuredOutputMode === 'disabled') {
-    // 不设置response_format，让模型自由输出
+    // 不設置response_format，讓模型自由輸出
     console.log('Structured output disabled, using free-form response');
   }
-  // json_schema模式由callWithJsonSchema函数处理
+  // json_schema模式由callWithJsonSchema函數處理
 
   let completion: OpenAI.Chat.Completions.ChatCompletion;
   try {
@@ -353,7 +353,7 @@ async function callWithStandardAPI(
 }
 
 /**
- * 主要的翻译函数 (Enhanced with Parameter Processor)
+ * 主要的翻譯函數 (Enhanced with Parameter Processor)
  */
 export async function translateWithOpenAI(
   text: string[],
@@ -416,7 +416,7 @@ export async function translateWithOpenAI(
       console.log('No custom parameters configured for this provider');
     }
 
-    // 根据结构化输出配置选择合适的API调用方式
+    // 根據結構化輸出配置選擇合適的API調用方式
     const structuredOutputMode = getStructuredOutputMode(provider);
 
     if (structuredOutputMode === 'json_schema') {

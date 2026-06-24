@@ -15,9 +15,9 @@ import { syncTaskPowerSaveBlocker } from './powerSaveManager';
 console.log(app.getVersion(), 'version');
 
 export function setupStoreHandlers() {
-  // gpuMode 一次性迁移：
-  // 老用户（settings 中无 gpuMode）统一迁移为 'auto'，并标记待通知；
-  // 新装用户由 store defaults 提供 gpuMode='auto'，不会进入此分支。
+  // gpuMode 一次性遷移：
+  // 老用戶（settings 中無 gpuMode）統一遷移為 'auto'，並標記待通知；
+  // 新裝用戶由 store defaults 提供 gpuMode='auto'，不會進入此分支。
   const currentSettings = store.get('settings');
   if (currentSettings && currentSettings.gpuMode === undefined) {
     store.set('settings', {
@@ -31,7 +31,7 @@ export function setupStoreHandlers() {
     );
   }
 
-  // 启动时初始化服务商配置
+  // 啟動時初始化服務商配置
   getAndInitializeProviders().then(async () => {
     const osInfo = {
       platform: os.platform(),
@@ -49,7 +49,7 @@ export function setupStoreHandlers() {
     logMessage('Translation providers initialized', 'info');
   });
 
-  // Provider 相关处理
+  // Provider 相關處理
   ipcMain.on('setTranslationProviders', async (event, providers) => {
     store.set('translationProviders', providers);
   });
@@ -58,7 +58,7 @@ export function setupStoreHandlers() {
     return getAndInitializeProviders();
   });
 
-  // 用户配置相关处理
+  // 用戶配置相關處理
   ipcMain.on('setUserConfig', async (event, config) => {
     store.set('userConfig', config);
   });
@@ -68,7 +68,7 @@ export function setupStoreHandlers() {
     return { ...defaultUserConfig, ...storedConfig };
   });
 
-  // 设置相关处理
+  // 設置相關處理
   ipcMain.handle('setSettings', async (event, settings) => {
     const preSettings = store.get('settings');
     store.set('settings', { ...preSettings, ...settings });
@@ -92,7 +92,7 @@ export function setupStoreHandlers() {
         'info',
       );
     }
-    // 语言切换后重建应用菜单
+    // 語言切換後重建應用菜單
     if (settings?.language && settings.language !== preSettings?.language) {
       rebuildAppMenu(settings.language);
     }
@@ -102,7 +102,7 @@ export function setupStoreHandlers() {
     return store.get('settings');
   });
 
-  // 日志相关处理
+  // 日誌相關處理
   ipcMain.handle(
     'addLog',
     async (event, logEntry: Omit<LogEntry, 'timestamp'>) => {
@@ -141,7 +141,7 @@ export function setupStoreHandlers() {
     return true;
   });
 
-  // 配置导入导出
+  // 配置導入導出
   ipcMain.handle('exportConfig', async (_event, password: string) => {
     return exportConfig(password);
   });

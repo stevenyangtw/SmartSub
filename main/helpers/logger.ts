@@ -12,7 +12,7 @@ export function logMessage(
   const messageStr =
     message instanceof Error ? message.message : String(message);
 
-  // 对日志消息进行脱敏处理，防止泄露敏感信息
+  // 對日誌消息進行脫敏處理，防止洩露敏感信息
   const sanitizedMessage = sanitizeLogMessage(messageStr);
 
   const projectId = getTaskContext()?.projectId;

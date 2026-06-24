@@ -55,7 +55,7 @@ function getDownloadStatePath(engineId: PyEngineId): string {
   );
 }
 
-/** 下载/解压/备份的临时根（与各引擎包同盘，保证 rename 原子替换） */
+/** 下載/解壓/備份的臨時根（與各引擎包同盤，保證 rename 原子替換） */
 function getPyEngineScratchRoot(): string {
   return path.join(getPyEnginesRoot(), '.cache');
 }
@@ -68,7 +68,7 @@ function getPyEngineStagingDir(engineId: PyEngineId): string {
   return path.join(getPyEngineScratchRoot(), 'staging', engineId);
 }
 
-/** 升级时旧版本备份目录，自检通过后删除，失败时回滚。 */
+/** 升級時舊版本備份目錄，自檢通過後刪除，失敗時回滾。 */
 function getPyEnginePreviousDir(engineId: PyEngineId): string {
   return path.join(getPyEngineScratchRoot(), 'previous', engineId);
 }
@@ -207,16 +207,16 @@ export class PyEngineDownloader {
   }
 
   /**
-   * 安装/升级：按所选源 + 回退顺序依次尝试。
-   * variant 决定下载 CPU 包还是 Full GPU(CUDA) 包；不支持 cuda 的平台会收敛为 cpu。
-   * 用户取消与协议不支持（protocol_unsupported）属终止类错误，不再换源。
+   * 安裝/升級：按所選源 + 回退順序依次嘗試。
+   * variant 決定下載 CPU 包還是 Full GPU(CUDA) 包；不支持 cuda 的平臺會收斂為 cpu。
+   * 用戶取消與協議不支持（protocol_unsupported）屬終止類錯誤，不再換源。
    */
   async download(
     source: PyEngineDownloadSource,
     variant: PyEngineVariant = 'cpu',
   ): Promise<void> {
     const resolvedVariant = normalizePyEngineVariant(variant);
-    // 自包含运行时内嵌解释器，无外部基座依赖，可直接下载。
+    // 自包含運行時內嵌解釋器，無外部基座依賴，可直接下載。
     return this.core.runWithFallback(
       source,
       (s) => this.downloadFromSource(s, resolvedVariant),
@@ -244,8 +244,8 @@ export class PyEngineDownloader {
     const tempPath = getTempTarPath(this.engineId);
     const downloadsDir = getPyEngineDownloadsDir();
 
-    // 安装/升级前协议区间校验：拉远端 manifest，超出 app 支持区间则拒装并提示升级 SmartSub。
-    // 老 release 无 manifest.json → 放行（向后兼容）。同时复用 manifest 为本地版本戳。
+    // 安裝/升級前協議區間校驗：拉遠端 manifest，超出 app 支持區間則拒裝並提示升級 SmartSub。
+    // 老 release 無 manifest.json → 放行（向後兼容）。同時複用 manifest 為本地版本戳。
     const remoteManifest = await this.fetchRemoteManifest(source, resolvedTag);
     if (!isRemoteProtocolInstallable(remoteManifest)) {
       const err = new PythonEngineError(
@@ -370,11 +370,11 @@ export class PyEngineDownloader {
         });
         throw error;
       }
-      // 两类情况必须清掉残留临时包与续传状态，避免下次一直续传同一个坏/锁文件：
-      // 1) Windows 文件被锁（EPERM/EBUSY/EACCES）——否则一直打开同一被锁文件无法重下；
-      // 2) 内容损坏（校验/解包失败）——续传判定只看 URL，而引擎 tag 固定为 latest，
-      //    上游 latest 重发或代理忽略 Range 都会让已下载的临时包损坏；若不清理，
-      //    下次重试会再次命中续传、把字节拼到坏文件后，导致 sha 反复不匹配的死循环。
+      // 兩類情況必須清掉殘留臨時包與續傳狀態，避免下次一直續傳同一個壞/鎖文件：
+      // 1) Windows 文件被鎖（EPERM/EBUSY/EACCES）——否則一直打開同一被鎖文件無法重下；
+      // 2) 內容損壞（校驗/解包失敗）——續傳判定只看 URL，而引擎 tag 固定為 latest，
+      //    上游 latest 重發或代理忽略 Range 都會讓已下載的臨時包損壞；若不清理，
+      //    下次重試會再次命中續傳、把字節拼到壞文件後，導致 sha 反覆不匹配的死循環。
       const code =
         error && typeof error === 'object' && 'code' in error
           ? String((error as { code?: unknown }).code)
@@ -405,7 +405,7 @@ export class PyEngineDownloader {
     }
   }
 
-  /** 拉取远端 manifest.json；老 release 不存在时返回 null（向后兼容，不报错）。 */
+  /** 拉取遠端 manifest.json；老 release 不存在時返回 null（向後兼容，不報錯）。 */
   private async fetchRemoteManifest(
     source: PyEngineDownloadSource,
     tag: string = PY_ENGINE_TAG,
@@ -425,8 +425,8 @@ export class PyEngineDownloader {
   }
 
   /**
-   * 更新检测：以 checksums.sha256 中本平台产物的哈希为主信号（完全适配 rolling latest），
-   * 与本地 manifest.sha256 比对。同时返回远端 manifest 供版本展示与协议判定。
+   * 更新檢測：以 checksums.sha256 中本平臺產物的哈希為主信號（完全適配 rolling latest），
+   * 與本地 manifest.sha256 比對。同時返回遠端 manifest 供版本展示與協議判定。
    */
   async checkUpdate(
     source: PyEngineDownloadSource,
@@ -434,7 +434,7 @@ export class PyEngineDownloader {
   ): Promise<PyEngineUpdateInfo> {
     const localManifest = readEngineManifest(this.engineId);
     const installed = isRuntimeInstalled(this.engineId);
-    // 未显式指定时按已安装变体检查（老安装无 variant 字段 → 'cpu' 兜底）。
+    // 未顯式指定時按已安裝變體檢查（老安裝無 variant 字段 → 'cpu' 兜底）。
     const resolvedVariant = normalizePyEngineVariant(
       variant ?? localManifest?.variant,
     );
@@ -461,8 +461,8 @@ export class PyEngineDownloader {
     const remoteManifest = await this.fetchRemoteManifest(source);
     const protocolSupported = isRemoteProtocolInstallable(remoteManifest);
 
-    // 变体切换（已装 cpu、目标 cuda 或反之）也视为「有更新」，以驱动 UI 的下载入口；
-    // 同变体则按哈希比对判断是否为内容更新。
+    // 變體切換（已裝 cpu、目標 cuda 或反之）也視為「有更新」，以驅動 UI 的下載入口；
+    // 同變體則按哈希比對判斷是否為內容更新。
     const installedVariant = normalizePyEngineVariant(localManifest?.variant);
     const variantSwitch = installed && installedVariant !== resolvedVariant;
     const hasUpdate =
@@ -543,7 +543,7 @@ export class PyEngineDownloader {
       cwd: stagingDir,
     });
 
-    // 自包含运行时：归档顶层即 内嵌解释器 + main.py + site-packages/（无外部基座）。
+    // 自包含運行時：歸檔頂層即 內嵌解釋器 + main.py + site-packages/（無外部基座）。
     const stagingMain = path.join(stagingDir, 'main.py');
     const stagingSite = path.join(stagingDir, 'site-packages');
     const stagingPython = getRuntimePythonPath(stagingDir);
@@ -566,8 +566,8 @@ export class PyEngineDownloader {
   }
 
   /**
-   * 安全替换：先停机解锁（依赖 Phase 0 无孤儿进程）→ 备份 current→previous → swap →
-   * 写 manifest → ping 自检；自检失败回滚旧版，成功删除备份。
+   * 安全替換：先停機解鎖（依賴 Phase 0 無孤兒進程）→ 備份 current→previous → swap →
+   * 寫 manifest → ping 自檢；自檢失敗回滾舊版，成功刪除備份。
    */
   private async installFromStaging(
     stagingDir: string,
@@ -579,10 +579,10 @@ export class PyEngineDownloader {
     const previousDir = getPyEnginePreviousDir(this.engineId);
     const hadPrevious = fs.existsSync(currentDir);
 
-    // 1. 停机解 Windows 文件锁
+    // 1. 停機解 Windows 文件鎖
     await shutdownPythonRuntime();
 
-    // 2. 备份 current → previous（previous 残留先清；manifest 在包目录内随之备份）
+    // 2. 備份 current → previous（previous 殘留先清；manifest 在包目錄內隨之備份）
     if (fs.existsSync(previousDir)) {
       fs.rmSync(previousDir, { recursive: true, force: true });
     }
@@ -591,7 +591,7 @@ export class PyEngineDownloader {
       fs.renameSync(currentDir, previousDir);
     }
 
-    // 3. swap staging → current（失败立即还原备份）
+    // 3. swap staging → current（失敗立即還原備份）
     fs.mkdirSync(path.dirname(currentDir), { recursive: true });
     try {
       fs.renameSync(stagingDir, currentDir);
@@ -606,16 +606,16 @@ export class PyEngineDownloader {
       throw swapError;
     }
 
-    // 3b. macOS 无证书兜底：对换入的原生库 ad-hoc 重签
+    // 3b. macOS 無證書兜底：對換入的原生庫 ad-hoc 重籤
     adhocResignDir(currentDir);
 
-    // 4. 写新 manifest（写在引擎包目录内，随目录一起 swap/rollback）
+    // 4. 寫新 manifest（寫在引擎包目錄內，隨目錄一起 swap/rollback）
     writeEngineManifest(
       this.buildLocalManifest(sha256, remoteManifest, variant),
       this.engineId,
     );
 
-    // 5. 自检：启动 + ping（ensureStarted 内含协议区间校验）
+    // 5. 自檢：啟動 + ping（ensureStarted 內含協議區間校驗）
     try {
       this.core.updateProgress({ status: 'verifying' });
       await getPythonRuntimeManager().ensureStarted(this.engineId);
@@ -628,7 +628,7 @@ export class PyEngineDownloader {
       throw selfCheckError;
     }
 
-    // 6. 成功：删除备份
+    // 6. 成功：刪除備份
     if (fs.existsSync(previousDir)) {
       fs.rmSync(previousDir, { recursive: true, force: true });
     }
@@ -639,7 +639,7 @@ export class PyEngineDownloader {
     const currentDir = getEngineDir(this.engineId);
     const previousDir = getPyEnginePreviousDir(this.engineId);
 
-    // 先停机，释放刚失败的 current/ 句柄
+    // 先停機，釋放剛失敗的 current/ 句柄
     await shutdownPythonRuntime();
 
     if (fs.existsSync(currentDir)) {
@@ -647,7 +647,7 @@ export class PyEngineDownloader {
     }
 
     if (hadPrevious && fs.existsSync(previousDir)) {
-      // 旧包目录内含其 manifest，整目录还原即恢复版本戳
+      // 舊包目錄內含其 manifest，整目錄還原即恢復版本戳
       fs.renameSync(previousDir, currentDir);
       try {
         await getPythonRuntimeManager().ensureStarted(this.engineId);
@@ -659,7 +659,7 @@ export class PyEngineDownloader {
         );
       }
     }
-    // 无旧版可退（首次安装失败）：current 已删除即回到未安装态（manifest 随目录消失）
+    // 無舊版可退（首次安裝失敗）：current 已刪除即回到未安裝態（manifest 隨目錄消失）
   }
 }
 

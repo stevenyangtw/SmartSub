@@ -1,11 +1,11 @@
 /**
- * 检查是否是配置相关的错误
- * 配置错误应该直接中止任务，不进行重试
+ * 檢查是否是配置相關的錯誤
+ * 配置錯誤應該直接中止任務，不進行重試
  */
 export function isConfigurationError(error: Error): boolean {
   const errorMessage = error.message.toLowerCase();
 
-  // 明确的配置错误模式
+  // 明確的配置錯誤模式
   const explicitConfigErrors = [
     'missingkeyorsecret',
     'api key is required',
@@ -17,10 +17,10 @@ export function isConfigurationError(error: Error): boolean {
     'invalid credentials',
     'configuration error',
     'missing configuration',
-    '请先配置',
+    '請先配置',
   ];
 
-  // 认证相关错误模式
+  // 認證相關錯誤模式
   const authErrors = [
     'unauthorized',
     'authentication failed',
@@ -30,18 +30,18 @@ export function isConfigurationError(error: Error): boolean {
     '403',
   ];
 
-  // 检查是否包含明确的配置错误
+  // 檢查是否包含明確的配置錯誤
   const hasExplicitConfigError = explicitConfigErrors.some((pattern) =>
     errorMessage.includes(pattern),
   );
 
-  // 检查是否是认证错误（但排除网络相关的认证问题）
+  // 檢查是否是認證錯誤（但排除網絡相關的認證問題）
   const hasAuthError =
     authErrors.some((pattern) => errorMessage.includes(pattern)) &&
     !errorMessage.includes('network') &&
     !errorMessage.includes('timeout');
 
-  // 检查原始错误消息中的配置错误模式（保持大小写敏感）
+  // 檢查原始錯誤消息中的配置錯誤模式（保持大小寫敏感）
   const hasOriginalConfigError = [
     'missingKeyOrSecret',
     'OpenAI API key is required',
@@ -52,8 +52,8 @@ export function isConfigurationError(error: Error): boolean {
   return hasExplicitConfigError || hasAuthError || hasOriginalConfigError;
 }
 
-/** 批量翻译失败时写入 targetContent 的前缀 */
-const TRANSLATION_FAILURE_PREFIX = '[翻译失败:';
+/** 批量翻譯失敗時寫入 targetContent 的前綴 */
+const TRANSLATION_FAILURE_PREFIX = '[翻譯失敗:';
 
 export function extractTranslationFailure(
   text: string | undefined | null,

@@ -51,17 +51,17 @@ interface SubtitleListProps {
   onCursorPositionChange?: (position: number) => void;
   onAiOptimizeClick?: (index: number) => void;
   onSplitClick?: (index: number) => void;
-  /** 行内时间编辑提交；返回错误文案（不应用）或 null（已应用） */
+  /** 行內時間編輯提交；返回錯誤文案（不應用）或 null（已應用） */
   onTimeChange?: (
     index: number,
     startSec: number,
     endSec: number,
   ) => string | null;
-  /** 失败字幕批量重翻控制（不传则不显示重翻按钮） */
+  /** 失敗字幕批量重翻控制（不傳則不顯示重翻按鈕） */
   retranslate?: RetranslateControl;
-  /** 合并选中区间 [start, endExclusive)；不传则禁用多选 */
+  /** 合併選中區間 [start, endExclusive)；不傳則禁用多選 */
   onMergeRange?: (start: number, endExclusive: number) => void;
-  /** 视图偏好由父级（编辑工具栏）统一控制 */
+  /** 視圖偏好由父級（編輯工具欄）統一控制 */
   expandAll: boolean;
   fontScale: 's' | 'm' | 'l';
 }
@@ -78,7 +78,7 @@ interface RowLabels {
   timeEditHint: string;
 }
 
-// 秒数 → 紧凑时间（m:ss 或 h:mm:ss），用于紧凑行
+// 秒數 → 緊湊時間（m:ss 或 h:mm:ss），用於緊湊行
 const compactTime = (seconds: number | undefined): string => {
   const total = Math.max(0, Math.floor(seconds || 0));
   const h = Math.floor(total / 3600);
@@ -89,7 +89,7 @@ const compactTime = (seconds: number | undefined): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-// 多行文本压成单行预览
+// 多行文本壓成單行預覽
 const toPreview = (text: string | undefined): string =>
   (text || '').replace(/\s*\n\s*/g, ' ').trim();
 
@@ -129,7 +129,7 @@ interface SubtitleRowProps {
   ) => string | null;
 }
 
-// 行组件：紧凑单行（默认） / 展开编辑（当前行）
+// 行組件：緊湊單行（預設） / 展開編輯（當前行）
 const SubtitleRow = memo(function SubtitleRow({
   subtitle,
   index,
@@ -151,7 +151,7 @@ const SubtitleRow = memo(function SubtitleRow({
   onSplit,
   onTimeCommit,
 }: SubtitleRowProps) {
-  // 失败行降噪：左缘红条 + ⚠，不再整行红底
+  // 失敗行降噪：左緣紅條 + ⚠，不再整行紅底
   const failedEdge = isFailed
     ? 'border-l-2 border-l-red-500'
     : 'border-l-2 border-l-transparent';
@@ -200,11 +200,11 @@ const SubtitleRow = memo(function SubtitleRow({
       id={`subtitle-${index}`}
       className={`rounded-md ${isCurrent ? 'bg-accent' : 'bg-card'} p-1.5 text-xs ${failedEdge}`}
       onClick={(e) => {
-        // 展开行：点击行内任意位置（含字幕文本框）都选中并跳转视频。
-        // 仅「按钮 / 时间输入框」自行处理、不跳转，避免打断这些操作。
+        // 展開行：點擊行內任意位置（含字幕文本框）都選中並跳轉影片。
+        // 僅「按鈕 / 時間輸入框」自行處理、不跳轉，避免打斷這些操作。
         const target = e.target as HTMLElement;
         if (target.closest('button, input')) return;
-        // 点击文本框时也跳转，但不触发行范围选择，保留文本框内的原生光标/选择
+        // 點擊文本框時也跳轉，但不觸發行範圍選擇，保留文本框內的原生光標/選擇
         const inTextarea = !!target.closest('textarea');
         onRowClick(index, inTextarea ? false : e.shiftKey);
       }}
@@ -329,11 +329,11 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
 }) => {
   const { t } = useTranslation('home');
 
-  // 获取翻译失败的字幕索引
+  // 獲取翻譯失敗的字幕索引
   const failedIndices = getFailedTranslationIndices();
   const hasFailedTranslations = failedIndices.length > 0;
 
-  // 只看失败：开启时记录基线 N0，随失败行减少展示"已处理 x/N0"
+  // 只看失敗：開啟時記錄基線 N0，隨失敗行減少展示"已處理 x/N0"
   const [failedOnly, setFailedOnly] = useState(false);
   const [failedBaseline, setFailedBaseline] = useState(0);
 
@@ -347,8 +347,8 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
 
   const processedCount = Math.max(0, failedBaseline - failedIndices.length);
 
-  // 钉住正在编辑的失败行：填上译文后行不再"失败"，但在用户切走前
-  // 必须留在过滤视图里，否则输入第一个字符时编辑框会被卸载
+  // 釘住正在編輯的失敗行：填上譯文後行不再"失敗"，但在用戶切走前
+  // 必須留在過濾視圖裡，否則輸入第一個字符時編輯框會被卸載
   const pinnedIndexRef = useRef(-1);
   const lastCurrentRef = useRef(-2);
   if (lastCurrentRef.current !== currentSubtitleIndex) {
@@ -359,7 +359,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
         : -1;
   }
 
-  // 过滤映射：null = 不过滤（虚拟索引即真实索引）
+  // 過濾映射：null = 不過濾（虛擬索引即真實索引）
   let displayIndices: number[] | null = null;
   if (failedOnly) {
     const pinned = pinnedIndexRef.current;
@@ -372,14 +372,14 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     ? displayIndices.length
     : mergedSubtitles.length;
 
-  // 滚动容器引用
+  // 滾動容器引用
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // 用户主动点击字幕时跳过一次自动滚动：被点击的字幕已经在视野内，
-  // 再触发自动滚动会导致列表跳动
+  // 用戶主動點擊字幕時跳過一次自動滾動：被點擊的字幕已經在視野內，
+  // 再觸發自動滾動會導致列表跳動
   const skipNextAutoScrollRef = useRef(false);
 
-  // 最新回调引用：行回调经此分发，保持行 props 恒定让 memo 生效
+  // 最新回調引用：行回調經此分發，保持行 props 恆定讓 memo 生效
   const latestRef = useRef({
     handleSubtitleClick,
     handleSubtitleChange,
@@ -402,17 +402,17 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
   const virtualizer = useVirtualizer({
     count: displayCount,
     getScrollElement: () => scrollContainerRef.current,
-    // 紧凑行 ~30px；展开行由 measureElement 动态测量
+    // 緊湊行 ~30px；展開行由 measureElement 動態測量
     estimateSize: () => 34,
     overscan: 10,
-    // 以真实索引作为 key，过滤切换/失败行减少时测量缓存仍对得上行
+    // 以真實索引作為 key，過濾切換/失敗行減少時測量緩存仍對得上行
     getItemKey: (i) => (displayIndices ? displayIndices[i] : i),
   });
 
-  // 展开/收起全部或字号变化会改变行高，强制虚拟列表重算。
-  // 注意：measure() 清空缓存后依赖 ResizeObserver 回填，但「高度未变化」的当前展开行
-  // 不会触发 ResizeObserver，会停留在估算高度（34px）导致下一行压上来重叠。
-  // 因此清空后再对所有已渲染行强制重新测量，确保当前行也拿到真实高度。
+  // 展開/收起全部或字號變化會改變行高，強制虛擬列表重算。
+  // 注意：measure() 清空緩存後依賴 ResizeObserver 回填，但「高度未變化」的當前展開行
+  // 不會觸發 ResizeObserver，會停留在估算高度（34px）導致下一行壓上來重疊。
+  // 因此清空後再對所有已渲染行強制重新測量，確保當前行也拿到真實高度。
   useEffect(() => {
     virtualizer.measure();
     const container = scrollContainerRef.current;
@@ -422,13 +422,13 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
       .forEach((node) => virtualizer.measureElement(node));
   }, [expandAll, fontScale, virtualizer]);
 
-  // 多选区间（归一化 [lo, hi]，含两端）；anchor 为最后一次普通点击的行
+  // 多選區間（歸一化 [lo, hi]，含兩端）；anchor 為最後一次普通點擊的行
   const [selRange, setSelRange] = useState<[number, number] | null>(null);
   const selAnchorRef = useRef(-1);
   const selectionEnabled = !!onMergeRange;
 
-  // 行点击：普通点击 = 选中 + 展开 + 视频跳转（沿用现有联动）并清选区；
-  // Shift+点击 = 仅扩展选区（不展开不跳转）；失败过滤视图下退化为普通点击
+  // 行點擊：普通點擊 = 選中 + 展開 + 影片跳轉（沿用現有聯動）並清選區；
+  // Shift+點擊 = 僅擴展選區（不展開不跳轉）；失敗過濾視圖下退化為普通點擊
   const onRowClick = useCallback(
     (index: number, shiftKey: boolean) => {
       if (shiftKey && selectionEnabled && !failedOnly) {
@@ -452,7 +452,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     [selectionEnabled, failedOnly],
   );
 
-  // Esc 清除选区
+  // Esc 清除選區
   useEffect(() => {
     if (!selRange) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -462,14 +462,14 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selRange]);
 
-  // 字幕数量变化（合并/拆分）后索引错位，选区失效
+  // 字幕數量變化（合併/拆分）後索引錯位，選區失效
   const subtitleCount = mergedSubtitles.length;
   useEffect(() => {
     setSelRange(null);
     selAnchorRef.current = -1;
   }, [subtitleCount]);
 
-  // 选区合并：hook 端 slice(start, endExclusive)
+  // 選區合併：hook 端 slice(start, endExclusive)
   const selCount = selRange ? selRange[1] - selRange[0] + 1 : 0;
   const handleMergeSelection = useCallback(() => {
     if (!selRange || selRange[1] <= selRange[0]) return;
@@ -489,7 +489,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     [],
   );
 
-  // 光标位置变化（用于拆分功能）
+  // 光標位置變化（用於拆分功能）
   const onSelectionEvent = useCallback(
     (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
       const target = e.target as HTMLTextAreaElement;
@@ -498,7 +498,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     [],
   );
 
-  // Tab/Shift+Tab：同一行内原文⇄译文切换焦点（阻断浏览器默认的顺序跳转）
+  // Tab/Shift+Tab：同一行內原文⇄譯文切換焦點（阻斷瀏覽器預設的順序跳轉）
   const focusRowField = (index: number, field: 'src' | 'tgt') => {
     const el = document.getElementById(
       `subtitle-${field}-${index}`,
@@ -544,7 +544,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     [],
   );
 
-  // 行内文案（memo 化保持引用稳定）
+  // 行內文案（memo 化保持引用穩定）
   const labels = useMemo<RowLabels>(
     () => ({
       currentPlaying: t('currentPlaying'),
@@ -560,9 +560,9 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
     [t],
   );
 
-  // 自动滚动到当前字幕（播放跟随 / 失败翻译跳转 / 上下条导航时生效）
-  // 用户主动点击的字幕不滚动；等一帧让展开行完成测量后再定位
-  // 过滤模式下需把真实索引映射为列表位置；不在列表中则不滚动
+  // 自動滾動到當前字幕（播放跟隨 / 失敗翻譯跳轉 / 上下條導航時生效）
+  // 用戶主動點擊的字幕不滾動；等一幀讓展開行完成測量後再定位
+  // 過濾模式下需把真實索引映射為列表位置；不在列表中則不滾動
   useEffect(() => {
     if (skipNextAutoScrollRef.current) {
       skipNextAutoScrollRef.current = false;
@@ -577,7 +577,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
       virtualizer.scrollToIndex(listIndex, { align: 'auto' });
     });
     return () => cancelAnimationFrame(frame);
-    // displayIndices 内容随失败行变化，仅在当前行/过滤开关变化时重定位
+    // displayIndices 內容隨失敗行變化，僅在當前行/過濾開關變化時重定位
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSubtitleIndex, failedOnly, virtualizer]);
 
@@ -585,8 +585,8 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
 
   return (
     <div className="h-full flex flex-col border rounded-md overflow-hidden">
-      {/* 状态/失败操作栏（视图控制已上移至编辑工具栏；窄宽下换行避免重叠）
-          纯转写模式无翻译状态与失败操作，整条隐藏避免空栏 */}
+      {/* 狀態/失敗操作欄（視圖控制已上移至編輯工具欄；窄寬下換行避免重疊）
+          純轉寫模式無翻譯狀態與失敗操作，整條隱藏避免空欄 */}
       {shouldShowTranslation && (
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 p-2 border-b bg-muted/30 flex-shrink-0">
           <div className="flex min-w-0 items-center gap-3 text-sm text-muted-foreground">
@@ -693,7 +693,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
         </div>
       )}
 
-      {/* 多选操作条：Shift+点选连续区间后出现 */}
+      {/* 多選操作條：Shift+點選連續區間後出現 */}
       {selRange && selCount >= 2 && (
         <div className="flex items-center justify-between gap-2 border-b bg-accent/40 p-2 flex-shrink-0">
           <span className="text-xs text-muted-foreground tabular-nums">
@@ -726,7 +726,7 @@ const SubtitleList: React.FC<SubtitleListProps> = ({
         </div>
       )}
 
-      {/* 字幕列表（虚拟化；只看失败时为过滤视图） */}
+      {/* 字幕列表（虛擬化；只看失敗時為過濾視圖） */}
       <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
         {failedOnly && displayCount === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-sm text-muted-foreground">

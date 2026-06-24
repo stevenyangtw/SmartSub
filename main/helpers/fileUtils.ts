@@ -5,15 +5,15 @@ import { createHash } from 'crypto';
 import { logMessage, store } from './storeManager';
 
 /**
- * 计算字符串的MD5哈希值
+ * 計算字符串的MD5哈希值
  */
 export function getMd5(str: string) {
   return createHash('md5').update(str).digest('hex');
 }
 
 /**
- * 将 ffmpeg 的时间标记（HH:MM:SS.xx / MM:SS / 纯秒数）转换为秒。
- * 用于在 fluent-ffmpeg 的 progress.percent 不可用时，根据 timemark 与总时长自算进度。
+ * 將 ffmpeg 的時間標記（HH:MM:SS.xx / MM:SS / 純秒數）轉換為秒。
+ * 用於在 fluent-ffmpeg 的 progress.percent 不可用時，根據 timemark 與總時長自算進度。
  */
 export function timemarkToSeconds(timemark: string | number): number {
   if (typeof timemark === 'number')
@@ -27,21 +27,21 @@ export function timemarkToSeconds(timemark: string | number): number {
 }
 
 /**
- * 获取临时目录路径
+ * 獲取臨時目錄路徑
  */
 export function getTempDir() {
   const settings = store.get('settings');
 
-  // 判断是否使用自定义临时目录
+  // 判斷是否使用自定義臨時目錄
   if (settings.useCustomTempDir && settings.customTempDir) {
-    // 确保自定义目录存在
+    // 確保自定義目錄存在
     const customDir = settings.customTempDir as string;
     if (!fs.existsSync(customDir)) {
       try {
         fs.mkdirSync(customDir, { recursive: true });
       } catch (error) {
         logMessage(
-          `无法创建自定义临时目录: ${error.message}，将使用默认临时目录`,
+          `無法創建自定義臨時目錄: ${error.message}，將使用預設臨時目錄`,
           'error',
         );
         return path.join(app.getPath('temp'), 'whisper-subtitles');
@@ -50,12 +50,12 @@ export function getTempDir() {
     return customDir;
   }
 
-  // 默认临时目录
+  // 預設臨時目錄
   return path.join(app.getPath('temp'), 'whisper-subtitles');
 }
 
 /**
- * 确保临时目录存在
+ * 確保臨時目錄存在
  */
 export function ensureTempDir() {
   const tempDir = getTempDir();
@@ -66,20 +66,20 @@ export function ensureTempDir() {
 }
 
 /**
- * 格式化SRT内容
+ * 格式化SRT內容
  */
 export function formatSrtContent(subtitles: [string, string, string][]) {
   return subtitles
     .map((subtitle, index) => {
       const [startTime, endTime, text] = subtitle;
-      // SRT格式：序号 + 时间码 + 文本 + 空行
+      // SRT格式：序號 + 時間碼 + 文本 + 空行
       return `${index + 1}\n${startTime.replace('.', ',')} --> ${endTime.replace('.', ',')}\n${text.trim()}\n`;
     })
     .join('\n');
 }
 
 /**
- * 创建或清空文件
+ * 創建或清空文件
  */
 export async function createOrClearFile(filePath: string): Promise<void> {
   try {
@@ -91,7 +91,7 @@ export async function createOrClearFile(filePath: string): Promise<void> {
 }
 
 /**
- * 向文件追加内容
+ * 向文件追加內容
  */
 export async function appendToFile(
   filePath: string,
@@ -106,7 +106,7 @@ export async function appendToFile(
 }
 
 /**
- * 读取文件内容并按行分割
+ * 讀取文件內容並按行分割
  */
 export async function readFileContent(filePath: string): Promise<string[]> {
   try {
@@ -119,14 +119,14 @@ export async function readFileContent(filePath: string): Promise<string[]> {
 }
 
 /**
- * 封装文件对象
+ * 封裝文件對象
  */
 export function wrapFileObject(filePath: string) {
   let fileSize = 0;
   try {
     fileSize = fs.statSync(filePath).size;
   } catch {
-    // 文件不可读时大小留 0，渲染层不展示
+    // 文件不可讀時大小留 0，渲染層不展示
   }
   return {
     filePath,

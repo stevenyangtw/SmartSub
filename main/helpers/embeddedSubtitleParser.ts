@@ -1,22 +1,22 @@
 /**
- * 内封软字幕：纯解析逻辑（无 ffmpeg / 无 electron 依赖，便于单测）。
- * 仅负责：容器扩展名预过滤、ffmpeg stderr 字幕流解析、SRT 是否含字幕块判定。
+ * 內封軟字幕：純解析邏輯（無 ffmpeg / 無 electron 依賴，便於單測）。
+ * 僅負責：容器擴展名預過濾、ffmpeg stderr 字幕流解析、SRT 是否含字幕塊判定。
  */
 
 export interface EmbeddedSubtitleStream {
-  /** 字幕流相对序号（第几条 Subtitle 行，从 0 起），用于 ffmpeg -map 0:s:N */
+  /** 字幕流相對序號（第幾條 Subtitle 行，從 0 起），用於 ffmpeg -map 0:s:N */
   subIndex: number;
-  /** 小写编码名，如 subrip / ass / mov_text / hdmv_pgs_subtitle */
+  /** 小寫編碼名，如 subrip / ass / mov_text / hdmv_pgs_subtitle */
   codec: string;
-  /** 语言标签（如 eng / chi）；缺失或 und 时为 undefined */
+  /** 語言標籤（如 eng / chi）；缺失或 und 時為 undefined */
   language?: string;
-  /** 是否为可直接转 SRT 的文本字幕 */
+  /** 是否為可直接轉 SRT 的文本字幕 */
   isText: boolean;
   isDefault: boolean;
   isForced: boolean;
 }
 
-/** 可能内封文本软字幕的容器扩展名（不含点、小写） */
+/** 可能內封文本軟字幕的容器擴展名（不含點、小寫） */
 export const EMBEDDED_SUBTITLE_CONTAINERS = new Set([
   'mkv',
   'webm',
@@ -30,7 +30,7 @@ export const EMBEDDED_SUBTITLE_CONTAINERS = new Set([
   'ogv',
 ]);
 
-/** 可直接 -c:s srt 转写的文本字幕编码 */
+/** 可直接 -c:s srt 轉寫的文本字幕編碼 */
 export const TEXT_SUBTITLE_CODECS = new Set([
   'subrip',
   'srt',
@@ -41,7 +41,7 @@ export const TEXT_SUBTITLE_CODECS = new Set([
   'text',
 ]);
 
-/** 扩展名预过滤：仅对可能内封字幕的容器才值得 spawn 探测 */
+/** 擴展名預過濾：僅對可能內封字幕的容器才值得 spawn 探測 */
 export function canHaveEmbeddedSubtitle(ext: string): boolean {
   if (!ext) return false;
   return EMBEDDED_SUBTITLE_CONTAINERS.has(ext.replace(/^\./, '').toLowerCase());
@@ -50,7 +50,7 @@ export function canHaveEmbeddedSubtitle(ext: string): boolean {
 const SUBTITLE_LINE =
   /Stream #\d+:(\d+)(?:\[0x[0-9a-fA-F]+\])?(?:\(([^)]*)\))?:\s*Subtitle:\s*([A-Za-z0-9_]+)/;
 
-/** 解析 `ffmpeg -i` 的 stderr，按出现顺序返回所有字幕流信息 */
+/** 解析 `ffmpeg -i` 的 stderr，按出現順序返回所有字幕流信息 */
 export function parseSubtitleStreams(stderr: string): EmbeddedSubtitleStream[] {
   const streams: EmbeddedSubtitleStream[] = [];
   const lines = (stderr || '').split(/\r?\n/);
@@ -73,7 +73,7 @@ export function parseSubtitleStreams(stderr: string): EmbeddedSubtitleStream[] {
   return streams;
 }
 
-/** SRT 是否至少含一条字幕块（用时间码箭头判定，空/全空白为 false） */
+/** SRT 是否至少含一條字幕塊（用時間碼箭頭判定，空/全空白為 false） */
 export function srtHasCues(content: string): boolean {
   if (!content) return false;
   return /-->/.test(content);

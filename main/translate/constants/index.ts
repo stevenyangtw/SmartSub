@@ -9,14 +9,14 @@ export const DEFAULT_BATCH_SIZE = {
   API: 1,
 } as const;
 
-// 翻译请求超时时间（毫秒）。
-// 防止单个请求无限挂起导致整个翻译流程卡死、进度永久停留（issue #269）。
+// 翻譯請求超時時間（毫秒）。
+// 防止單個請求無限掛起導致整個翻譯流程卡死、進度永久停留（issue #269）。
 export const TRANSLATION_REQUEST_TIMEOUT = 60_000;
-// 本地大模型（Ollama）响应可能较慢，使用更宽松的超时时间。
+// 本地大模型（Ollama）響應可能較慢，使用更寬鬆的超時時間。
 export const OLLAMA_REQUEST_TIMEOUT = 300_000;
 
 export const THINK_TAG_REGEX = /<think>[\s\S]*?<\/think>\n/g;
 export const RESULT_TAG_REGEX = /<result[^>]*>([\s\S]*?)<\/result>/;
 
-// 获取 ```json\n{content}\n``` 中的 content
+// 獲取 ```json\n{content}\n``` 中的 content
 export const JSON_CONTENT_REGEX = /```json\n([\s\S]*?)\n```/;

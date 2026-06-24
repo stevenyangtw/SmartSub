@@ -14,7 +14,7 @@ export async function getAndInitializeProviders(): Promise<Provider[]> {
   try {
     const savedProviders = store.get('translationProviders') || [];
     const savedVersion = store.get('providerVersion');
-    // 如果是新安装或已经是最新版本，直接初始化
+    // 如果是新安裝或已經是最新版本，直接初始化
     if (savedProviders.length === 0) {
       logMessage('Initializing default providers', 'info');
       return initializeDefaultProviders();
@@ -24,7 +24,7 @@ export async function getAndInitializeProviders(): Promise<Provider[]> {
       return savedProviders;
     }
 
-    // 需要迁移的情况
+    // 需要遷移的情況
     logMessage('Migrating providers', 'info');
     const migratedProviders = migrateProviders(savedProviders);
     store.set('translationProviders', migratedProviders);
@@ -58,9 +58,9 @@ function initializeDefaultProviders(): Provider[] {
 }
 
 /**
- * 判断用户的 systemPrompt 是否需要更新为新的默认值
- * 如果用户的值为空、等于当前默认值、或匹配任意历史默认值 → 更新
- * 否则说明用户自定义过 → 保留
+ * 判斷用戶的 systemPrompt 是否需要更新為新的預設值
+ * 如果用戶的值為空、等於當前預設值、或匹配任意歷史預設值 → 更新
+ * 否則說明用戶自定義過 → 保留
  */
 function shouldUpdateSystemPrompt(currentPrompt: string | undefined): boolean {
   if (!currentPrompt) return true;
@@ -84,7 +84,7 @@ function withTencentRateLimitDefaults(provider: any): any {
 }
 
 function migrateProviders(oldProviders: any[]): Provider[] {
-  // 分离内置和自定义服务商
+  // 分離內置和自定義服務商
   const builtinProviders = oldProviders
     .filter((p) => PROVIDER_TYPES.some((type) => type.id === p.id))
     .map((p) => {
@@ -127,7 +127,7 @@ function migrateProviders(oldProviders: any[]): Provider[] {
       structuredOutput: p.structuredOutput || 'json_object',
     }));
 
-  // 添加缺失的内置服务商
+  // 添加缺失的內置服務商
   const existingIds = builtinProviders.map((p) => p.id);
   const missingProviders = PROVIDER_TYPES.filter(
     (type) => type.isBuiltin && !existingIds.includes(type.id),

@@ -24,7 +24,7 @@ function compareMajorMinor(a: string, b: string): number {
   return 0;
 }
 
-/** 比较完整 semver（用于排序） */
+/** 比較完整 semver（用於排序） */
 export function compareCudaVersion(a: string, b: string): number {
   const pa = a.split('.').map((n) => parseInt(n, 10) || 0);
   const pb = b.split('.').map((n) => parseInt(n, 10) || 0);
@@ -36,7 +36,7 @@ export function compareCudaVersion(a: string, b: string): number {
 }
 
 /**
- * 从远程 addon-versions.json 解析 CUDA 版本列表；失败时回退到内置常量
+ * 從遠程 addon-versions.json 解析 CUDA 版本列表；失敗時回退到內置常量
  */
 export function parseRemoteCudaVersions(
   remote: RemoteAddonVersions | null | undefined,

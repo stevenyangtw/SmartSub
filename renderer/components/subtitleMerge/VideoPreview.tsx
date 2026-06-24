@@ -1,6 +1,6 @@
 /**
- * 视频预览组件
- * 按真实视频比例显示视频和字幕效果；使用原生播放控制条，处理状态以浮层呈现
+ * 影片預覽組件
+ * 按真實影片比例顯示影片和字幕效果；使用原生播放控制條，處理狀態以浮層呈現
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,15 +24,15 @@ interface VideoPreviewProps {
   style: SubtitleStyle;
   subtitlePath?: string | null;
   sampleText?: string;
-  /** 合成进度（用于处理中/错误浮层） */
+  /** 合成進度（用於處理中/錯誤浮層） */
   progress?: MergeProgress;
-  /** 合成状态（驱动浮层显隐） */
+  /** 合成狀態（驅動浮層顯隱） */
   status?: MergeStatus;
-  /** 取消中标记 */
+  /** 取消中標記 */
   isCancelling?: boolean;
   /** 取消合成 */
   onCancelMerge?: () => void;
-  /** 打开输出文件夹 */
+  /** 打開輸出資料夾 */
   onOpenOutputFolder?: () => void;
 }
 
@@ -42,7 +42,7 @@ interface PreviewCue {
   text: string;
 }
 
-// SRT 时间 "HH:MM:SS,mmm" → 秒
+// SRT 時間 "HH:MM:SS,mmm" → 秒
 const srtTimeToSeconds = (time: string): number => {
   const match = time.trim().match(/^(\d+):(\d{2}):(\d{2})[,.](\d{1,3})$/);
   if (!match) return NaN;
@@ -55,7 +55,7 @@ const srtTimeToSeconds = (time: string): number => {
   );
 };
 
-// 二分查找当前时间所在条目：最后一个 startSec <= t 的候选，再验 endSec
+// 二分查找當前時間所在條目：最後一個 startSec <= t 的候選，再驗 endSec
 const findCueAtTime = (cues: PreviewCue[], time: number): PreviewCue | null => {
   let lo = 0;
   let hi = cues.length - 1;
@@ -78,7 +78,7 @@ export default function VideoPreview({
   videoInfo,
   style,
   subtitlePath = null,
-  sampleText = '字幕预览效果',
+  sampleText = '字幕預覽效果',
   progress,
   status = 'idle',
   isCancelling = false,
@@ -92,19 +92,19 @@ export default function VideoPreview({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [cues, setCues] = useState<PreviewCue[]>([]);
-  // 预览框尺寸：按可视区宽高拟合最大矩形，保证完整可见且不撑出滚动条
+  // 預覽框尺寸：按可視區寬高擬合最大矩形，保證完整可見且不撐出滾動條
   const [box, setBox] = useState<{ width: number; height: number }>({
     width: 0,
     height: 0,
   });
 
-  // 预览盒宽高比：优先用真实视频比例（非 16:9 视频也能所见即所得），否则回退 16:9
+  // 預覽盒寬高比：優先用真實影片比例（非 16:9 影片也能所見即所得），否則回退 16:9
   const aspect =
     videoInfo && videoInfo.width > 0 && videoInfo.height > 0
       ? videoInfo.width / videoInfo.height
       : 16 / 9;
 
-  // 监听预览区尺寸变化，重算最大可容纳的盒子（取按宽/按高撑满中较小者）
+  // 監聽預覽區尺寸變化，重算最大可容納的盒子（取按寬/按高撐滿中較小者）
   useEffect(() => {
     const el = previewAreaRef.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
@@ -126,7 +126,7 @@ export default function VideoPreview({
     return () => ro.disconnect();
   }, [aspect]);
 
-  // 选中字幕文件后解析真实条目（清除则回退样例文字）
+  // 選中字幕文件後解析真實條目（清除則回退樣例文字）
   useEffect(() => {
     if (!subtitlePath) {
       setCues([]);
@@ -157,7 +157,7 @@ export default function VideoPreview({
           );
         setCues(parsed);
       } catch (error) {
-        console.error('解析预览字幕失败:', error);
+        console.error('解析預覽字幕失敗:', error);
         if (!stale) setCues([]);
       }
     })();
@@ -166,12 +166,12 @@ export default function VideoPreview({
     };
   }, [subtitlePath]);
 
-  // 叠加层文字：有字幕文件时所见即所得（空档期不显示），否则用样例文字调样式
+  // 疊加層文字：有字幕文件時所見即所得（空檔期不顯示），否則用樣例文字調樣式
   const currentCue = cues.length > 0 ? findCueAtTime(cues, currentTime) : null;
   const overlayText =
     subtitlePath && cues.length > 0 ? (currentCue?.text ?? null) : sampleText;
 
-  // 处理进度更新（原生控制条拖动同样会触发，保证字幕叠加层同步）
+  // 處理進度更新（原生控制條拖動同樣會觸發，保證字幕疊加層同步）
   const handleProgress = ({ playedSeconds }: { playedSeconds: number }) => {
     setCurrentTime(playedSeconds);
   };
@@ -180,7 +180,7 @@ export default function VideoPreview({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {/* 预览区域 - 自适应高度，保持真实比例完整可见 */}
+      {/* 預覽區域 - 自適應高度，保持真實比例完整可見 */}
       <div
         ref={previewAreaRef}
         className="flex min-h-0 flex-1 items-center justify-center overflow-hidden"
@@ -196,7 +196,7 @@ export default function VideoPreview({
           <div className="absolute inset-0 flex items-center justify-center">
             {videoPath ? (
               <>
-                {/* 视频播放器：原生控制条 */}
+                {/* 影片播放器：原生控制條 */}
                 <ReactPlayer
                   ref={playerRef}
                   url={`media://${encodeURIComponent(videoPath)}`}
@@ -211,8 +211,8 @@ export default function VideoPreview({
                   style={{ position: 'absolute', top: 0, left: 0 }}
                 />
 
-                {/* CSS 模拟字幕叠加层（真实条目优先，未选字幕时显示样例）。
-                  scale=盒高/333：让预览字号随预览框大小等比缩放，≈烧录后字号 */}
+                {/* CSS 模擬字幕疊加層（真實條目優先，未選字幕時顯示樣例）。
+                  scale=盒高/333：讓預覽字號隨預覽框大小等比縮放，≈燒錄後字號 */}
                 {overlayText !== null && (
                   <SubtitlePreviewOverlay
                     style={style}
@@ -230,7 +230,7 @@ export default function VideoPreview({
             )}
           </div>
 
-          {/* 处理中浮层：不撑高布局，居中半透明面板 + 进度 + 取消 */}
+          {/* 處理中浮層：不撐高佈局，居中半透明面板 + 進度 + 取消 */}
           {isProcessing && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/55 backdrop-blur-sm">
               <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -263,7 +263,7 @@ export default function VideoPreview({
             </div>
           )}
 
-          {/* 成功浮层：右上角卡片，不全遮挡画面 */}
+          {/* 成功浮層：右上角卡片，不全遮擋畫面 */}
           {status === 'completed' && (
             <div className="absolute right-2 top-2 z-20 flex items-center gap-2 rounded-lg border border-success/40 bg-background/95 px-3 py-2 shadow-lg">
               <CheckCircle className="h-4 w-4 text-success" />
@@ -282,7 +282,7 @@ export default function VideoPreview({
             </div>
           )}
 
-          {/* 错误浮层：底部条 */}
+          {/* 錯誤浮層：底部條 */}
           {status === 'error' && progress?.errorMessage && (
             <div className="absolute inset-x-2 bottom-2 z-20 flex items-start gap-2 rounded-lg border border-destructive/40 bg-background/95 px-3 py-2 shadow-lg">
               <XCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive" />

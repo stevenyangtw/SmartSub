@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// 复用原有的子组件和 hooks
+// 複用原有的子組件和 hooks
 import { useStandaloneSubtitles } from '../../hooks/useStandaloneSubtitles';
 import { useRetranslateFailed } from '../../hooks/useRetranslateFailed';
 import { useVideoPlayer } from '../../hooks/useVideoPlayer';
@@ -38,8 +38,8 @@ interface PendingFile {
   sourceLanguage?: string;
   targetLanguage?: string;
   status: 'pending' | 'proofreading' | 'completed';
-  finalTargetPath?: string; // 目标翻译文件路径（用户配置格式）
-  translateContent?: string; // 翻译内容格式设置
+  finalTargetPath?: string; // 目標翻譯文件路徑（用戶配置格式）
+  translateContent?: string; // 翻譯內容格式設置
 }
 
 interface ProofreadEditorProps {
@@ -56,7 +56,7 @@ export default function ProofreadEditor({
   const { t } = useTranslation('home');
   const { t: commonT } = useTranslation('common');
 
-  // 构建配置
+  // 構建配置
   const config = useMemo(
     () => ({
       videoPath: file.videoPath,
@@ -70,7 +70,7 @@ export default function ProofreadEditor({
     [file],
   );
 
-  // 使用独立的字幕 hook
+  // 使用獨立的字幕 hook
   const {
     mergedSubtitles,
     updateSubtitles,
@@ -90,7 +90,7 @@ export default function ProofreadEditor({
     getFailedTranslationIndices,
     goToNextFailedTranslation,
     goToPreviousFailedTranslation,
-    // 编辑增强
+    // 編輯增強
     handleUndo,
     handleRedo,
     canUndo,
@@ -98,12 +98,12 @@ export default function ProofreadEditor({
     handleMergeSubtitles,
     handleSplitSubtitle,
     handleTimeChange,
-    // 光标位置
+    // 光標位置
     handleCursorPositionChange,
     getCursorPosition,
   } = useStandaloneSubtitles(config, true);
 
-  // 失败字幕批量重翻（复用任务翻译链路）
+  // 失敗字幕批量重翻（複用任務翻譯鏈路）
   const retranslate = useRetranslateFailed({
     getSubtitles,
     getFailedTranslationIndices,
@@ -112,7 +112,7 @@ export default function ProofreadEditor({
     targetLanguage: file.targetLanguage,
   });
 
-  // 使用视频播放器 hook
+  // 使用影片播放器 hook
   const {
     duration,
     setDuration,
@@ -133,16 +133,16 @@ export default function ProofreadEditor({
     setCurrentSubtitleIndex,
   );
 
-  // 是否有视频
+  // 是否有影片
   const hasVideo = !!videoPath;
 
-  // 视图偏好（从 SubtitleList 上提，由编辑工具栏统一控制）：
-  // 折叠左侧面板 / 展开全部 / 字号
+  // 視圖偏好（從 SubtitleList 上提，由編輯工具欄統一控制）：
+  // 摺疊左側面板 / 展開全部 / 字號
   const [videoCollapsed, setVideoCollapsed] = useState(false);
   const [expandAll, setExpandAll] = useState(false);
   const [fontScale, setFontScale] = useState<'s' | 'm' | 'l'>('m');
 
-  // 读取持久化偏好（仅客户端，避免 SSR 不一致）
+  // 讀取持久化偏好（僅客戶端，避免 SSR 不一致）
   useEffect(() => {
     try {
       setVideoCollapsed(
@@ -152,7 +152,7 @@ export default function ProofreadEditor({
       const fs = localStorage.getItem('proofread:fontScale');
       if (fs === 's' || fs === 'm' || fs === 'l') setFontScale(fs);
     } catch {
-      // localStorage 不可用时用默认值
+      // localStorage 不可用時用預設值
     }
   }, []);
 
@@ -162,7 +162,7 @@ export default function ProofreadEditor({
       try {
         localStorage.setItem('proofread:videoCollapsed', next ? '1' : '0');
       } catch {
-        // 忽略持久化失败
+        // 忽略持久化失敗
       }
       return next;
     });
@@ -174,7 +174,7 @@ export default function ProofreadEditor({
       try {
         localStorage.setItem('proofread:expandAll', next ? '1' : '0');
       } catch {
-        // 忽略持久化失败
+        // 忽略持久化失敗
       }
       return next;
     });
@@ -185,22 +185,22 @@ export default function ProofreadEditor({
     try {
       localStorage.setItem('proofread:fontScale', scale);
     } catch {
-      // 忽略持久化失败
+      // 忽略持久化失敗
     }
   }, []);
 
-  // 左侧面板是否展示（无视频或手动折叠时隐藏，字幕列表占满宽度）
+  // 左側面板是否展示（無影片或手動摺疊時隱藏，字幕列表佔滿寬度）
   const showLeftPanel = hasVideo && !videoCollapsed;
 
-  // 外部触发器状态
+  // 外部觸發器狀態
   const [triggerAiOptimize, setTriggerAiOptimize] = useState(false);
   const [triggerSplit, setTriggerSplit] = useState(false);
 
-  // 处理从字幕列表点击 AI 优化按钮
+  // 處理從字幕列表點擊 AI 優化按鈕
   const handleAiOptimizeClick = useCallback(
     (index: number) => {
       handleSubtitleClick(index);
-      // 使用 setTimeout 确保 currentSubtitleIndex 已更新
+      // 使用 setTimeout 確保 currentSubtitleIndex 已更新
       setTimeout(() => {
         setTriggerAiOptimize(true);
       }, 0);
@@ -208,11 +208,11 @@ export default function ProofreadEditor({
     [handleSubtitleClick],
   );
 
-  // 处理从字幕列表点击拆分按钮
+  // 處理從字幕列表點擊拆分按鈕
   const handleSplitClick = useCallback(
     (index: number) => {
       handleSubtitleClick(index);
-      // 使用 setTimeout 确保 currentSubtitleIndex 已更新
+      // 使用 setTimeout 確保 currentSubtitleIndex 已更新
       setTimeout(() => {
         setTriggerSplit(true);
       }, 0);
@@ -220,16 +220,16 @@ export default function ProofreadEditor({
     [handleSubtitleClick],
   );
 
-  // 重置触发器
+  // 重置觸發器
   const handleTriggerHandled = useCallback(() => {
     setTriggerAiOptimize(false);
     setTriggerSplit(false);
   }, []);
 
-  // 未保存修改守卫
+  // 未保存修改守衛
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
-  // 返回列表：有未保存修改时先拦截
+  // 返回列表：有未保存修改時先攔截
   const handleBackClick = useCallback(() => {
     if (isDirty) {
       setShowUnsavedDialog(true);
@@ -259,16 +259,16 @@ export default function ProofreadEditor({
     return () => window.removeEventListener('beforeunload', handler);
   }, [isDirty]);
 
-  // 标记完成隐含保存：保证完成态文件与界面一致；保存失败则留在编辑器
+  // 標記完成隱含保存：保證完成態文件與界面一致；保存失敗則留在編輯器
   const handleMarkCompleteClick = useCallback(async () => {
     const ok = await handleSave();
     if (ok) onMarkComplete();
   }, [handleSave, onMarkComplete]);
 
-  // Cmd/Ctrl+F：递增 token 通知工具栏展开搜索替换
+  // Cmd/Ctrl+F：遞增 token 通知工具欄展開搜索替換
   const [searchOpenToken, setSearchOpenToken] = useState(0);
 
-  // 编辑器快捷键（4.3 清单）
+  // 編輯器快捷鍵（4.3 清單）
   useHotkeys([
     { combo: 'mod+s', allowInInput: true, handler: () => void handleSave() },
     {
@@ -322,7 +322,7 @@ export default function ProofreadEditor({
   return (
     <div className="h-full flex flex-col">
       <div className="sticky top-0 z-10 flex-shrink-0 bg-background border-b">
-        {/* 顶部工具栏 */}
+        {/* 頂部工具欄 */}
         <TooltipProvider>
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
@@ -381,7 +381,7 @@ export default function ProofreadEditor({
           </div>
         </TooltipProvider>
 
-        {/* 编辑工具栏 */}
+        {/* 編輯工具欄 */}
         <SubtitleEditToolbar
           subtitles={mergedSubtitles}
           onSubtitlesChange={updateSubtitles}
@@ -409,16 +409,16 @@ export default function ProofreadEditor({
         />
       </div>
 
-      {/* 主内容区 - 复用原有布局 */}
+      {/* 主內容區 - 複用原有佈局 */}
       <div
         className={`grid gap-2 flex-1 overflow-auto min-h-0 p-4 ${
           showLeftPanel ? 'grid-cols-2' : 'grid-cols-1'
         }`}
       >
-        {/* 左侧：视频播放器和控制区域 */}
+        {/* 左側：影片播放器和控制區域 */}
         {showLeftPanel && (
           <div className="flex flex-col overflow-auto min-h-0">
-            {/* 视频播放器组件 */}
+            {/* 影片播放器組件 */}
             <VideoPlayer
               videoPath={videoPath}
               playerRef={playerRef}
@@ -435,7 +435,7 @@ export default function ProofreadEditor({
               subtitleTracks={subtitleTracksForPlayer}
             />
 
-            {/* 视频信息和字幕统计组件 */}
+            {/* 影片信息和字幕統計組件 */}
             <VideoInfo
               fileName={videoInfo.fileName}
               extension={videoInfo.extension}
@@ -446,7 +446,7 @@ export default function ProofreadEditor({
           </div>
         )}
 
-        {/* 右侧/全屏：字幕列表组件 */}
+        {/* 右側/全屏：字幕列表組件 */}
         <SubtitleList
           mergedSubtitles={mergedSubtitles}
           currentSubtitleIndex={currentSubtitleIndex}
@@ -468,7 +468,7 @@ export default function ProofreadEditor({
         />
       </div>
 
-      {/* 底部快捷键提示条 */}
+      {/* 底部快捷鍵提示條 */}
       <div className="flex-shrink-0 flex items-center justify-center gap-3 border-t bg-muted/30 px-4 py-1 text-[11px] text-muted-foreground select-none">
         {hasVideo && (
           <span>
@@ -494,7 +494,7 @@ export default function ProofreadEditor({
         </span>
       </div>
 
-      {/* 未保存修改确认对话框 */}
+      {/* 未保存修改確認對話框 */}
       <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

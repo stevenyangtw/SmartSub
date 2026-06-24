@@ -46,7 +46,7 @@ function findWorkItemByFileUuid(uuid: string) {
 }
 
 /**
- * 主进程侧镜像任务执行事件到 WorkItem 存储。
+ * 主進程側鏡像任務執行事件到 WorkItem 存儲。
  */
 export function applyTaskEventToProjects(
   channel: string,
@@ -89,7 +89,7 @@ export function applyTaskEventToProjects(
   });
 }
 
-/** @deprecated 请使用 getWorkItems；保留兼容 shim */
+/** @deprecated 請使用 getWorkItems；保留兼容 shim */
 export function setupTaskManager() {
   ipcMain.handle('getTaskProjects', () => listTaskProjects());
 

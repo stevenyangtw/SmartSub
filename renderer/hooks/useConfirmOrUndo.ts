@@ -3,9 +3,9 @@ import { useTranslation } from 'next-i18next';
 import { toast } from 'sonner';
 
 /**
- * 危险操作统一交互：立即执行 + 5 秒撤销 toast（Linear/Notion 模式）。
+ * 危險操作統一交互：立即執行 + 5 秒撤銷 toast（Linear/Notion 模式）。
  *
- * 调用方先自行快照旧状态并应用变更，再调用本函数给出撤销入口：
+ * 調用方先自行快照舊狀態並應用變更，再調用本函數給出撤銷入口：
  *
  *   const confirmOrUndo = useConfirmOrUndo();
  *   const prev = files;

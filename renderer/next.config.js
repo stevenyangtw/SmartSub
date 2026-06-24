@@ -9,10 +9,10 @@ module.exports = {
   output: 'export',
   distDir: process.env.NODE_ENV === 'production' ? '../app' : '.next',
   webpack: (config, { isServer }) => {
-    // 添加 types 目录到 webpack 解析路径
+    // 添加 types 目錄到 webpack 解析路徑
     config.resolve.modules.push(path.resolve('./types'));
 
-    // 确保 TypeScript 文件被正确处理
+    // 確保 TypeScript 文件被正確處理
     config.module.rules.push({
       test: /\.tsx?$/,
       use: [

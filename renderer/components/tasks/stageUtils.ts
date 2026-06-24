@@ -10,7 +10,7 @@ export interface StageDef {
   labelKey: string;
 }
 
-/** 按任务类型 + 输入文件种类推导该文件要经过的阶段 */
+/** 按任務類型 + 輸入文件種類推導該文件要經過的階段 */
 export function getFileStages(
   file: any,
   typeDef: TaskTypeDef,
@@ -36,7 +36,7 @@ export function getStageStatus(file: any, key: StageKey): StageStatus {
   return 'pending';
 }
 
-/** 文件整体进度（0-100）：完成阶段均摊 + 当前阶段按其进度折算 */
+/** 文件整體進度（0-100）：完成階段均攤 + 當前階段按其進度折算 */
 export function getFilePercent(file: any, stages: StageDef[]): number {
   if (!stages.length) return 0;
   let total = 0;
@@ -78,7 +78,7 @@ export function getFileError(file: any, stages: StageDef[]): string {
   return '';
 }
 
-/** 校对解锁条件（沿用旧 TaskList 逻辑） */
+/** 校對解鎖條件（沿用舊 TaskList 邏輯） */
 export function isProofreadReady(file: any, typeDef: TaskTypeDef): boolean {
   if (typeDef.taskType === 'generateOnly') {
     return file?.extractSubtitle === 'done';
@@ -86,12 +86,12 @@ export function isProofreadReady(file: any, typeDef: TaskTypeDef): boolean {
   return file?.translateSubtitle === 'done';
 }
 
-/** 打开所在文件夹时优先揭示的产物路径 */
+/** 打開所在資料夾時優先揭示的產物路徑 */
 export function getRevealPath(file: any): string {
   return file?.translatedSrtFile || file?.srtFile || file?.filePath || '';
 }
 
-/** 字节数转人类可读（如 1.5 MB）；无效值返回空串 */
+/** 字節數轉人類可讀（如 1.5 MB）；無效值返回空串 */
 export function formatBytes(bytes?: number): string {
   if (!bytes || bytes <= 0) return '';
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -104,7 +104,7 @@ export function formatBytes(bytes?: number): string {
   return `${value >= 10 || unit === 0 ? Math.round(value) : value.toFixed(1)} ${units[unit]}`;
 }
 
-/** 秒转 h:mm:ss / m:ss；无效值返回空串 */
+/** 秒轉 h:mm:ss / m:ss；無效值返回空串 */
 export function formatMediaDuration(sec?: number): string {
   if (!sec || sec <= 0) return '';
   const total = Math.round(sec);

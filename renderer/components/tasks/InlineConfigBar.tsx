@@ -51,7 +51,7 @@ function ConfigItem({
 }
 
 const triggerClass = 'h-8 w-auto min-w-[120px] max-w-[200px] text-xs gap-1';
-// 模型选择器需容纳「引擎 · 模型」两段文本，略宽于其它选择器
+// 模型選擇器需容納「引擎 · 模型」兩段文本，略寬於其它選擇器
 const modelTriggerClass =
   'h-8 w-auto min-w-[160px] max-w-[260px] text-xs gap-1';
 
@@ -73,10 +73,10 @@ const InlineConfigBar: React.FC<InlineConfigBarProps> = ({
     form.setValue(name, value);
   };
 
-  // localCli 走"自备模型/命令"路径，无可下载模型，按是否启用 localCli 决定是否进分组下拉。
-  // 过渡期沿用 useLocalWhisper 作为 localCli 启用信号（全局字段移除时改用 localCli 已配置判断）。
+  // localCli 走"自備模型/命令"路徑，無可下載模型，按是否啟用 localCli 決定是否進分組下拉。
+  // 過渡期沿用 useLocalWhisper 作為 localCli 啟用信號（全局字段移除時改用 localCli 已配置判斷）。
   const includeLocalCli = useLocalWhisper;
-  // 就绪 = 跨引擎任一已装模型，或启用了 localCli（自备模型）；否则引导去下载。
+  // 就緒 = 跨引擎任一已裝模型，或啟用了 localCli（自備模型）；否則引導去下載。
   const hasModels = hasAnyModelAnyEngine(systemInfo) || includeLocalCli;
 
   const languageItems = (includeAuto: boolean) => (

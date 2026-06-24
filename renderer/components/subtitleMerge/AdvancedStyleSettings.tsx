@@ -1,5 +1,5 @@
 /**
- * 高级样式设置组件
+ * 高級樣式設置組件
  */
 
 import React from 'react';
@@ -54,7 +54,7 @@ export default function AdvancedStyleSettings({
         />
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-4 pt-2">
-        {/* 字体样式开关 */}
+        {/* 字體樣式開關 */}
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Switch
@@ -93,7 +93,7 @@ export default function AdvancedStyleSettings({
           </div>
         </div>
 
-        {/* 边框样式 */}
+        {/* 邊框樣式 */}
         <div className="space-y-2">
           <Label className="text-sm">{t('borderStyle')}</Label>
           <Select
@@ -116,7 +116,7 @@ export default function AdvancedStyleSettings({
           </Select>
         </div>
 
-        {/* 边框宽度 */}
+        {/* 邊框寬度 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-sm">{t('outline')}</Label>
@@ -134,7 +134,7 @@ export default function AdvancedStyleSettings({
           />
         </div>
 
-        {/* 阴影距离 */}
+        {/* 陰影距離 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-sm">{t('shadow')}</Label>
@@ -152,7 +152,7 @@ export default function AdvancedStyleSettings({
           />
         </div>
 
-        {/* 背景颜色 */}
+        {/* 背景顏色 */}
         <div className="space-y-2">
           <Label className="text-sm">{t('backgroundColor')}</Label>
           <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ export default function AdvancedStyleSettings({
           </div>
         </div>
 
-        {/* 边距设置 */}
+        {/* 邊距設置 */}
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2">
             <Label className="text-sm">{t('marginLeft')}</Label>

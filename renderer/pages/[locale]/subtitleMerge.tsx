@@ -1,5 +1,5 @@
 /**
- * 视频合并字幕页面
+ * 影片合併字幕頁面
  */
 
 import React from 'react';
@@ -13,9 +13,9 @@ export default function SubtitleMergePage() {
   const { t } = useTranslation('subtitleMerge');
   const router = useRouter();
 
-  // 合成成功/失败均由面板内预览浮层呈现，不再额外弹 toast
+  // 合成成功/失敗均由面板內預覽浮層呈現，不再額外彈 toast
 
-  // 等 query 就绪再挂载面板，保证衔接入口的预填参数能进入初始状态
+  // 等 query 就緒再掛載面板，保證銜接入口的預填參數能進入初始狀態
   if (!router.isReady) return null;
 
   const initialVideoPath =

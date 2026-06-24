@@ -15,7 +15,7 @@ function getItem<T = object>(key: string, initialValue = ''): T | string {
   }
 }
 /**
- * 删除
+ * 刪除
  */
 const removeItem = (key: string) => {
   if (store[key]) {

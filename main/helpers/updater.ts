@@ -3,17 +3,17 @@ import { autoUpdater } from 'electron-updater';
 import { store } from './store';
 import { logMessage } from './logger';
 
-// 配置自动更新
-autoUpdater.autoDownload = false; // 不自动下载，让用户决定
+// 配置自動更新
+autoUpdater.autoDownload = false; // 不自動下載，讓用戶決定
 
-autoUpdater.autoInstallOnAppQuit = true; // 应用退出时自动安装
+autoUpdater.autoInstallOnAppQuit = true; // 應用退出時自動安裝
 
-// 针对未签名应用的配置
-// autoUpdater.allowPrerelease = false; // 允许预发布版本
-autoUpdater.forceDevUpdateConfig = true; // 强制使用开发配置，绕过签名验证
-// autoUpdater.allowDowngrade = true; // 允许降级安装，有助于解决某些版本问题
+// 針對未簽名應用的配置
+// autoUpdater.allowPrerelease = false; // 允許預發佈版本
+autoUpdater.forceDevUpdateConfig = true; // 強制使用開發配置，繞過簽名驗證
+// autoUpdater.allowDowngrade = true; // 允許降級安裝，有助於解決某些版本問題
 
-// 日志设置
+// 日誌設置
 autoUpdater.logger = {
   info: (message) => logMessage(`[Updater] ${message}`, 'info'),
   warn: (message) => logMessage(`[Updater] ${message}`, 'warning'),
@@ -24,26 +24,26 @@ autoUpdater.logger = {
 import { getBuildInfo } from './buildInfo';
 
 export function setupAutoUpdater(mainWindow: BrowserWindow) {
-  // 针对Mac平台的特殊处理
+  // 針對Mac平臺的特殊處理
   const isMacOS = process.platform === 'darwin';
-  const buildInfo = getBuildInfo(); // buildInfo 仍用于日志记录
+  const buildInfo = getBuildInfo(); // buildInfo 仍用於日誌記錄
 
-  // 如果是Mac平台，禁用自动下载和安装
+  // 如果是Mac平臺，禁用自動下載和安裝
   if (isMacOS) {
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
   }
 
-  // 设置更新通道：所有构建（含 beta 等预发布版本）都只跟踪稳定通道。
-  // 预发布版本若不显式关闭 allowPrerelease，electron-updater 会从
-  // releases.atom（包含未发 release 的裸 tag）解析出 beta tag 自身，
-  // 再去请求其名下不存在的 latest-mac.yml 而报 404。
-  // 关闭后 beta 安装包静默无更新，待下一个稳定版发布时正常收到提示。
+  // 設置更新通道：所有構建（含 beta 等預發佈版本）都只跟蹤穩定通道。
+  // 預發佈版本若不顯式關閉 allowPrerelease，electron-updater 會從
+  // releases.atom（包含未發 release 的裸 tag）解析出 beta tag 自身，
+  // 再去請求其名下不存在的 latest-mac.yml 而報 404。
+  // 關閉後 beta 安裝包靜默無更新，待下一個穩定版發佈時正常收到提示。
   autoUpdater.channel = 'latest';
   autoUpdater.allowPrerelease = false;
   logMessage(`Setting update channel to: ${autoUpdater.channel}`, 'info');
 
-  // 检查更新（失败反馈统一由 renderer 依据 update-status error 事件呈现）
+  // 檢查更新（失敗反饋統一由 renderer 依據 update-status error 事件呈現）
   const checkForUpdates = async () => {
     try {
       logMessage(
@@ -58,13 +58,13 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
     }
   };
 
-  // 设置自动更新事件处理
+  // 設置自動更新事件處理
   autoUpdater.on('checking-for-update', () => {
     mainWindow.webContents.send('update-status', { status: 'checking' });
   });
 
   autoUpdater.on('update-available', (info) => {
-    // 只通知渲染进程，不弹出系统对话框，由渲染进程的 UpdateDialog 组件处理
+    // 只通知渲染進程，不彈出系統對話框，由渲染進程的 UpdateDialog 組件處理
     mainWindow.webContents.send('update-status', {
       status: 'available',
       version: info.version,
@@ -83,7 +83,7 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
     });
   });
 
-  // 安装提示仅由 renderer 的 toast（带「立即安装」动作）承担，不再叠加原生 dialog
+  // 安裝提示僅由 renderer 的 toast（帶「立即安裝」動作）承擔，不再疊加原生 dialog
   autoUpdater.on('update-downloaded', (info) => {
     mainWindow.webContents.send('update-status', {
       status: 'downloaded',
@@ -98,22 +98,22 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
       error: error.message,
     });
 
-    // 当自动更新出错时，提供手动下载选项
+    // 當自動更新出錯時，提供手動下載選項
     // if (process.platform === 'darwin') {
-    //   // 针对Mac平台的特殊处理
+    //   // 針對Mac平臺的特殊處理
     //   dialog
     //     .showMessageBox(mainWindow, {
     //       type: 'info',
-    //       title: '更新失败',
-    //       message: '自动更新失败',
+    //       title: '更新失敗',
+    //       message: '自動更新失敗',
     //       detail:
-    //         '由于macOS系统限制，自动更新失败。您可以手动下载并安装最新版本。',
-    //       buttons: ['手动下载', '取消'],
+    //         '由於macOS系統限制，自動更新失敗。您可以手動下載並安裝最新版本。',
+    //       buttons: ['手動下載', '取消'],
     //       cancelId: 1,
     //     })
     //     .then(({ response }) => {
     //       if (response === 0) {
-    //         // 打开GitHub发布页面，让用户手动下载
+    //         // 打開GitHub發佈頁面，讓用戶手動下載
     //         const releaseUrl =
     //           'https://github.com/buxuku/SmartSub/releases/latest';
     //         require('electron').shell.openExternal(releaseUrl);
@@ -122,15 +122,15 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
     // }
   });
 
-  // 设置IPC处理程序
+  // 設置IPC處理程序
   ipcMain.handle('check-for-updates', async () => {
     return checkForUpdates();
   });
 
   ipcMain.handle('download-update', async () => {
-    // 针对Mac平台的特殊处理
+    // 針對Mac平臺的特殊處理
     if (process.platform === 'darwin') {
-      // 打开GitHub发布页面，让用户手动下载
+      // 打開GitHub發佈頁面，讓用戶手動下載
       const releaseUrl = 'https://github.com/buxuku/SmartSub/releases/latest';
       require('electron').shell.openExternal(releaseUrl);
       return { success: true, manualDownload: true };
@@ -150,12 +150,12 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
     return { success: true };
   });
 
-  // 启动时检查更新（可选，根据用户设置）
+  // 啟動時檢查更新（可選，根據用戶設置）
   const settings = store.get('settings');
-  const checkUpdateOnStartup = settings?.checkUpdateOnStartup !== false; // 默认为true
+  const checkUpdateOnStartup = settings?.checkUpdateOnStartup !== false; // 預設為true
 
   if (checkUpdateOnStartup) {
-    // 延迟几秒检查更新，让应用先启动完成
+    // 延遲幾秒檢查更新，讓應用先啟動完成
     setTimeout(() => {
       checkForUpdates();
     }, 5000);

@@ -1,6 +1,6 @@
 /**
- * 各引擎转写实现共用的纯工具：数值兜底、语言归一、SRT 时间格式化、VAD 设置归一。
- * 不依赖任何引擎实现，供 builtin / faster-whisper / localCli 适配器复用。
+ * 各引擎轉寫實現共用的純工具：數值兜底、語言歸一、SRT 時間格式化、VAD 設置歸一。
+ * 不依賴任何引擎實現，供 builtin / faster-whisper / localCli 適配器複用。
  */
 
 export function getNumericSetting(
@@ -16,9 +16,9 @@ export function getWhisperLanguage(language?: string): string {
   }
 
   const normalized = language.toLowerCase();
-  // 所有中文变体（简体/繁体/台湾/香港等）统一映射为 zh，
-  // Whisper 对 zh 的训练数据最充分，识别国语/普通话最准确；
-  // 粤语请通过下拉框单独选择 yue 传入。
+  // 所有中文變體（簡體/繁體/臺灣/香港等）統一映射為 zh，
+  // Whisper 對 zh 的訓練數據最充分，識別國語/普通話最準確；
+  // 粵語請通過下拉框單獨選擇 yue 傳入。
   if (normalized.startsWith('zh')) {
     return 'zh';
   }
@@ -46,7 +46,7 @@ export interface VadSettings {
   vadSamplesOverlap: number;
 }
 
-/** 抗幻觉/抗重复总开关（全局设置 settings.reduceRepetition）。 */
+/** 抗幻覺/抗重複總開關（全局設置 settings.reduceRepetition）。 */
 export function isReduceRepetitionEnabled(
   settings: Record<string, unknown> | undefined,
 ): boolean {
@@ -54,11 +54,11 @@ export function isReduceRepetitionEnabled(
 }
 
 /**
- * faster-whisper 的抗幻觉/抗重复参数包：仅在开关开启时返回覆盖值，
- * 关闭时返回空对象（sidecar 缺键回落 faster-whisper 默认，行为不变）。
- * - condition_on_previous_text=false：断开上文喂入，最有效地打断重复/幻觉级联
- * - no_repeat_ngram_size=3 / repetition_penalty=1.1：禁止重复 n-gram、惩罚重复 token
- * - hallucination_silence_threshold=2.0：跳过长静音（依赖 word_timestamps，已开）
+ * faster-whisper 的抗幻覺/抗重複參數包：僅在開關開啟時返回覆蓋值，
+ * 關閉時返回空對象（sidecar 缺鍵回落 faster-whisper 預設，行為不變）。
+ * - condition_on_previous_text=false：斷開上文喂入，最有效地打斷重複/幻覺級聯
+ * - no_repeat_ngram_size=3 / repetition_penalty=1.1：禁止重複 n-gram、懲罰重複 token
+ * - hallucination_silence_threshold=2.0：跳過長靜音（依賴 word_timestamps，已開）
  */
 export function getFasterWhisperAntiRepetitionParams(
   settings: Record<string, unknown> | undefined,
@@ -72,7 +72,7 @@ export function getFasterWhisperAntiRepetitionParams(
   };
 }
 
-/** 从 store 的 settings 归一化出 VAD 参数（各引擎再映射到自己的字段名）。 */
+/** 從 store 的 settings 歸一化出 VAD 參數（各引擎再映射到自己的字段名）。 */
 export function getVadSettings(settings: Record<string, unknown>): VadSettings {
   return {
     useVAD: settings?.useVAD !== false,

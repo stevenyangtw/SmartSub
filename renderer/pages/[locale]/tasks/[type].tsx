@@ -78,11 +78,11 @@ export default function TaskPage() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const { systemInfo } = useSystemInfo();
   const { form, formData } = useFormConfig();
-  /** 来自加载（而非用户/任务事件）的 files 引用，避免回写存储 */
+  /** 來自加載（而非用戶/任務事件）的 files 引用，避免回寫存儲 */
   const loadedFilesRef = useRef<any[] | null>(null);
   const projectIdRef = useRef<string | null>(null);
 
-  // 统一导入入口：按 filePath 去重（对既有列表与本批内部），跳过时提示
+  // 統一導入入口：按 filePath 去重（對既有列表與本批內部），跳過時提示
   const appendFiles = useCallback(
     (incoming: IFiles[]) => {
       if (!incoming?.length) return;
@@ -126,7 +126,7 @@ export default function TaskPage() {
     load();
   }, []);
 
-  // 任务状态按工程获取与监听
+  // 任務狀態按工程獲取與監聽
   useEffect(() => {
     if (!projectId) return;
     let disposed = false;
@@ -150,12 +150,12 @@ export default function TaskPage() {
     };
   }, [projectId]);
 
-  // 解析任务工程：带 ?project= 恢复既有工程，否则开新工程
+  // 解析任務工程：帶 ?project= 恢復既有工程，否則開新工程
   useEffect(() => {
     if (!router.isReady || !typeDef) return;
     const q =
       typeof router.query.project === 'string' ? router.query.project : '';
-    if (q && q === projectIdRef.current) return; // 首次保存后 URL 回填触发，无需重载
+    if (q && q === projectIdRef.current) return; // 首次保存後 URL 回填觸發，無需重載
 
     let cancelled = false;
     (async () => {
@@ -183,7 +183,7 @@ export default function TaskPage() {
     };
   }, [router.isReady, router.query.project, slug, typeDef]);
 
-  // ?autostart=1 一次性消费进 state 并从 URL 剥离:避免刷新/回退重新触发自动开始
+  // ?autostart=1 一次性消費進 state 並從 URL 剝離:避免刷新/回退重新觸發自動開始
   const [autoStartPending, setAutoStartPending] = useState(false);
   useEffect(() => {
     if (!router.isReady) return;
@@ -197,7 +197,7 @@ export default function TaskPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, router.query.autostart]);
 
-  // files 变更持久化到任务工程（清空即删除工程）
+  // files 變更持久化到任務工程（清空即刪除工程）
   useEffect(() => {
     if (!projectId || !typeDef) return;
     if (loadedFilesRef.current === files) return;
@@ -221,7 +221,7 @@ export default function TaskPage() {
     })();
   }, [files, projectId]);
 
-  // 进入任务页 = 选择任务类型：同步到持久化配置
+  // 進入任務頁 = 選擇任務類型：同步到持久化配置
   useEffect(() => {
     if (!typeDef) return;
     if (
@@ -233,10 +233,10 @@ export default function TaskPage() {
     }
   }, [typeDef, formData, form]);
 
-  // 带翻译的任务类型不存在「不翻译」：清理历史残留 '-1' 或已被删除的服务商 id
+  // 帶翻譯的任務類型不存在「不翻譯」：清理歷史殘留 '-1' 或已被刪除的服務商 id
   useEffect(() => {
     if (!typeDef?.hasTranslate || !providers.length) return;
-    if (!formData || Object.keys(formData).length === 0) return; // 配置未加载完
+    if (!formData || Object.keys(formData).length === 0) return; // 配置未加載完
     const current = formData?.translateProvider;
     const valid = providers.some((p: any) => p.id === current);
     if (current && current !== '-1' && valid) return;
@@ -247,16 +247,16 @@ export default function TaskPage() {
     form.setValue('translateProvider', defaultId);
   }, [typeDef, providers, formData?.translateProvider, form]);
 
-  // 默认 (引擎,模型)：取"上次使用"（缺省 builtin + 该引擎首个可用模型），并校验当前
-  // (引擎,模型) 仍在分组选项中；失配/未选则回填默认值，避免空模型或悬空引擎直接开跑报错。
-  // systemInfo / useLocalWhisper / lastUsed 变化时复跑，修正残留旧选择。
+  // 預設 (引擎,模型)：取"上次使用"（缺省 builtin + 該引擎首個可用模型），並校驗當前
+  // (引擎,模型) 仍在分組選項中；失配/未選則回填預設值，避免空模型或懸空引擎直接開跑報錯。
+  // systemInfo / useLocalWhisper / lastUsed 變化時復跑，修正殘留舊選擇。
   useEffect(() => {
     if (!typeDef?.needsModel) return;
-    if (!formData || Object.keys(formData).length === 0) return; // 配置未加载完
+    if (!formData || Object.keys(formData).length === 0) return; // 配置未加載完
     const groups = getEngineModelGroups(systemInfo, {
       includeLocalCli: useLocalWhisper,
     });
-    if (!groups.length) return; // 无可选：保持空，InlineConfigBar 展示「去下载模型」
+    if (!groups.length) return; // 無可選：保持空，InlineConfigBar 展示「去下載模型」
 
     const currentEngine = formData.transcriptionEngine as
       | TranscriptionEngine
@@ -289,8 +289,8 @@ export default function TaskPage() {
     form,
   ]);
 
-  // 「仅生成字幕」任务的源字幕就是最终交付物，不能用 noSave（任务结束会被清理删除）。
-  // 修正默认/历史残留的 noSave 或空值，避免视频目录最终没有字幕文件，且下拉框不再显示为空。
+  // 「僅生成字幕」任務的源字幕就是最終交付物，不能用 noSave（任務結束會被清理刪除）。
+  // 修正預設/歷史殘留的 noSave 或空值，避免影片目錄最終沒有字幕文件，且下拉框不再顯示為空。
   useEffect(() => {
     if (typeDef?.taskType !== 'generateOnly') return;
     if (!formData || Object.keys(formData).length === 0) return;
@@ -300,7 +300,7 @@ export default function TaskPage() {
     }
   }, [typeDef, formData?.sourceSrtSaveOption, form]);
 
-  // 新一轮任务开始时恢复完成横幅
+  // 新一輪任務開始時恢復完成橫幅
   useEffect(() => {
     if (taskStatus === 'running') setBannerDismissed(false);
   }, [taskStatus]);
@@ -339,12 +339,12 @@ export default function TaskPage() {
     window?.ipc?.send('openDialog', { dialogType: 'openDialog', fileType });
   };
 
-  // Cmd/Ctrl+O 导入文件（任务页范围）
+  // Cmd/Ctrl+O 導入文件（任務頁範圍）
   useHotkeys([
     { combo: 'mod+o', allowInInput: true, handler: () => handleImport() },
   ]);
 
-  // 任务运行/取消中禁止破坏性列表操作（删行/清空），避免主进程仍处理已移除文件
+  // 任務運行/取消中禁止破壞性列表操作（刪行/清空），避免主進程仍處理已移除文件
   const queueBusy =
     taskStatus === 'running' ||
     taskStatus === 'paused' ||
@@ -394,7 +394,7 @@ export default function TaskPage() {
     const paths: string[] = [];
     const droppedFiles = e.dataTransfer.files;
     for (let i = 0; i < droppedFiles.length; i++) {
-      // Electron 32+ 移除 File.path，优先 webUtils；旧 preload 场景回退 .path
+      // Electron 32+ 移除 File.path，優先 webUtils；舊 preload 場景回退 .path
       const filePath =
         window?.ipc?.getPathForFile?.(droppedFiles[i]) ??
         (droppedFiles[i] as any).path;
@@ -415,7 +415,7 @@ export default function TaskPage() {
     }
   };
 
-  // 将 IFiles 转换为 ProofreadEditor 需要的 PendingFile 格式（沿用原 home 逻辑）
+  // 將 IFiles 轉換為 ProofreadEditor 需要的 PendingFile 格式（沿用原 home 邏輯）
   const pendingFileForProofread = useMemo(() => {
     if (!proofreadFile || !typeDef) return null;
 

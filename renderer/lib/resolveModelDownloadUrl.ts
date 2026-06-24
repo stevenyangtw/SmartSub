@@ -1,9 +1,9 @@
 /**
- * 通过主进程解析「可复制的下载链接」（按引擎域 + 模型 + 当前选中源）。
+ * 通過主進程解析「可複製的下載鏈接」（按引擎域 + 模型 + 當前選中源）。
  *
- * 链接构造逻辑集中在主进程各 catalog，renderer 仅薄封装一次 IPC，避免重复实现
- * 导致与真实下载链接漂移。解析失败（未知模型/源、IPC 异常）统一返回 null，
- * 由调用方（气泡复制按钮）给出失败提示。
+ * 鏈接構造邏輯集中在主進程各 catalog，renderer 僅薄封裝一次 IPC，避免重複實現
+ * 導致與真實下載鏈接漂移。解析失敗（未知模型/源、IPC 異常）統一返回 null，
+ * 由調用方（氣泡複製按鈕）給出失敗提示。
  */
 export type ModelUrlScope = 'funasr' | 'qwen' | 'firered' | 'pyEngine';
 
@@ -11,7 +11,7 @@ export async function resolveModelDownloadUrl(
   scope: ModelUrlScope,
   source: string,
   modelId?: string,
-  /** pyEngine 域专用：cpu=默认包，cuda=Full GPU 包（影响复制的资产直链）。 */
+  /** pyEngine 域專用：cpu=預設包，cuda=Full GPU 包（影響複製的資產直鏈）。 */
   variant?: 'cpu' | 'cuda',
 ): Promise<string | null> {
   try {

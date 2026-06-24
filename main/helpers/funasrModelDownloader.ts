@@ -26,12 +26,12 @@ interface HfTreeEntry {
 
 const CONNECT_TIMEOUT = 30_000;
 
-/** 进度 key：funasr:<modelId>，与 ct2:<id> 同构，渲染层按前缀路由。 */
+/** 進度 key：funasr:<modelId>，與 ct2:<id> 同構，渲染層按前綴路由。 */
 export function getFunasrProgressKey(id: FunasrModelId): string {
   return `funasr:${id}`;
 }
 
-/** 镜像优先：hf-mirror.com（国内快）→ huggingface.co。base（含协议）取自可配置端点。 */
+/** 鏡像優先：hf-mirror.com（國內快）→ huggingface.co。base（含協議）取自可配置端點。 */
 function getHosts(source?: string): string[] {
   return getHfHosts(source);
 }
@@ -145,7 +145,7 @@ export class FunasrModelDownloader {
     this.currentKey = key;
     this.abortController = new AbortController();
 
-    // files 模式（silero-vad）：按候选 URL 顺序下单个小文件。
+    // files 模式（silero-vad）：按候選 URL 順序下單個小文件。
     if (spec.files && spec.files.length > 0) {
       return this.downloadFilesMode(id, spec, destDir, key);
     }
@@ -219,7 +219,7 @@ export class FunasrModelDownloader {
           this.update({ downloaded });
         }
 
-        // 全部下完后校验关键文件齐全。
+        // 全部下完後校驗關鍵文件齊全。
         if (!isFunasrModelInstalled(id)) {
           throw new Error(
             `download finished but required files missing for ${id}: ${spec.requiredFiles.join(', ')}`,
@@ -258,7 +258,7 @@ export class FunasrModelDownloader {
     throw lastError instanceof Error ? lastError : new Error(String(lastError));
   }
 
-  /** files 模式：逐文件按候选 URL 顺序回退下载（用于 silero_vad.onnx 这类单文件）。 */
+  /** files 模式：逐文件按候選 URL 順序回退下載（用於 silero_vad.onnx 這類單文件）。 */
   private async downloadFilesMode(
     id: FunasrModelId,
     spec: (typeof FUNASR_MODELS)[FunasrModelId],
@@ -275,7 +275,7 @@ export class FunasrModelDownloader {
     for (const f of spec.files || []) {
       const dest = path.join(destDir, f.name);
       if (fs.existsSync(dest) && fs.statSync(dest).size > 0) continue;
-      // 候选 URL 运行时按可配置端点生成；为空时回退 spec 内静态兜底。
+      // 候選 URL 運行時按可配置端點生成；為空時回退 spec 內靜態兜底。
       const runtimeUrls = getFunasrFileUrls(id, f.name);
       const urls = runtimeUrls.length > 0 ? runtimeUrls : (f.urls ?? []);
       let ok = false;

@@ -4,7 +4,7 @@ import { app } from 'electron';
 import { getDownloadEndpoints } from './config/downloadConfig';
 import { resolveOverridePath, resolveBundledVadPath } from './modelImport';
 
-/** funasr 模型根目录：userData/models/funasr */
+/** funasr 模型根目錄：userData/models/funasr */
 export function getFunasrModelsRoot(): string {
   const { store } = require('./store') as typeof import('./store');
   const fallback = path.join(app.getPath('userData'), 'models', 'funasr');
@@ -16,34 +16,34 @@ export function getFunasrModelsRoot(): string {
   return root;
 }
 
-/** funasr 子模型标识（与本地子目录一一对应）。 */
+/** funasr 子模型標識（與本地子目錄一一對應）。 */
 export type FunasrModelId = 'sensevoice-small' | 'paraformer-zh' | 'silero-vad';
 
-/** ASR 模型底层类型，决定 sidecar 走 from_sense_voice / from_paraformer。 */
+/** ASR 模型底層類型，決定 sidecar 走 from_sense_voice / from_paraformer。 */
 export type FunasrModelType = 'sense_voice' | 'paraformer';
 
 /**
- * 两种下载模式：
- * - repo：从 HF（镜像）仓库按 tree 下载子集（keepFiles）。
- * - files：按显式候选 URL 顺序回退下单个文件（silero 这类 release 资产）。
+ * 兩種下載模式：
+ * - repo：從 HF（鏡像）倉庫按 tree 下載子集（keepFiles）。
+ * - files：按顯式候選 URL 順序回退下單個文件（silero 這類 release 資產）。
  */
 export interface FunasrModelSpec {
   id: FunasrModelId;
   dirName: string;
-  /** 'asr' 进入模型下拉并参与转写；'vad' 为共用基础组件，不进下拉。 */
+  /** 'asr' 進入模型下拉並參與轉寫；'vad' 為共用基礎組件，不進下拉。 */
   kind: 'asr' | 'vad';
-  /** ASR 模型的底层加载类型（kind==='asr' 时必填）。 */
+  /** ASR 模型的底層加載類型（kind==='asr' 時必填）。 */
   modelType?: FunasrModelType;
-  /** 判定「已安装」必须存在的关键文件 */
+  /** 判定「已安裝」必須存在的關鍵文件 */
   requiredFiles: string[];
-  /** HF（镜像）仓库 id（repo 模式） */
+  /** HF（鏡像）倉庫 id（repo 模式） */
   repo?: string;
-  /** 仅保留这些文件，省带宽（repo 模式；缺省下载全部非点文件） */
+  /** 僅保留這些文件，省帶寬（repo 模式；缺省下載全部非點文件） */
   keepFiles?: string[];
   /**
-   * files 模式的待下载文件列表（按 name 逐个下载）。
-   * 候选 URL 由 getFunasrFileUrls() 在运行时按可配置端点生成；
-   * urls 仅作为可选的静态兜底（一般留空）。
+   * files 模式的待下載文件列表（按 name 逐個下載）。
+   * 候選 URL 由 getFunasrFileUrls() 在運行時按可配置端點生成；
+   * urls 僅作為可選的靜態兜底（一般留空）。
    */
   files?: { name: string; urls?: string[] }[];
 }
@@ -67,22 +67,22 @@ export const FUNASR_MODELS: Record<FunasrModelId, FunasrModelSpec> = {
     keepFiles: ['model.int8.onnx', 'tokens.txt'],
     requiredFiles: ['model.int8.onnx', 'tokens.txt'],
   },
-  // 【已退役/随包内置】VAD 现随应用发布（extraResources/sherpa/vad/silero_vad.onnx），
-  // 运行时一律走 getFunasrVadModelPath()/isFunasrVadInstalled()，不再下载。
-  // 此条目仅作为兼容旧版「曾下载到 funasr 根」的遗留元数据保留，UI 不再暴露下载入口。
+  // 【已退役/隨包內置】VAD 現隨應用發佈（extraResources/sherpa/vad/silero_vad.onnx），
+  // 運行時一律走 getFunasrVadModelPath()/isFunasrVadInstalled()，不再下載。
+  // 此條目僅作為兼容舊版「曾下載到 funasr 根」的遺留元數據保留，UI 不再暴露下載入口。
   'silero-vad': {
     id: 'silero-vad',
     dirName: 'silero-vad',
     kind: 'vad',
     requiredFiles: ['silero_vad.onnx'],
-    // 候选 URL 在运行时由 getFunasrFileUrls() 按可配置端点生成（镜像/代理可在设置页覆盖）。
+    // 候選 URL 在運行時由 getFunasrFileUrls() 按可配置端點生成（鏡像/代理可在設置頁覆蓋）。
     files: [{ name: 'silero_vad.onnx' }],
   },
 };
 
 /**
- * files 模式下单个文件的运行时候选下载 URL（按序回退）。
- * 镜像 / 代理 / GitHub base 均取自可配置的下载端点，用户在设置页改完即时生效。
+ * files 模式下單個文件的運行時候選下載 URL（按序回退）。
+ * 鏡像 / 代理 / GitHub base 均取自可配置的下載端點，用戶在設置頁改完即時生效。
  */
 export function getFunasrFileUrls(
   id: FunasrModelId,
@@ -115,8 +115,8 @@ export function isFunasrModelInstalled(id: FunasrModelId): boolean {
 }
 
 /**
- * 共享 silero VAD 的绝对路径：随应用内置（extraResources/sherpa/vad/silero_vad.onnx），
- * 不再依赖下载。funasr / qwen / fireRedAsr 共用这一份，与各引擎可自定义的模型根目录解耦。
+ * 共享 silero VAD 的絕對路徑：隨應用內置（extraResources/sherpa/vad/silero_vad.onnx），
+ * 不再依賴下載。funasr / qwen / fireRedAsr 共用這一份，與各引擎可自定義的模型根目錄解耦。
  */
 export function getFunasrVadModelPath(): string {
   const { getExtraResourcesPath } =
@@ -124,28 +124,28 @@ export function getFunasrVadModelPath(): string {
   return resolveBundledVadPath(getExtraResourcesPath());
 }
 
-/** 共享 VAD 是否就绪：检查随包内置文件是否存在（正常安装下恒为真）。 */
+/** 共享 VAD 是否就緒：檢查隨包內置文件是否存在（正常安裝下恆為真）。 */
 export function isFunasrVadInstalled(): boolean {
   return fs.existsSync(getFunasrVadModelPath());
 }
 
-/** 全部 ASR 模型 id（静态，纯函数，不触磁盘）。 */
+/** 全部 ASR 模型 id（靜態，純函數，不觸磁盤）。 */
 export function getFunasrAsrModelIds(): FunasrModelId[] {
   return (Object.keys(FUNASR_MODELS) as FunasrModelId[]).filter(
     (id) => FUNASR_MODELS[id].kind === 'asr',
   );
 }
 
-/** 已安装的 ASR 模型 id（触磁盘）。 */
+/** 已安裝的 ASR 模型 id（觸磁盤）。 */
 export function getInstalledFunasrAsrModels(): FunasrModelId[] {
   return getFunasrAsrModelIds().filter((id) => isFunasrModelInstalled(id));
 }
 
 /**
- * 选定要使用的 ASR 模型（纯函数）：
- * - requested 命中已装 ASR → 用它；
- * - 否则回退首个已装 ASR；
- * - 无已装 ASR → null。
+ * 選定要使用的 ASR 模型（純函數）：
+ * - requested 命中已裝 ASR → 用它；
+ * - 否則回退首個已裝 ASR；
+ * - 無已裝 ASR → null。
  */
 export function resolveFunasrAsrSelection(
   requested: string | undefined,
@@ -163,7 +163,7 @@ export function resolveFunasrAsrSelection(
   };
 }
 
-/** funasr 转写就绪 = 内置 VAD + 至少一个 ASR 模型已安装。 */
+/** funasr 轉寫就緒 = 內置 VAD + 至少一個 ASR 模型已安裝。 */
 export function isFunasrReady(): boolean {
   return isFunasrVadInstalled() && getInstalledFunasrAsrModels().length > 0;
 }

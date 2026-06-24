@@ -1,6 +1,6 @@
 /**
- * 字幕合并核心逻辑
- * 使用 fluent-ffmpeg 实现字幕烧录到视频
+ * 字幕合併核心邏輯
+ * 使用 fluent-ffmpeg 實現字幕燒錄到影片
  */
 
 import ffmpegStatic from 'ffmpeg-static';
@@ -19,55 +19,55 @@ import type {
 } from '../../types/subtitleMerge';
 import { VIDEO_QUALITY_CRF } from '../../types/subtitleMerge';
 
-// 设置 ffmpeg 路径
+// 設置 ffmpeg 路徑
 const ffmpegPath = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-/** 取消哨兵：渲染层据此把取消与真实错误区分开 */
+/** 取消哨兵：渲染層據此把取消與真實錯誤區分開 */
 export const MERGE_CANCELLED = 'MERGE_CANCELLED';
 
-// 合成同时只有一个（UI 在处理中禁用入口），单例引用即可
+// 合成同時只有一個（UI 在處理中禁用入口），單例引用即可
 let currentMergeCommand: ReturnType<typeof ffmpeg> | null = null;
 let mergeCancelled = false;
 
-/** 取消当前合成：kill ffmpeg；error 回调里完成半成品清理 */
+/** 取消當前合成：kill ffmpeg；error 回調裡完成半成品清理 */
 export function cancelCurrentMerge(): boolean {
   if (!currentMergeCommand) return false;
   mergeCancelled = true;
   try {
     currentMergeCommand.kill('SIGKILL');
-    logMessage('字幕合成已被用户取消', 'warning');
+    logMessage('字幕合成已被用戶取消', 'warning');
     return true;
   } catch (error) {
-    logMessage(`取消合成失败: ${error}`, 'warning');
+    logMessage(`取消合成失敗: ${error}`, 'warning');
     return false;
   }
 }
 
 /**
- * 将前端 numpad 风格的 Alignment 转换为 ASS/SSA 格式
+ * 將前端 numpad 風格的 Alignment 轉換為 ASS/SSA 格式
  *
- * 前端 numpad 风格 (我们使用的):
+ * 前端 numpad 風格 (我們使用的):
  * 7=左上, 8=中上, 9=右上
  * 4=左中, 5=居中, 6=右中
  * 1=左下, 2=中下, 3=右下
  *
  * ASS/SSA 格式 (FFmpeg libass 使用的):
  * 底部行: 1=左下, 2=中下, 3=右下
- * 中间行: 9=左中, 10=居中, 11=右中
- * 顶部行: 5=左上, 6=中上, 7=右上
+ * 中間行: 9=左中, 10=居中, 11=右中
+ * 頂部行: 5=左上, 6=中上, 7=右上
  */
 function convertAlignment(numpadAlignment: SubtitleAlignment): number {
   const alignmentMap: Record<SubtitleAlignment, number> = {
-    // 底部行 (保持不变)
+    // 底部行 (保持不變)
     1: 1, // 左下 -> 1
     2: 2, // 中下 -> 2
     3: 3, // 右下 -> 3
-    // 中间行
+    // 中間行
     4: 9, // 左中 -> 9
     5: 10, // 居中 -> 10
     6: 11, // 右中 -> 11
-    // 顶部行
+    // 頂部行
     7: 5, // 左上 -> 5
     8: 6, // 中上 -> 6
     9: 7, // 右上 -> 7
@@ -76,7 +76,7 @@ function convertAlignment(numpadAlignment: SubtitleAlignment): number {
 }
 
 /**
- * 将 CSS 颜色转换为 ASS 颜色格式
+ * 將 CSS 顏色轉換為 ASS 顏色格式
  * CSS: #RRGGBB 或 rgba(r, g, b, a)
  * ASS: &HAABBGGRR (Alpha, Blue, Green, Red)
  */
@@ -84,32 +84,32 @@ export function cssColorToAss(cssColor: string, alpha: number = 0): string {
   let r: number, g: number, b: number;
 
   if (cssColor.startsWith('#')) {
-    // 处理 #RRGGBB 格式
+    // 處理 #RRGGBB 格式
     const hex = cssColor.slice(1);
     r = parseInt(hex.substr(0, 2), 16);
     g = parseInt(hex.substr(2, 2), 16);
     b = parseInt(hex.substr(4, 2), 16);
   } else if (cssColor.startsWith('rgb')) {
-    // 处理 rgba(r, g, b, a) 格式
+    // 處理 rgba(r, g, b, a) 格式
     const match = cssColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
     if (match) {
       r = parseInt(match[1]);
       g = parseInt(match[2]);
       b = parseInt(match[3]);
     } else {
-      // 默认白色
+      // 預設白色
       r = 255;
       g = 255;
       b = 255;
     }
   } else {
-    // 默认白色
+    // 預設白色
     r = 255;
     g = 255;
     b = 255;
   }
 
-  // 转换为 ASS 格式: &HAABBGGRR
+  // 轉換為 ASS 格式: &HAABBGGRR
   const alphaHex = alpha.toString(16).padStart(2, '0').toUpperCase();
   const blueHex = b.toString(16).padStart(2, '0').toUpperCase();
   const greenHex = g.toString(16).padStart(2, '0').toUpperCase();
@@ -119,35 +119,35 @@ export function cssColorToAss(cssColor: string, alpha: number = 0): string {
 }
 
 /**
- * 构建 force_style 参数字符串
+ * 構建 force_style 參數字符串
  */
 export function buildForceStyle(style: SubtitleStyle): string {
   const parts: string[] = [];
 
-  // 字体设置
+  // 字體設置
   parts.push(`FontName=${style.fontName}`);
   parts.push(`FontSize=${style.fontSize}`);
 
-  // 颜色设置 (ASS 格式)
+  // 顏色設置 (ASS 格式)
   parts.push(`PrimaryColour=${cssColorToAss(style.primaryColor)}`);
   parts.push(`OutlineColour=${cssColorToAss(style.outlineColor)}`);
   parts.push(`BackColour=${cssColorToAss(style.backColor, 128)}`);
 
-  // 字体样式
+  // 字體樣式
   if (style.bold) parts.push('Bold=1');
   if (style.italic) parts.push('Italic=1');
   if (style.underline) parts.push('Underline=1');
 
-  // 边框和阴影
+  // 邊框和陰影
   parts.push(`BorderStyle=${style.borderStyle}`);
   parts.push(`Outline=${style.outline}`);
   parts.push(`Shadow=${style.shadow}`);
 
-  // 对齐位置 (转换为 ASS 格式)
+  // 對齊位置 (轉換為 ASS 格式)
   const assAlignment = convertAlignment(style.alignment);
   parts.push(`Alignment=${assAlignment}`);
 
-  // 边距
+  // 邊距
   parts.push(`MarginL=${style.marginL}`);
   parts.push(`MarginR=${style.marginR}`);
   parts.push(`MarginV=${style.marginV}`);
@@ -156,15 +156,15 @@ export function buildForceStyle(style: SubtitleStyle): string {
 }
 
 /**
- * 转义字幕文件路径以用于 FFmpeg 滤镜
- * Windows 路径需要特殊处理
+ * 轉義字幕文件路徑以用於 FFmpeg 濾鏡
+ * Windows 路徑需要特殊處理
  */
 export function escapeSubtitlePath(subtitlePath: string): string {
-  // 将反斜杠转换为正斜杠
+  // 將反斜槓轉換為正斜槓
   let escaped = subtitlePath.replace(/\\/g, '/');
-  // 转义特殊字符: : ' [
-  // 注意: 先转义 : 和 [，再转义 '（避免引入的 \ 被重复转义）
-  // 此时路径中不应有反斜杠（已全部转为正斜杠），所以不需要转义 \
+  // 轉義特殊字符: : ' [
+  // 注意: 先轉義 : 和 [，再轉義 '（避免引入的 \ 被重複轉義）
+  // 此時路徑中不應有反斜槓（已全部轉為正斜槓），所以不需要轉義 \
   escaped = escaped
     .replace(/:/g, '\\:')
     .replace(/\[/g, '\\[')
@@ -173,11 +173,11 @@ export function escapeSubtitlePath(subtitlePath: string): string {
 }
 
 /**
- * 将字幕文件复制到临时目录，使用安全的文件名（无特殊字符）
- * 返回临时文件路径。调用方需要在使用完毕后清理临时文件。
+ * 將字幕文件複製到臨時目錄，使用安全的文件名（無特殊字符）
+ * 返回臨時文件路徑。調用方需要在使用完畢後清理臨時文件。
  *
- * 这是处理包含特殊字符（如单引号 ' ）路径的最可靠方式，
- * 因为 ffmpeg 的滤镜字符串解析在不同版本和不同库封装下行为可能不一致。
+ * 這是處理包含特殊字符（如單引號 ' ）路徑的最可靠方式，
+ * 因為 ffmpeg 的濾鏡字符串解析在不同版本和不同庫封裝下行為可能不一致。
  */
 export function createSafeSubtitleCopy(subtitlePath: string): string {
   const ext = path.extname(subtitlePath);
@@ -188,34 +188,34 @@ export function createSafeSubtitleCopy(subtitlePath: string): string {
   const safeName = `subtitle_${Date.now()}${ext}`;
   const tmpPath = path.join(tmpDir, safeName);
   fs.copyFileSync(subtitlePath, tmpPath);
-  logMessage(`创建临时字幕文件: ${tmpPath}`, 'info');
+  logMessage(`創建臨時字幕文件: ${tmpPath}`, 'info');
   return tmpPath;
 }
 
 /**
- * 清理临时字幕文件
+ * 清理臨時字幕文件
  */
 export function cleanupTempSubtitle(tmpPath: string): void {
   try {
     if (tmpPath.includes('video-subtitle-master') && fs.existsSync(tmpPath)) {
       fs.unlinkSync(tmpPath);
-      logMessage(`清理临时字幕文件: ${tmpPath}`, 'info');
+      logMessage(`清理臨時字幕文件: ${tmpPath}`, 'info');
     }
   } catch (err) {
-    logMessage(`清理临时文件失败: ${err}`, 'warning');
+    logMessage(`清理臨時文件失敗: ${err}`, 'warning');
   }
 }
 
 /**
- * 判断路径是否包含需要特殊处理的字符
+ * 判斷路徑是否包含需要特殊處理的字符
  */
 function pathNeedsSafeCopy(filePath: string): boolean {
-  // 包含单引号、反斜杠（非路径分隔符）、冒号（非Windows盘符）等特殊字符
+  // 包含單引號、反斜槓（非路徑分隔符）、冒號（非Windows盤符）等特殊字符
   return /['\[\];,]/.test(filePath);
 }
 
-// 纯拉丁字体（不含 CJK 字形）。中文字幕若用这些字体烧录，libass 找不到字形会渲染成
-// 豆腐块/乱码（issue: mac 中文烧录乱码）。命中且字幕含 CJK 时回退到平台 CJK 字体。
+// 純拉丁字體（不含 CJK 字形）。中文字幕若用這些字體燒錄，libass 找不到字形會渲染成
+// 豆腐塊/亂碼（issue: mac 中文燒錄亂碼）。命中且字幕含 CJK 時回退到平臺 CJK 字體。
 const LATIN_ONLY_FONTS = new Set([
   'arial',
   'helvetica',
@@ -229,24 +229,24 @@ const LATIN_ONLY_FONTS = new Set([
   'courier new',
 ]);
 
-/** 文本是否包含 CJK（中日韩）字符 */
+/** 文本是否包含 CJK（中日韓）字符 */
 function containsCJK(text: string): boolean {
   return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/.test(
     text,
   );
 }
 
-/** 选中字体是否为纯拉丁字体（无 CJK 字形） */
+/** 選中字體是否為純拉丁字體（無 CJK 字形） */
 function isLatinOnlyFont(fontName: string): boolean {
   return LATIN_ONLY_FONTS.has((fontName || '').trim().toLowerCase());
 }
 
 /**
- * macOS 上「确有字体文件」的常见 CJK 字体（按优先级）。
- * 关键点：PingFang 在部分 macOS 上没有可被 fontconfig 索引的字体文件
- * （仅 CoreText 可见），libass 解析「PingFang SC」会回退到 Helvetica → 中文渲染成乱码。
- * 因此烧录前必须挑一个「文件确实存在」的 CJK 字体，按 family 名交给 libass。
- * family 名取自 libass/fontconfig 对相应文件的实际解析结果（已实测）。
+ * macOS 上「確有字體文件」的常見 CJK 字體（按優先級）。
+ * 關鍵點：PingFang 在部分 macOS 上沒有可被 fontconfig 索引的字體文件
+ * （僅 CoreText 可見），libass 解析「PingFang SC」會回退到 Helvetica → 中文渲染成亂碼。
+ * 因此燒錄前必須挑一個「文件確實存在」的 CJK 字體，按 family 名交給 libass。
+ * family 名取自 libass/fontconfig 對相應文件的實際解析結果（已實測）。
  */
 const MAC_CJK_FONTS: Array<{ name: string; files: string[] }> = [
   { name: 'PingFang SC', files: ['/System/Library/Fonts/PingFang.ttc'] },
@@ -273,7 +273,7 @@ const MAC_CJK_FONTS: Array<{ name: string; files: string[] }> = [
 
 let cachedMacCJKFont: string | null = null;
 
-/** macOS：返回第一个字体文件确实存在的 CJK 字体名（结果缓存） */
+/** macOS：返回第一個字體文件確實存在的 CJK 字體名（結果緩存） */
 function resolveMacCJKFont(): string {
   if (cachedMacCJKFont) return cachedMacCJKFont;
   const found = MAC_CJK_FONTS.find((f) =>
@@ -289,7 +289,7 @@ function resolveMacCJKFont(): string {
   return cachedMacCJKFont;
 }
 
-/** 该字体在 macOS 上是否为「文件存在」的已知 CJK 字体（可被 libass 正常解析） */
+/** 該字體在 macOS 上是否為「文件存在」的已知 CJK 字體（可被 libass 正常解析） */
 function isMacResolvableCJKFont(fontName: string): boolean {
   const norm = (fontName || '').trim().toLowerCase();
   const matched = MAC_CJK_FONTS.find((f) => f.name.toLowerCase() === norm);
@@ -305,7 +305,7 @@ function isMacResolvableCJKFont(fontName: string): boolean {
   );
 }
 
-/** 按运行平台返回一个稳定可用的 CJK 字体名 */
+/** 按運行平臺返回一個穩定可用的 CJK 字體名 */
 function getPlatformCJKFont(): string {
   switch (process.platform) {
     case 'darwin':
@@ -317,16 +317,16 @@ function getPlatformCJKFont(): string {
   }
 }
 
-// 备注：曾尝试给 libass 传 fontsdir 兜底，但实测打包版 ffmpeg 的默认 fontconfig
-// 已能按 family 名解析系统 CJK 字体（含 Supplemental 目录），fontsdir 反而会触发
-// 扫描整目录的无害告警（如 Apple Color Emoji 元数据读取失败），故移除。
+// 備註：曾嘗試給 libass 傳 fontsdir 兜底，但實測打包版 ffmpeg 的預設 fontconfig
+// 已能按 family 名解析系統 CJK 字體（含 Supplemental 目錄），fontsdir 反而會觸發
+// 掃描整目錄的無害告警（如 Apple Color Emoji 元數據讀取失敗），故移除。
 
 /**
- * 为「含 CJK 的字幕」决定最终烧录字体：
- * - 不含 CJK：原样使用用户所选字体；
- * - macOS：所选字体若不是「文件存在的已知 CJK 字体」（含用户默认 PingFang 在本机缺失的情况），
- *   一律换成 resolveMacCJKFont() 解析出的可用 CJK 字体；
- * - 其它平台：仅当所选为纯拉丁字体时回退到平台 CJK 字体。
+ * 為「含 CJK 的字幕」決定最終燒錄字體：
+ * - 不含 CJK：原樣使用用戶所選字體；
+ * - macOS：所選字體若不是「文件存在的已知 CJK 字體」（含用戶預設 PingFang 在本機缺失的情況），
+ *   一律換成 resolveMacCJKFont() 解析出的可用 CJK 字體；
+ * - 其它平臺：僅當所選為純拉丁字體時回退到平臺 CJK 字體。
  */
 function resolveBurnFontName(chosenFont: string, hasCJK: boolean): string {
   if (!hasCJK) return chosenFont;
@@ -339,13 +339,13 @@ function resolveBurnFontName(chosenFont: string, hasCJK: boolean): string {
 }
 
 /**
- * 获取视频信息
+ * 獲取影片信息
  */
 export function getVideoInfo(videoPath: string): Promise<VideoInfo> {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
-        logMessage(`获取视频信息失败: ${err.message}`, 'error');
+        logMessage(`獲取影片信息失敗: ${err.message}`, 'error');
         reject(err);
         return;
       }
@@ -368,7 +368,7 @@ export function getVideoInfo(videoPath: string): Promise<VideoInfo> {
 }
 
 /**
- * 合并字幕到视频
+ * 合併字幕到影片
  */
 export async function mergeSubtitleToVideo(
   config: MergeConfig,
@@ -384,10 +384,10 @@ export async function mergeSubtitleToVideo(
   } = config;
   const isSoftMux = outputMode === 'softmux';
 
-  // 获取视频分辨率，用于显式设置 original_size
-  // 防止滤镜重新初始化时因自动检测失败而报错
+  // 獲取影片分辨率，用於顯式設置 original_size
+  // 防止濾鏡重新初始化時因自動檢測失敗而報錯
   let originalSize = '';
-  // 视频总时长（秒），用于在 progress.percent 不可用时自算合并进度（issue #310）
+  // 影片總時長（秒），用於在 progress.percent 不可用時自算合併進度（issue #310）
   let totalDurationSec = 0;
   try {
     const videoInfo = await getVideoInfo(videoPath);
@@ -397,15 +397,15 @@ export async function mergeSubtitleToVideo(
     totalDurationSec = videoInfo.duration || 0;
   } catch (err) {
     logMessage(
-      `获取视频分辨率失败，跳过 original_size 设置: ${err}`,
+      `獲取影片分辨率失敗，跳過 original_size 設置: ${err}`,
       'warning',
     );
   }
 
-  // 如果字幕路径包含特殊字符（如单引号），则复制到临时目录使用安全文件名
-  // 这是最可靠的方式，因为 ffmpeg 的滤镜字符串解析对特殊字符的处理在
-  // 不同版本、不同平台、不同库封装下行为可能不一致
-  // 软字幕封装走普通 input 参数（不经滤镜字符串解析），无需安全副本
+  // 如果字幕路徑包含特殊字符（如單引號），則複製到臨時目錄使用安全文件名
+  // 這是最可靠的方式，因為 ffmpeg 的濾鏡字符串解析對特殊字符的處理在
+  // 不同版本、不同平臺、不同庫封裝下行為可能不一致
+  // 軟字幕封裝走普通 input 參數（不經濾鏡字符串解析），無需安全副本
   let actualSubPath = subtitlePath;
   let tmpSubPath: string | null = null;
   if (!isSoftMux && pathNeedsSafeCopy(subtitlePath)) {
@@ -415,16 +415,16 @@ export async function mergeSubtitleToVideo(
 
   return new Promise((resolve, reject) => {
     logMessage(
-      `开始合并字幕（${isSoftMux ? '软字幕封装' : '硬字幕烧录'}）: ${videoPath}`,
+      `開始合併字幕（${isSoftMux ? '軟字幕封裝' : '硬字幕燒錄'}）: ${videoPath}`,
       'info',
     );
     logMessage(`字幕文件: ${subtitlePath}`, 'info');
     if (tmpSubPath) {
-      logMessage(`使用临时字幕文件: ${tmpSubPath}`, 'info');
+      logMessage(`使用臨時字幕文件: ${tmpSubPath}`, 'info');
     }
-    logMessage(`输出文件: ${outputPath}`, 'info');
+    logMessage(`輸出文件: ${outputPath}`, 'info');
 
-    // 发送初始进度
+    // 發送初始進度
     onProgress?.({
       percent: 0,
       timeMark: '00:00:00',
@@ -432,39 +432,39 @@ export async function mergeSubtitleToVideo(
       status: 'processing',
     });
 
-    // 取消后删除写了一半的输出文件，不留半成品
+    // 取消後刪除寫了一半的輸出文件，不留半成品
     const cleanupPartialOutput = () => {
       try {
         if (fs.existsSync(outputPath)) {
           fs.unlinkSync(outputPath);
-          logMessage(`已删除未完成的输出文件: ${outputPath}`, 'info');
+          logMessage(`已刪除未完成的輸出文件: ${outputPath}`, 'info');
         }
       } catch (cleanupErr) {
-        logMessage(`删除未完成输出文件失败: ${cleanupErr}`, 'warning');
+        logMessage(`刪除未完成輸出文件失敗: ${cleanupErr}`, 'warning');
       }
     };
 
     mergeCancelled = false;
     let command: ReturnType<typeof ffmpeg>;
     if (isSoftMux) {
-      // 软字幕封装：全流复制 + 字幕流转 srt 进 mkv，秒级完成无画质损失
+      // 軟字幕封裝：全流複製 + 字幕流轉 srt 進 mkv，秒級完成無畫質損失
       command = ffmpeg(videoPath).input(subtitlePath).outputOptions([
         '-map',
         '0',
         '-map',
         '1',
         '-c',
-        'copy', // 视频/音频流直接复制
+        'copy', // 影片/音頻流直接複製
         '-c:s',
-        'srt', // 字幕流统一转 srt（mkv 原生支持；ass/vtt 自动转换）
+        'srt', // 字幕流統一轉 srt（mkv 原生支持；ass/vtt 自動轉換）
         '-disposition:s:0',
-        'default', // 字幕轨默认开启
+        'default', // 字幕軌預設開啟
         '-y',
       ]);
     } else {
-      // 中文乱码兜底：字幕含 CJK 时，确保最终字体「文件确实存在且含 CJK 字形」。
-      // 典型坑：用户默认字体 PingFang 在部分 mac 上无字体文件，libass 会回退到 Helvetica
-      // 渲染成乱码（已实测）。这里换成本机存在的 CJK 字体（如 Hiragino Sans GB）。
+      // 中文亂碼兜底：字幕含 CJK 時，確保最終字體「文件確實存在且含 CJK 字形」。
+      // 典型坑：用戶預設字體 PingFang 在部分 mac 上無字體文件，libass 會回退到 Helvetica
+      // 渲染成亂碼（已實測）。這裡換成本機存在的 CJK 字體（如 Hiragino Sans GB）。
       let effectiveStyle = style;
       try {
         const subtitleSample = fs.readFileSync(subtitlePath, 'utf-8');
@@ -473,20 +473,20 @@ export async function mergeSubtitleToVideo(
         if (burnFont !== style.fontName) {
           effectiveStyle = { ...style, fontName: burnFont };
           logMessage(
-            `字幕含中文，但所选字体「${style.fontName}」在本机不可用/无 CJK 字形，已改用「${burnFont}」`,
+            `字幕含中文，但所選字體「${style.fontName}」在本機不可用/無 CJK 字形，已改用「${burnFont}」`,
             'warning',
           );
         }
       } catch (readErr) {
-        logMessage(`读取字幕用于字体检测失败（忽略）: ${readErr}`, 'warning');
+        logMessage(`讀取字幕用於字體檢測失敗（忽略）: ${readErr}`, 'warning');
       }
 
       const forceStyle = buildForceStyle(effectiveStyle);
       const escapedSubPath = escapeSubtitlePath(actualSubPath);
       const subtitlesFilter = `subtitles='${escapedSubPath}'${originalSize}:force_style='${forceStyle}'`;
       logMessage(`subtitles filter: ${subtitlesFilter}`, 'info');
-      // 烧录必然重编码视频：显式指定 CRF 控制画质，避免沿用 libx264 默认(CRF23)
-      // 造成肉眼可见的压缩与体积骤减（issue #331）。音频仍直接复制不动。
+      // 燒錄必然重編碼影片：顯式指定 CRF 控制畫質，避免沿用 libx264 預設(CRF23)
+      // 造成肉眼可見的壓縮與體積驟減（issue #331）。音頻仍直接複製不動。
       const crf = VIDEO_QUALITY_CRF[videoQuality] ?? VIDEO_QUALITY_CRF.original;
       logMessage(
         `hardcode video quality: ${videoQuality} (crf=${crf})`,
@@ -496,10 +496,10 @@ export async function mergeSubtitleToVideo(
         .videoFilters(subtitlesFilter)
         .outputOptions([
           '-crf',
-          String(crf), // 画质档位 → libx264 CRF
+          String(crf), // 畫質檔位 → libx264 CRF
           '-c:a',
-          'copy', // 保持音频编码不变
-          '-y', // 覆盖输出文件
+          'copy', // 保持音頻編碼不變
+          '-y', // 覆蓋輸出文件
         ]);
     }
 
@@ -507,14 +507,14 @@ export async function mergeSubtitleToVideo(
       .on('start', (cmd) => {
         logMessage(`FFmpeg 命令: ${cmd}`, 'info');
       })
-      // 从 ffmpeg 解析到的输入时长兜底总时长：不依赖 ffprobe（本应用未配置 ffprobe，
-      // getVideoInfo 在缺失 ffprobe 的环境会失败，导致 totalDurationSec=0、进度恒为 0%）。
+      // 從 ffmpeg 解析到的輸入時長兜底總時長：不依賴 ffprobe（本應用未配置 ffprobe，
+      // getVideoInfo 在缺失 ffprobe 的環境會失敗，導致 totalDurationSec=0、進度恆為 0%）。
       .on('codecData', (data: { duration?: string }) => {
         const parsed = timemarkToSeconds(data?.duration || '');
         if (parsed > 0) {
           totalDurationSec = parsed;
           logMessage(
-            `codecData 输入时长: ${data.duration} (${parsed}s)`,
+            `codecData 輸入時長: ${data.duration} (${parsed}s)`,
             'info',
           );
         }
@@ -533,7 +533,7 @@ export async function mergeSubtitleToVideo(
             (timemarkToSeconds(progress.timemark) / totalDurationSec) * 100;
         }
         percent = Math.max(percent || 0, 0);
-        logMessage(`合并进度: ${percent.toFixed(1)}%`, 'info');
+        logMessage(`合併進度: ${percent.toFixed(1)}%`, 'info');
         onProgress?.({
           percent: Math.min(percent, 99),
           timeMark: progress.timemark || '00:00:00',
@@ -543,11 +543,11 @@ export async function mergeSubtitleToVideo(
       })
       .on('end', () => {
         currentMergeCommand = null;
-        // 清理临时文件
+        // 清理臨時文件
         if (tmpSubPath) {
           cleanupTempSubtitle(tmpSubPath);
         }
-        logMessage('字幕合并完成', 'info');
+        logMessage('字幕合併完成', 'info');
         onProgress?.({
           percent: 100,
           timeMark: '',
@@ -558,15 +558,15 @@ export async function mergeSubtitleToVideo(
       })
       .on('error', (err) => {
         currentMergeCommand = null;
-        // 清理临时文件
+        // 清理臨時文件
         if (tmpSubPath) {
           cleanupTempSubtitle(tmpSubPath);
         }
-        // 用户取消：清理半成品、静默复位（不发 error 进度，不算失败）
+        // 用戶取消：清理半成品、靜默復位（不發 error 進度，不算失敗）
         if (mergeCancelled) {
           mergeCancelled = false;
           cleanupPartialOutput();
-          logMessage('字幕合并已取消', 'warning');
+          logMessage('字幕合併已取消', 'warning');
           onProgress?.({
             percent: 0,
             timeMark: '',
@@ -576,7 +576,7 @@ export async function mergeSubtitleToVideo(
           reject(new Error(MERGE_CANCELLED));
           return;
         }
-        logMessage(`字幕合并失败: ${err.message}`, 'error');
+        logMessage(`字幕合併失敗: ${err.message}`, 'error');
         onProgress?.({
           percent: 0,
           timeMark: '',
@@ -593,7 +593,7 @@ export async function mergeSubtitleToVideo(
 }
 
 /**
- * 生成默认输出路径
+ * 生成預設輸出路徑
  */
 export function generateOutputPath(
   videoPath: string,
@@ -606,7 +606,7 @@ export function generateOutputPath(
 }
 
 /**
- * 检查字幕文件格式
+ * 檢查字幕文件格式
  */
 export function getSubtitleFormat(subtitlePath: string): string {
   const ext = path.extname(subtitlePath).toLowerCase();
@@ -620,7 +620,7 @@ export function getSubtitleFormat(subtitlePath: string): string {
 }
 
 /**
- * 统计字幕条数
+ * 統計字幕條數
  */
 export async function countSubtitles(subtitlePath: string): Promise<number> {
   try {
@@ -628,22 +628,22 @@ export async function countSubtitles(subtitlePath: string): Promise<number> {
     const format = getSubtitleFormat(subtitlePath);
 
     if (format === 'srt') {
-      // SRT 格式: 通过数字序号计数
+      // SRT 格式: 通過數字序號計數
       const matches = content.match(/^\d+\s*$/gm);
       return matches ? matches.length : 0;
     } else if (format === 'ass' || format === 'ssa') {
-      // ASS/SSA 格式: 通过 Dialogue 行计数
+      // ASS/SSA 格式: 通過 Dialogue 行計數
       const matches = content.match(/^Dialogue:/gm);
       return matches ? matches.length : 0;
     } else if (format === 'vtt') {
-      // VTT 格式: 通过时间戳行计数
+      // VTT 格式: 通過時間戳行計數
       const matches = content.match(/^\d{2}:\d{2}/gm);
       return matches ? matches.length : 0;
     }
 
     return 0;
   } catch (error) {
-    logMessage(`统计字幕条数失败: ${error}`, 'error');
+    logMessage(`統計字幕條數失敗: ${error}`, 'error');
     return 0;
   }
 }

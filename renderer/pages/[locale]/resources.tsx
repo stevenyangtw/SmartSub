@@ -4,12 +4,12 @@ import { RefreshCw } from 'lucide-react';
 import { getStaticPaths, makeStaticProperties } from '../../lib/get-static';
 
 /**
- * 资源中心已拆为「引擎与模型」(`/engines`) 与「翻译服务」(`/translation`) 两个顶级页
- * （见 split-resource-center-nav）。本页降级为薄重定向，保住旧 `/resources?tab=*` 深链接 / 书签：
+ * 資源中心已拆為「引擎與模型」(`/engines`) 與「翻譯服務」(`/translation`) 兩個頂級頁
+ * （見 split-resource-center-nav）。本頁降級為薄重定向，保住舊 `/resources?tab=*` 深鏈接 / 書籤：
  *
- *   无 tab / overview / engines / models → /engines
+ *   無 tab / overview / engines / models → /engines
  *   providers                            → /translation
- *   acceleration                         → /engines（GPU 已折叠进 builtin，预选 builtin）
+ *   acceleration                         → /engines（GPU 已摺疊進 builtin，預選 builtin）
  */
 const ResourcesRedirect = () => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const ResourcesRedirect = () => {
           JSON.stringify('builtin'),
         );
       } catch {
-        // 忽略：localStorage 不可用时仍重定向，EngineModelTab 回落默认 builtin
+        // 忽略：localStorage 不可用時仍重定向，EngineModelTab 回落預設 builtin
       }
     }
     router.replace(`/${locale}/engines`);

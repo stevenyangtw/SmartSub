@@ -108,7 +108,7 @@ const TaskRowList: React.FC<TaskRowListProps> = ({
     taskStatus === 'paused' ||
     taskStatus === 'cancelling';
 
-  // 单文件 ETA：记录当前 loading 阶段首次观察到的时间与进度，按速率粗估剩余
+  // 單文件 ETA：記錄當前 loading 階段首次觀察到的時間與進度，按速率粗估剩餘
   const etaRef = useRef<
     Record<string, { stage: string; t0: number; p0: number }>
   >({});
@@ -134,7 +134,7 @@ const TaskRowList: React.FC<TaskRowListProps> = ({
       return null;
     }
     const dp = percent - rec.p0;
-    // 至少观察到 5 个百分点的推进才给估算，避免初期乱跳
+    // 至少觀察到 5 個百分點的推進才給估算，避免初期亂跳
     if (dp < 5 || percent >= 100) return null;
     const elapsed = Date.now() - rec.t0;
     if (elapsed <= 0) return null;

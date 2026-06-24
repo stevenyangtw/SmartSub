@@ -11,7 +11,7 @@ export interface TranscribeContext {
   file: IFiles;
   formData: Record<string, unknown>;
   hasOpenAiWhisper: boolean;
-  /** 取消信号。由 router 从任务上下文注入，各引擎据此中断转写。 */
+  /** 取消信號。由 router 從任務上下文注入，各引擎據此中斷轉寫。 */
   signal?: AbortSignal;
 }
 
@@ -19,15 +19,15 @@ export interface TranscriptionEngineAdapter {
   id: TranscriptionEngine;
   displayName: string;
   requiresRuntime: boolean;
-  /** 运行时引擎对应的 Python 三层架构引擎 id（warmup/sidecar 切换用）；非 Python 引擎留空。 */
+  /** 運行時引擎對應的 Python 三層架構引擎 id（warmup/sidecar 切換用）；非 Python 引擎留空。 */
   pyEngineId?: PyEngineId;
   isAvailable(): Promise<EngineStatus>;
   transcribe(ctx: TranscribeContext): Promise<string>;
-  /** 中断进行中的转写。builtin=signal 原生中断(no-op)、faster=sidecar 取消、localCli=kill child。 */
+  /** 中斷進行中的轉寫。builtin=signal 原生中斷(no-op)、faster=sidecar 取消、localCli=kill child。 */
   cancelActive(): void;
   /**
-   * 批次开始时的可选预热（在 ensureStarted 成功后调用）：把模型加载等冷启动成本
-   * 移出首个文件关键路径，与音频抽取并行。必须非致命（失败仅记日志，不阻塞任务）。
+   * 批次開始時的可選預熱（在 ensureStarted 成功後調用）：把模型加載等冷啟動成本
+   * 移出首個文件關鍵路徑，與音頻抽取並行。必須非致命（失敗僅記日誌，不阻塞任務）。
    */
   prewarm?(formData: Record<string, unknown>): void;
 }

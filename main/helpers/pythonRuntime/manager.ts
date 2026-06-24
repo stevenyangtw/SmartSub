@@ -16,9 +16,9 @@ export interface EngineCommand {
   args: string[];
   cwd?: string;
   env?: Record<string, string>;
-  /** 基座 prefix（设为 PYTHONHOME，定位 stdlib） */
+  /** 基座 prefix（設為 PYTHONHOME，定位 stdlib） */
   pythonHome?: string;
-  /** 引擎包 site-packages（设为 PYTHONPATH，挂载该引擎依赖） */
+  /** 引擎包 site-packages（設為 PYTHONPATH，掛載該引擎依賴） */
   pythonPath?: string;
 }
 
@@ -49,9 +49,9 @@ interface RequestOptions {
   onEvent?: (method: string, params: Record<string, unknown>) => void;
 }
 
-// 冷启动 ping 超时：Windows 下基座解释器首次加载 + 杀软扫描可能较久。
-// 重依赖已推迟到首个 transcribe（见 py-engine list_engines/find_spec），ping 本身很快，
-// 这里给足冗余并配合一次重试，彻底消除"偶发冷启动超时"。
+// 冷啟動 ping 超時：Windows 下基座解釋器首次加載 + 殺軟掃描可能較久。
+// 重依賴已推遲到首個 transcribe（見 py-engine list_engines/find_spec），ping 本身很快，
+// 這裡給足冗餘並配合一次重試，徹底消除"偶發冷啟動超時"。
 export const START_PING_TIMEOUT_MS = 60_000;
 const SHUTDOWN_GRACE_MS = 3_000;
 
@@ -65,18 +65,18 @@ export function buildSanitizedEnv(
     PYTHONIOENCODING: 'utf-8',
     PYTHONDONTWRITEBYTECODE: '1',
     PYTHONUNBUFFERED: '1',
-    // 散装 site-packages 下 numpy/ctranslate2/onnxruntime 可能各带一份 Intel
-    // OpenMP(libiomp5md)。容忍重复加载，规避 Windows 上 "OMP: Error #15 ...
+    // 散裝 site-packages 下 numpy/ctranslate2/onnxruntime 可能各帶一份 Intel
+    // OpenMP(libiomp5md)。容忍重複加載，規避 Windows 上 "OMP: Error #15 ...
     // already initialized" 直接 abort/卡死。
     KMP_DUPLICATE_LIB_OK: 'TRUE',
   };
-  // 先清宿主机污染源（全局 conda/venv/PYTHONPATH 会污染基座解释器）
+  // 先清宿主機汙染源（全局 conda/venv/PYTHONPATH 會汙染基座解釋器）
   delete env.PYTHONPATH;
   delete env.PYTHONHOME;
   delete env.PYTHONSTARTUP;
   delete env.VIRTUAL_ENV;
   delete env.CONDA_PREFIX;
-  // 再按三层模型注入受控值：基座 prefix + 当前引擎包 site-packages
+  // 再按三層模型注入受控值：基座 prefix + 當前引擎包 site-packages
   if (overrides?.pythonHome) env.PYTHONHOME = overrides.pythonHome;
   if (overrides?.pythonPath) env.PYTHONPATH = overrides.pythonPath;
   return env;
@@ -91,7 +91,7 @@ export class PythonRuntimeManager {
   private startingPromise: Promise<PingResult> | null = null;
   private lastPingInfo: PingResult | null = null;
   private stopping = false;
-  // 当前 sidecar 服务的引擎；切换引擎需重启（换 PYTHONPATH / 模型环境）。
+  // 當前 sidecar 服務的引擎；切換引擎需重啟（換 PYTHONPATH / 模型環境）。
   private currentEngineId: PyEngineId | null = null;
 
   constructor(
@@ -117,11 +117,11 @@ export class PythonRuntimeManager {
   async ensureStarted(
     engineId: PyEngineId = 'faster-whisper',
   ): Promise<PingResult> {
-    // 已在跑且就是目标引擎 → 直接复用缓存 ping。
+    // 已在跑且就是目標引擎 → 直接複用緩存 ping。
     if (this.proc && this.lastPingInfo && this.currentEngineId === engineId) {
       return this.lastPingInfo;
     }
-    // 在跑但引擎不同 → 切换：停旧 sidecar，换 PYTHONPATH 重启（一次冷启动）。
+    // 在跑但引擎不同 → 切換：停舊 sidecar，換 PYTHONPATH 重啟（一次冷啟動）。
     if (this.proc && this.currentEngineId !== engineId) {
       this.logger(
         `Switching python engine ${this.currentEngineId} -> ${engineId}; restarting sidecar`,
@@ -140,7 +140,7 @@ export class PythonRuntimeManager {
 
   private async start(engineId: PyEngineId): Promise<PingResult> {
     this.currentEngineId = engineId;
-    // 防重入：若残留旧进程（如上次 ping 超时未清理），先杀掉，避免孤儿 + 引用覆盖。
+    // 防重入：若殘留舊進程（如上次 ping 超時未清理），先殺掉，避免孤兒 + 引用覆蓋。
     if (this.proc) {
       try {
         this.proc.kill();
@@ -198,8 +198,8 @@ export class PythonRuntimeManager {
           },
         );
 
-        // 协议区间校验：超出 app 支持区间则停机并报错（提示升级 SmartSub，而非崩溃）。
-        // 旧引擎不返回 protocolVersion 时放行（向后兼容）。
+        // 協議區間校驗：超出 app 支持區間則停機並報錯（提示升級 SmartSub，而非崩潰）。
+        // 舊引擎不返回 protocolVersion 時放行（向後兼容）。
         if (
           typeof info.protocolVersion === 'number' &&
           !isProtocolSupported(info.protocolVersion)
@@ -226,8 +226,8 @@ export class PythonRuntimeManager {
         );
         return info;
       } catch (error) {
-        // 关键：ping 失败（超时/退出）时务必杀掉仍在启动的进程，
-        // 避免孤儿 + 二次 spawn + Windows 文件锁。
+        // 關鍵：ping 失敗（超時/退出）時務必殺掉仍在啟動的進程，
+        // 避免孤兒 + 二次 spawn + Windows 文件鎖。
         if (this.proc === proc) {
           try {
             proc.kill();
@@ -244,7 +244,7 @@ export class PythonRuntimeManager {
     try {
       return await attempt();
     } catch (firstError) {
-      // 协议不兼容重试无意义，直接抛出。
+      // 協議不兼容重試無意義，直接拋出。
       if (
         firstError instanceof PythonEngineError &&
         firstError.code === 'protocol_unsupported'

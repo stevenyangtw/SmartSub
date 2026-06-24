@@ -1,13 +1,13 @@
 import type { IFiles } from './types';
 import type { ProofreadItem } from './proofread';
 
-/** 流水线类工作项（转写 / 翻译） */
+/** 流水線類工作項（轉寫 / 翻譯） */
 export type PipelineWorkItemType =
   | 'generateAndTranslate'
   | 'generateOnly'
   | 'translateOnly';
 
-/** 校对批次工作项 */
+/** 校對批次工作項 */
 export type ProofreadWorkItemType = 'proofread';
 
 export type WorkItemType = PipelineWorkItemType | ProofreadWorkItemType;
@@ -19,10 +19,10 @@ export type WorkItemStatus =
   | 'error'
   | 'interrupted';
 
-/** 流水线文件 — P19-1 先与 IFiles 对齐，后续正型 */
+/** 流水線文件 — P19-1 先與 IFiles 對齊，後續正型 */
 export type PipelineFile = IFiles;
 
-/** 校对项 — 与 ProofreadItem 对齐 */
+/** 校對項 — 與 ProofreadItem 對齊 */
 export type ProofreadEntry = ProofreadItem;
 
 export interface WorkItemArtifact {

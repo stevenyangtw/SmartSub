@@ -12,13 +12,13 @@ export default async function translate(
 ) {
   const { apiKey: accessKeyId, apiSecret: secretKey } = proof || {};
   if (!accessKeyId || !secretKey) {
-    console.log('请先配置 API KEY 和 API SECRET');
+    console.log('請先配置 API KEY 和 API SECRET');
     throw new Error('missingKeyOrSecret');
   }
   const formatSourceLanguage = convertLanguageCode(sourceLanguage, 'volc');
   const formatTargetLanguage = convertLanguageCode(targetLanguage, 'volc');
   if (!formatSourceLanguage || !formatTargetLanguage) {
-    console.log('不支持的语言');
+    console.log('不支持的語言');
     throw new Error('not supported language');
   }
   if (!service || !fetchApi) {
@@ -36,22 +36,23 @@ export default async function translate(
     });
   }
   const postBody = {
-    SourceLanguage: formatSourceLanguage == 'auto' ? undefined : formatSourceLanguage,
+    SourceLanguage:
+      formatSourceLanguage == 'auto' ? undefined : formatSourceLanguage,
     TargetLanguage: formatTargetLanguage,
     TextList: Array.isArray(query) ? query : [query],
   };
   try {
     const res = await fetchApi(postBody, {});
     if (!res?.TranslationList?.[0]?.Translation) {
-      throw new Error(res?.ResponseMetadata?.Error?.Code || '未知错误');
+      throw new Error(res?.ResponseMetadata?.Error?.Code || '未知錯誤');
     }
 
-    // 如果输入是数组，返回结果数组
+    // 如果輸入是數組，返回結果數組
     if (Array.isArray(query)) {
       return res.TranslationList.map((item) => item.Translation);
     }
     return res.TranslationList[0].Translation;
   } catch (error) {
-    throw new Error(error?.message || '未知错误');
+    throw new Error(error?.message || '未知錯誤');
   }
 }

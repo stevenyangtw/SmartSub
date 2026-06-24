@@ -10,22 +10,22 @@ import type { FireRedAddonParams } from '../engines/fireRedParams';
 export interface SherpaModelRequest {
   vadModel: string;
   modelType: 'sense_voice' | 'paraformer' | 'qwen3_asr' | 'fire_red_asr';
-  /** sense_voice / paraformer：单模型文件 + tokens.txt；fire_red_asr 复用 tokens 承载 tokens.txt。 */
+  /** sense_voice / paraformer：單模型文件 + tokens.txt；fire_red_asr 複用 tokens 承載 tokens.txt。 */
   asrModel?: string;
   tokens?: string;
-  /** qwen3_asr：四件套（tokenizer 为目录）。 */
+  /** qwen3_asr：四件套（tokenizer 為目錄）。 */
   qwen?: {
     convFrontend: string;
     encoder: string;
     decoder: string;
     tokenizer: string;
   };
-  /** fire_red_asr：encoder + decoder 两件套（tokens 走 tokens 字段）。 */
+  /** fire_red_asr：encoder + decoder 兩件套（tokens 走 tokens 字段）。 */
   fireRed?: {
     encoder: string;
     decoder: string;
   };
-  /** funasr 用 FunasrAddonParams；qwen 用 QwenAddonParams；fireRed 用 FireRedAddonParams（共享 VAD/线程字段）。 */
+  /** funasr 用 FunasrAddonParams；qwen 用 QwenAddonParams；fireRed 用 FireRedAddonParams（共享 VAD/線程字段）。 */
   params: FunasrAddonParams | QwenAddonParams | FireRedAddonParams;
 }
 
@@ -45,9 +45,9 @@ function workerPath(): string {
 }
 
 /**
- * 主侧 sherpa funasr 运行时：常驻一个 worker（worker 内 dlopen 原生库、缓存识别器），
- * 提供 prewarm / transcribe / cancel / dispose。模型加载与解码均在 worker 线程，
- * 不阻塞主/UI 线程——根治 Windows 首个 transcribe 卡 0%。
+ * 主側 sherpa funasr 運行時：常駐一個 worker（worker 內 dlopen 原生庫、緩存識別器），
+ * 提供 prewarm / transcribe / cancel / dispose。模型加載與解碼均在 worker 線程，
+ * 不阻塞主/UI 線程——根治 Windows 首個 transcribe 卡 0%。
  */
 class SherpaFunasrRuntime {
   private worker: Worker | null = null;
@@ -71,7 +71,7 @@ class SherpaFunasrRuntime {
       env: {
         ...process.env,
         SHERPA_ONNX_LIB_DIR: libDir,
-        // Windows DLL / Linux SO 依赖解析（macOS 靠 @loader_path 重写）。
+        // Windows DLL / Linux SO 依賴解析（macOS 靠 @loader_path 重寫）。
         PATH: `${libDir}${path.delimiter}${process.env.PATH ?? ''}`,
         LD_LIBRARY_PATH: `${libDir}${path.delimiter}${
           process.env.LD_LIBRARY_PATH ?? ''
@@ -110,7 +110,7 @@ class SherpaFunasrRuntime {
     this.pending.clear();
   }
 
-  /** 预热：仅 load 模型，不转写。失败非致命。 */
+  /** 預熱：僅 load 模型，不轉寫。失敗非致命。 */
   prewarm(model: SherpaModelRequest): void {
     try {
       this.ensureWorker().postMessage({ type: 'load', ...model });
@@ -151,7 +151,7 @@ export function getSherpaFunasrRuntime(): SherpaFunasrRuntime {
 }
 
 /**
- * 引擎无关的 sherpa ASR 运行时入口（D4）：funasr 与 qwen 复用同一常驻 worker 与缓存。
- * worker 依 `SherpaModelRequest.modelType` 选择 sense_voice / paraformer / qwen3_asr 分支。
+ * 引擎無關的 sherpa ASR 運行時入口（D4）：funasr 與 qwen 複用同一常駐 worker 與緩存。
+ * worker 依 `SherpaModelRequest.modelType` 選擇 sense_voice / paraformer / qwen3_asr 分支。
  */
 export const getSherpaAsrRuntime = getSherpaFunasrRuntime;

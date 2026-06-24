@@ -45,7 +45,7 @@ const FunasrModelSection: React.FC<{
   const [confirmDeleteId, setConfirmDeleteId] = useState<FunasrModelId | null>(
     null,
   );
-  // 下载源在「点击下载时」于气泡内选择（源配置来自上层 ModelLibrarySection 的 Context）。
+  // 下載源在「點擊下載時」於氣泡內選擇（源配置來自上層 ModelLibrarySection 的 Context）。
   const sourceConfig = useDownloadSource();
   const [pickerId, setPickerId] = useState<FunasrModelId | null>(null);
 
@@ -54,7 +54,7 @@ const FunasrModelSection: React.FC<{
       const r = await window?.ipc?.invoke('getFunasrModelStatus');
       if (r?.success) setStatus(r as FunasrModelStatus);
     } catch {
-      // 保持上次状态
+      // 保持上次狀態
     }
   }, []);
 

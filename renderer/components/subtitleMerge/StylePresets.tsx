@@ -1,5 +1,5 @@
 /**
- * 预设样式选择组件
+ * 預設樣式選擇組件
  */
 
 import React from 'react';

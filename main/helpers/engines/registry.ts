@@ -23,8 +23,8 @@ export function getEngineAdapter(
 }
 
 /**
- * 逐任务引擎解析：任务 formData 携带的 `transcriptionEngine` 优先（且必须是已知引擎），
- * 缺省回退 builtin。引擎已逐任务化，不再读全局设置。
+ * 逐任務引擎解析：任務 formData 攜帶的 `transcriptionEngine` 優先（且必須是已知引擎），
+ * 缺省回退 builtin。引擎已逐任務化，不再讀全局設置。
  */
 export function resolveEngineIdForTask(formData?: {
   transcriptionEngine?: TranscriptionEngine;

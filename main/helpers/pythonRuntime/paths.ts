@@ -8,10 +8,10 @@ import type {
 } from '../../../types/engine';
 import { resolveReleaseBaseUrl } from '../download/sources';
 
-/** 独立发布仓库：https://github.com/buxuku/smartsub-py-engine */
+/** 獨立發佈倉庫：https://github.com/buxuku/smartsub-py-engine */
 export const PY_ENGINE_REPO = 'buxuku/smartsub-py-engine';
 
-/** 滚动 latest Release，SmartSub 始终从此 tag 拉取最新构建 */
+/** 滾動 latest Release，SmartSub 始終從此 tag 拉取最新構建 */
 export const PY_ENGINE_TAG = 'latest';
 
 export function getPyEngineArtifactSuffix(): string {
@@ -24,15 +24,15 @@ export function getPyEngineArtifactSuffix(): string {
 }
 
 /**
- * Full GPU(CUDA12) 变体仅在 windows-x64 / linux-x64 发布（引擎仓 release.yml 的 gpu:true 平台）。
- * macOS 无 NVIDIA CUDA，恒为 cpu 包。
+ * Full GPU(CUDA12) 變體僅在 windows-x64 / linux-x64 發佈（引擎倉 release.yml 的 gpu:true 平臺）。
+ * macOS 無 NVIDIA CUDA，恆為 cpu 包。
  */
 export function isPyEngineVariantSupported(variant: PyEngineVariant): boolean {
   if (variant === 'cpu') return true;
   return process.platform === 'win32' || process.platform === 'linux';
 }
 
-/** 规整变体：在不支持 cuda 的平台上把 'cuda' 收敛为 'cpu'，其余原样返回。 */
+/** 規整變體：在不支持 cuda 的平臺上把 'cuda' 收斂為 'cpu'，其餘原樣返回。 */
 export function normalizePyEngineVariant(
   variant: PyEngineVariant | undefined | null,
 ): PyEngineVariant {
@@ -40,7 +40,7 @@ export function normalizePyEngineVariant(
   return isPyEngineVariantSupported(v) ? v : 'cpu';
 }
 
-/** GitCode 镜像 owner 与 GitHub 不同（buxuku1），repo 名相同。 */
+/** GitCode 鏡像 owner 與 GitHub 不同（buxuku1），repo 名相同。 */
 const PY_ENGINE_REPO_SLUGS = {
   github: PY_ENGINE_REPO,
   gitcode: 'buxuku1/smartsub-py-engine',
@@ -68,15 +68,15 @@ export function getPyEngineManifestUrl(
 }
 
 // ============================================================================
-// faster-whisper 单自包含运行时：内嵌 PBS 解释器 + site-packages + main.py
-// （旧的「内置基座(Layer1) + 可重定位引擎包(Layer2)」两层已塌缩为一个可下载运行时；
-//   不再有可单独下载/内置的 Python 基座。）
+// faster-whisper 單自包含運行時：內嵌 PBS 解釋器 + site-packages + main.py
+// （舊的「內置基座(Layer1) + 可重定位引擎包(Layer2)」兩層已塌縮為一個可下載運行時；
+//   不再有可單獨下載/內置的 Python 基座。）
 // ============================================================================
 
 const DEFAULT_ENGINE_ID: PyEngineId = 'faster-whisper';
 
 /**
- * 运行时内嵌 python 解释器路径（PBS 布局，按平台）：
+ * 運行時內嵌 python 解釋器路徑（PBS 佈局，按平臺）：
  * win=<runtime>\python.exe，unix=<runtime>/bin/python3。
  */
 export function getRuntimePythonPath(runtimeDir: string): string {
@@ -85,24 +85,24 @@ export function getRuntimePythonPath(runtimeDir: string): string {
     : path.join(runtimeDir, 'bin', 'python3');
 }
 
-/** 所有引擎运行时的根目录：userData/py-engines */
+/** 所有引擎運行時的根目錄：userData/py-engines */
 export function getPyEnginesRoot(): string {
   return path.join(app.getPath('userData'), 'py-engines');
 }
 
-/** 单个引擎运行时目录：userData/py-engines/<engineId> */
+/** 單個引擎運行時目錄：userData/py-engines/<engineId> */
 export function getEngineDir(engineId: PyEngineId = DEFAULT_ENGINE_ID): string {
   return path.join(getPyEnginesRoot(), engineId);
 }
 
-/** 运行时 site-packages（spawn 内嵌 python 时挂到 PYTHONPATH） */
+/** 運行時 site-packages（spawn 內嵌 python 時掛到 PYTHONPATH） */
 export function getEngineSitePackages(
   engineId: PyEngineId = DEFAULT_ENGINE_ID,
 ): string {
   return path.join(getEngineDir(engineId), 'site-packages');
 }
 
-/** 运行时入口 main.py */
+/** 運行時入口 main.py */
 export function getEngineMainPy(
   engineId: PyEngineId = DEFAULT_ENGINE_ID,
 ): string {
@@ -110,8 +110,8 @@ export function getEngineMainPy(
 }
 
 /**
- * 运行时就绪 = 内嵌解释器 + main.py + site-packages 三者俱在。
- * 自包含运行时不依赖任何外部基座，故内嵌解释器存在与否是关键判据。
+ * 運行時就緒 = 內嵌解釋器 + main.py + site-packages 三者俱在。
+ * 自包含運行時不依賴任何外部基座，故內嵌解釋器存在與否是關鍵判據。
  */
 export function isRuntimeInstalled(
   engineId: PyEngineId = DEFAULT_ENGINE_ID,
@@ -153,7 +153,7 @@ export function writeEngineManifest(
   );
 }
 
-/** 已安装变体：读本地 manifest.variant，缺失（老安装/未装）按 'cpu' 兜底。 */
+/** 已安裝變體：讀本地 manifest.variant，缺失（老安裝/未裝）按 'cpu' 兜底。 */
 export function getInstalledVariant(
   engineId: PyEngineId = DEFAULT_ENGINE_ID,
 ): PyEngineVariant {
@@ -161,8 +161,8 @@ export function getInstalledVariant(
 }
 
 /**
- * 运行时产物名：smartsub-faster-whisper-runtime-<suffix>[-cuda].tar.gz（与引擎仓 release.yml 一致）。
- * cpu 变体不带后缀（即原产物名，保证向后兼容）；cuda 变体追加 -cuda。
+ * 運行時產物名：smartsub-faster-whisper-runtime-<suffix>[-cuda].tar.gz（與引擎倉 release.yml 一致）。
+ * cpu 變體不帶後綴（即原產物名，保證向後兼容）；cuda 變體追加 -cuda。
  */
 export function getEngineArtifactName(
   engineId: PyEngineId = DEFAULT_ENGINE_ID,

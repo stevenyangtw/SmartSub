@@ -23,7 +23,7 @@ export default function ProofreadImport({
 }: ProofreadImportProps) {
   const { t } = useTranslation('home');
 
-  // 导入视频文件
+  // 導入影片文件
   const handleImportVideos = useCallback(async () => {
     try {
       const result = await window.ipc.invoke('selectFiles', {
@@ -33,7 +33,7 @@ export default function ProofreadImport({
 
       if (!result || result.canceled || result.filePaths.length === 0) return;
 
-      // 使用工具函数创建 PendingFile
+      // 使用工具函數創建 PendingFile
       const files = await Promise.all(
         result.filePaths.map((videoPath: string) =>
           createPendingFileFromVideo(videoPath),
@@ -49,7 +49,7 @@ export default function ProofreadImport({
     }
   }, [onImportComplete]);
 
-  // 导入字幕文件
+  // 導入字幕文件
   const handleImportSubtitles = useCallback(async () => {
     try {
       const result = await window.ipc.invoke('selectFiles', {
@@ -59,7 +59,7 @@ export default function ProofreadImport({
 
       if (!result || result.canceled || result.filePaths.length === 0) return;
 
-      // 使用工具函数创建 PendingFile
+      // 使用工具函數創建 PendingFile
       const files = await Promise.all(
         result.filePaths.map((filePath: string) =>
           createPendingFileFromSubtitle(filePath),
@@ -75,13 +75,13 @@ export default function ProofreadImport({
     }
   }, [onImportComplete]);
 
-  // 导入文件夹（智能检测）
+  // 導入資料夾（智能檢測）
   const handleImportFolder = useCallback(async () => {
     try {
       const result = await window.ipc.invoke('selectDirectory');
       if (!result || result.canceled || !result.directoryPath) return;
 
-      // 智能扫描目录
+      // 智能掃描目錄
       const scanResult = await window.ipc.invoke('smartScanDirectory', {
         directoryPath: result.directoryPath,
       });
@@ -98,9 +98,9 @@ export default function ProofreadImport({
         return;
       }
 
-      // 智能检测：如果有视频，按视频模式处理
+      // 智能檢測：如果有影片，按影片模式處理
       if (videos.length > 0) {
-        // 使用工具函数创建 PendingFile
+        // 使用工具函數創建 PendingFile
         const files = await Promise.all(
           videos.map((videoPath: string) =>
             createPendingFileFromVideo(videoPath),
@@ -111,9 +111,9 @@ export default function ProofreadImport({
           onImportComplete(files, 'video');
         }
       } else {
-        // 没有视频，按字幕模式处理
+        // 沒有影片，按字幕模式處理
         const allSubtitles: DetectedSubtitle[] = [];
-        // 取用户任务语向，用于判定每个字幕是原文还是译文
+        // 取用戶任務語向，用於判定每個字幕是原文還是譯文
         const userConfig = await window.ipc.invoke('getUserConfig');
 
         for (const filePath of subtitles) {
@@ -134,7 +134,7 @@ export default function ProofreadImport({
           });
         }
 
-        // 匹配字幕对
+        // 匹配字幕對
         const matchResult = await window.ipc.invoke('matchSubtitleFiles', {
           files: subtitles,
         });

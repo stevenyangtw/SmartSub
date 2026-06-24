@@ -13,22 +13,22 @@ export default async function translate(
 ) {
   const { apiKey, modelName } = proof || {};
   if (!apiKey) {
-    console.log('请先配置 API KEY');
+    console.log('請先配置 API KEY');
     throw new Error('missingKeyOrSecret');
   }
 
   const formatSourceLanguage = convertLanguageCode(sourceLanguage, 'doubao');
   const formatTargetLanguage = convertLanguageCode(targetLanguage, 'doubao');
   if (!formatTargetLanguage) {
-    console.log('不支持的目标语言');
+    console.log('不支持的目標語言');
     throw new Error('not supported language');
   }
 
-  // 支持字符串数组输入
+  // 支持字符串數組輸入
   const queryArray = Array.isArray(query) ? query : [query];
   const results: string[] = [];
 
-  // 豆包翻译API每次只能翻译一条文本，需要循环调用
+  // 豆包翻譯API每次只能翻譯一條文本，需要循環調用
   for (const text of queryArray) {
     const requestBody = {
       model: modelName || DEFAULT_MODEL,
@@ -40,7 +40,7 @@ export default async function translate(
               type: 'input_text',
               text: text,
               translation_options: {
-                source_language: formatSourceLanguage || undefined, // 如果是 auto 则不传
+                source_language: formatSourceLanguage || undefined, // 如果是 auto 則不傳
                 target_language: formatTargetLanguage,
               },
             },
@@ -58,13 +58,13 @@ export default async function translate(
         timeout: TRANSLATION_REQUEST_TIMEOUT,
       });
 
-      // 解析响应
+      // 解析響應
       const output = res?.data?.output;
       if (!output || output.length === 0) {
-        throw new Error(res?.data?.error?.message || '翻译返回为空');
+        throw new Error(res?.data?.error?.message || '翻譯返回為空');
       }
 
-      // 从 output 中提取翻译结果
+      // 從 output 中提取翻譯結果
       const translatedText = extractTranslation(output);
       results.push(translatedText);
     } catch (error) {
@@ -79,7 +79,7 @@ export default async function translate(
     }
   }
 
-  // 如果输入是数组，返回结果数组
+  // 如果輸入是數組，返回結果數組
   if (Array.isArray(query)) {
     return results;
   }
@@ -87,7 +87,7 @@ export default async function translate(
 }
 
 /**
- * 从 Responses API 的 output 中提取翻译文本
+ * 從 Responses API 的 output 中提取翻譯文本
  */
 function extractTranslation(output: any[]): string {
   for (const item of output) {
@@ -99,5 +99,5 @@ function extractTranslation(output: any[]): string {
       }
     }
   }
-  throw new Error('无法从响应中提取翻译结果');
+  throw new Error('無法從響應中提取翻譯結果');
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 
 /**
- * 启动台任务卡片专属图标。
- * 手绘双色调 SVG：统一 1.6 圆头描边 + currentColor 低透明度填充，
- * 跟随卡片配色与明暗主题，比通用图标库更精致统一。
+ * 啟動臺任務卡片專屬圖標。
+ * 手繪雙色調 SVG：統一 1.6 圓頭描邊 + currentColor 低透明度填充，
+ * 跟隨卡片配色與明暗主題，比通用圖標庫更精緻統一。
  */
 type IconProps = { className?: string };
 
@@ -16,7 +16,7 @@ const base = {
   strokeLinejoin: 'round',
 } as const;
 
-/** 视频 → 双语字幕：视频帧 + 双行字幕卡（原文实、译文虚） */
+/** 影片 → 雙語字幕：影片幀 + 雙行字幕卡（原文實、譯文虛） */
 export function GenerateTranslateIcon({ className }: IconProps) {
   return (
     <svg className={className} {...base}>
@@ -42,7 +42,7 @@ export function GenerateTranslateIcon({ className }: IconProps) {
   );
 }
 
-/** 视频 → 原文字幕：视频帧内嵌单行字幕条 */
+/** 影片 → 原文字幕：影片幀內嵌單行字幕條 */
 export function GenerateIcon({ className }: IconProps) {
   return (
     <svg className={className} {...base}>
@@ -67,7 +67,7 @@ export function GenerateIcon({ className }: IconProps) {
   );
 }
 
-/** 翻译已有字幕：A / 文 双语面板 */
+/** 翻譯已有字幕：A / 文 雙語面板 */
 export function TranslateIcon({ className }: IconProps) {
   return (
     <svg className={className} {...base}>
@@ -91,7 +91,7 @@ export function TranslateIcon({ className }: IconProps) {
   );
 }
 
-/** 校对字幕：字幕稿 + 圈选对勾 */
+/** 校對字幕：字幕稿 + 圈選對勾 */
 export function ProofreadIcon({ className }: IconProps) {
   return (
     <svg className={className} {...base}>
@@ -111,7 +111,7 @@ export function ProofreadIcon({ className }: IconProps) {
   );
 }
 
-/** 合成到视频：字幕压入画面底部 */
+/** 合成到影片：字幕壓入畫面底部 */
 export function MergeIcon({ className }: IconProps) {
   return (
     <svg className={className} {...base}>
@@ -133,8 +133,8 @@ export function MergeIcon({ className }: IconProps) {
 }
 
 /**
- * 卡片角落的淡线条装饰：同心圆弧 + 网格点，随卡片色调染色。
- * 父级用 text-*-500/[0.x] 控制颜色与强度。
+ * 卡片角落的淡線條裝飾：同心圓弧 + 網格點，隨卡片色調染色。
+ * 父級用 text-*-500/[0.x] 控制顏色與強度。
  */
 export function CardDecor({ className }: IconProps) {
   return (

@@ -6,15 +6,15 @@ import {
 } from '../../types/downloadConfig';
 
 /**
- * 读取「当前生效的下载端点配置」（用户在设置页的覆盖 + 默认值规范化）。
+ * 讀取「當前生效的下載端點配置」（用戶在設置頁的覆蓋 + 預設值規範化）。
  *
- * 仅用于 renderer 侧展示用途（如「复制下载链接」），让复制出的镜像地址与用户配置一致。
- * 通过模块级缓存保证：无论挂载多少行，整个会话只发一次 getSettings IPC。
+ * 僅用於 renderer 側展示用途（如「複製下載鏈接」），讓複製出的鏡像地址與用戶配置一致。
+ * 通過模塊級緩存保證：無論掛載多少行，整個會話只發一次 getSettings IPC。
  */
 let cache: DownloadEndpointConfig | null = null;
 let inflight: Promise<DownloadEndpointConfig> | null = null;
 
-/** 设置页保存 / 重置下载端点后调用，使缓存失效，下次挂载即读取最新配置。 */
+/** 設置頁保存 / 重置下載端點後調用，使緩存失效，下次掛載即讀取最新配置。 */
 export function invalidateDownloadEndpointsCache(): void {
   cache = null;
   inflight = null;

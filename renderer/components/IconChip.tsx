@@ -2,9 +2,9 @@ import React from 'react';
 import { cn } from 'lib/utils';
 
 /**
- * 卡片/区块标题左侧的统一图标容器。
- * 收敛此前「裸图标 + mr-2（24px 无约束）」与「图标容器」并存的不一致。
- * 默认中性底（bg-muted），可通过 className 覆盖语义色（如危险区用 destructive）。
+ * 卡片/區塊標題左側的統一圖標容器。
+ * 收斂此前「裸圖標 + mr-2（24px 無約束）」與「圖標容器」並存的不一致。
+ * 預設中性底（bg-muted），可通過 className 覆蓋語義色（如危險區用 destructive）。
  */
 export function IconChip({
   icon: Icon,

@@ -8,29 +8,29 @@ export interface ISystemInfo {
   fasterWhisperModelsInstalled?: string[];
   fasterWhisperModelsPath?: string;
   pythonEngineStatus?: EngineStatus;
-  /** funasr 引擎包是否已安装 */
+  /** funasr 引擎包是否已安裝 */
   funasrEngineInstalled?: boolean;
-  /** funasr 共用 VAD 是否已安装 */
+  /** funasr 共用 VAD 是否已安裝 */
   funasrVadInstalled?: boolean;
-  /** 已安装的 funasr ASR 模型 id（如 ['sensevoice-small','paraformer-zh']） */
+  /** 已安裝的 funasr ASR 模型 id（如 ['sensevoice-small','paraformer-zh']） */
   funasrAsrModelsInstalled?: string[];
-  /** funasr 模型根目录（固定路径，仅展示用，不可更改） */
+  /** funasr 模型根目錄（固定路徑，僅展示用，不可更改） */
   funasrModelsPath?: string;
-  /** qwen 引擎包（sherpa-onnx，与 funasr 同库）是否已安装 */
+  /** qwen 引擎包（sherpa-onnx，與 funasr 同庫）是否已安裝 */
   qwenEngineInstalled?: boolean;
-  /** qwen 共用 silero VAD 是否已安装 */
+  /** qwen 共用 silero VAD 是否已安裝 */
   qwenVadInstalled?: boolean;
-  /** 已安装的 qwen 模型 id（如 ['qwen3-asr-0.6b']） */
+  /** 已安裝的 qwen 模型 id（如 ['qwen3-asr-0.6b']） */
   qwenModelsInstalled?: string[];
-  /** qwen 模型根目录（固定路径，仅展示用，不可更改） */
+  /** qwen 模型根目錄（固定路徑，僅展示用，不可更改） */
   qwenModelsPath?: string;
-  /** fireRed 引擎包（sherpa-onnx，与 funasr 同库）是否已安装 */
+  /** fireRed 引擎包（sherpa-onnx，與 funasr 同庫）是否已安裝 */
   fireRedEngineInstalled?: boolean;
-  /** fireRed 共用 silero VAD 是否已安装 */
+  /** fireRed 共用 silero VAD 是否已安裝 */
   fireRedVadInstalled?: boolean;
-  /** 已安装的 fireRed 模型 id（如 ['fire-red-asr-large-zh-en']） */
+  /** 已安裝的 fireRed 模型 id（如 ['fire-red-asr-large-zh-en']） */
   fireRedModelsInstalled?: string[];
-  /** fireRed 模型根目录（固定路径，仅展示用，不可更改） */
+  /** fireRed 模型根目錄（固定路徑，僅展示用，不可更改） */
   fireRedModelsPath?: string;
 }
 
@@ -49,9 +49,9 @@ export interface IFiles {
   tempAudioFile?: string;
   translatedSrtFile?: string;
   tempTranslatedSrtFile?: string;
-  /** 本次转写实际使用的后端标签（如 "CUDA 12.4.0" / "Vulkan" / "CPU"） */
+  /** 本次轉寫實際使用的後端標籤（如 "CUDA 12.4.0" / "Vulkan" / "CPU"） */
   whisperBackend?: string;
-  /** 该文件走了内封软字幕直提（跳过抽音频 + ASR）：用于任务列表标识 */
+  /** 該文件走了內封軟字幕直提（跳過抽音頻 + ASR）：用於任務列表標識 */
   embeddedSubtitle?: boolean;
 }
 
@@ -60,10 +60,10 @@ export type TaskProjectType =
   | 'generateOnly'
   | 'translateOnly';
 
-/** 一次任务工程：任务维度记录，下挂文件列表 */
+/** 一次任務工程：任務維度記錄，下掛文件列表 */
 export interface TaskProject {
   id: string;
-  /** 默认「时间 + 第一个文件名」，用户可改 */
+  /** 默認「時間 + 第一個文件名」，用戶可改 */
   name: string;
   taskType: TaskProjectType;
   files: IFiles[];
@@ -72,7 +72,7 @@ export interface TaskProject {
 }
 
 export interface IFormData {
-  /** 任务类型（运行时由任务携带）：用于区分源字幕是 ASR 生成还是用户导入。 */
+  /** 任務類型（運行時由任務攜帶）：用於區分源字幕是 ASR 生成還是用戶導入。 */
   taskType?: TaskProjectType;
   translateContent:
     | 'onlyTranslate'
@@ -84,6 +84,6 @@ export interface IFormData {
   targetLanguage: string;
   translateRetryTimes: string;
   subtitleOutputFormat?: 'srt' | 'vtt' | 'ass' | 'lrc' | 'txt';
-  /** 中文标点去除（任务级开关）：开启后把中文标点替换为空格。作用于源字幕(中文源)与译文(中文目标)。缺省关闭。 */
+  /** 中文標點去除（任務級開關）：開啟後把中文標點替換為空格。作用於源字幕(中文源)與譯文(中文目標)。缺省關閉。 */
   removeChinesePunctuation?: boolean;
 }

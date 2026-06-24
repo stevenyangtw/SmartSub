@@ -1,19 +1,19 @@
 /**
- * 字幕格式编解码模块（零依赖，纯函数，便于单元测试）。
+ * 字幕格式編解碼模塊（零依賴，純函數，便於單元測試）。
  *
- * 统一支持常见字幕格式的解析（导入）与序列化（导出）：
- *   - srt：SubRip，应用内部规范格式
+ * 統一支持常見字幕格式的解析（導入）與序列化（導出）：
+ *   - srt：SubRip，應用內部規範格式
  *   - vtt：WebVTT
  *   - ass/ssa：Advanced SubStation Alpha
- *   - lrc：歌词格式（仅有起始时间）
- *   - txt：纯文本（无时间轴，仅用于导出）
+ *   - lrc：歌詞格式（僅有起始時間）
+ *   - txt：純文本（無時間軸，僅用於導出）
  *
- * 设计要点：
- *   - 内部统一用毫秒（ms）表示时间，避免各格式时间精度差异导致的累积误差。
- *   - 解析结果对齐应用既有的 Subtitle 模型 { id, startEndTime, content[] }，
- *     其中 startEndTime 始终是 SRT 风格字符串，保证下游（播放器/校对/合并）无需改动取值方式。
- *   - 同时提供「整文件序列化」与「逐条追加序列化」两套接口，
- *     以兼容翻译流程边翻译边写入（流式追加）的既有实现。
+ * 設計要點：
+ *   - 內部統一用毫秒（ms）表示時間，避免各格式時間精度差異導致的累積誤差。
+ *   - 解析結果對齊應用既有的 Subtitle 模型 { id, startEndTime, content[] }，
+ *     其中 startEndTime 始終是 SRT 風格字符串，保證下游（播放器/校對/合併）無需改動取值方式。
+ *   - 同時提供「整文件序列化」與「逐條追加序列化」兩套接口，
+ *     以兼容翻譯流程邊翻譯邊寫入（流式追加）的既有實現。
  */
 
 export type SubtitleFormat = 'srt' | 'vtt' | 'ass' | 'lrc' | 'txt';
@@ -21,10 +21,10 @@ export type SubtitleFormat = 'srt' | 'vtt' | 'ass' | 'lrc' | 'txt';
 export interface SubtitleCue {
   startMs: number;
   endMs: number;
-  text: string; // 多行以 \n 连接
+  text: string; // 多行以 \n 連接
 }
 
-// 与应用既有 Subtitle 模型结构兼容（main/translate/types、renderer/hooks/useSubtitles）
+// 與應用既有 Subtitle 模型結構兼容（main/translate/types、renderer/hooks/useSubtitles）
 export interface SubtitleEntry {
   id: string;
   startEndTime: string;
@@ -39,7 +39,7 @@ export const SUPPORTED_SUBTITLE_FORMATS: SubtitleFormat[] = [
   'txt',
 ];
 
-// 可作为「导入」来源的格式（txt 无时间轴，不支持导入）
+// 可作為「導入」來源的格式（txt 無時間軸，不支持導入）
 export const IMPORTABLE_SUBTITLE_FORMATS: SubtitleFormat[] = [
   'srt',
   'vtt',
@@ -64,14 +64,14 @@ const FORMAT_TO_EXT: Record<SubtitleFormat, string> = {
   txt: '.txt',
 };
 
-/** 根据文件路径/扩展名推断字幕格式，未知时回退为 srt。 */
+/** 根據文件路徑/擴展名推斷字幕格式，未知時回退為 srt。 */
 export function detectSubtitleFormat(filePath: string): SubtitleFormat {
   const match = /\.[^.\\/]+$/.exec(filePath || '');
   const ext = match ? match[0].toLowerCase() : '';
   return EXT_TO_FORMAT[ext] || 'srt';
 }
 
-/** 获取某格式对应的文件扩展名（含点）。 */
+/** 獲取某格式對應的文件擴展名（含點）。 */
 export function getFormatExtension(format: SubtitleFormat): string {
   return FORMAT_TO_EXT[format] || '.srt';
 }
@@ -82,7 +82,7 @@ export function isSupportedSubtitleFormat(
   return (SUPPORTED_SUBTITLE_FORMATS as string[]).includes(format);
 }
 
-// ----------------------------- 时间处理 -----------------------------
+// ----------------------------- 時間處理 -----------------------------
 
 function pad(n: number, len = 2): string {
   return String(Math.max(0, Math.floor(n))).padStart(len, '0');
@@ -107,15 +107,15 @@ function splitMs(input: number): TimeParts {
 }
 
 /**
- * 将各种字幕时间字符串解析为毫秒。
- * 支持：HH:MM:SS,mmm | HH:MM:SS.mmm | H:MM:SS.cc(ASS 厘秒) | MM:SS.xx | [mm:ss.xx](LRC)
+ * 將各種字幕時間字符串解析為毫秒。
+ * 支持：HH:MM:SS,mmm | HH:MM:SS.mmm | H:MM:SS.cc(ASS 釐秒) | MM:SS.xx | [mm:ss.xx](LRC)
  */
 export function parseTimeToMs(raw: string): number {
   if (!raw) return 0;
   let s = raw.trim();
-  // 去除 LRC 方括号
+  // 去除 LRC 方括號
   s = s.replace(/^\[/, '').replace(/\]$/, '');
-  // 逗号统一成点
+  // 逗號統一成點
   s = s.replace(',', '.');
   const parts = s.split(':');
   let h = 0;
@@ -146,7 +146,7 @@ export function formatVttTime(ms: number): string {
 
 export function formatAssTime(ms: number): string {
   const t = splitMs(ms);
-  const cs = Math.floor(t.ms / 10); // ASS 使用厘秒
+  const cs = Math.floor(t.ms / 10); // ASS 使用釐秒
   return `${t.h}:${pad(t.m)}:${pad(t.s)}.${pad(cs, 2)}`;
 }
 
@@ -158,7 +158,7 @@ export function formatLrcTime(ms: number): string {
   return `${pad(minutes)}:${pad(seconds)}.${pad(cs, 2)}`;
 }
 
-/** 解析 "HH:MM:SS,mmm --> HH:MM:SS,mmm" 形式的起止时间。 */
+/** 解析 "HH:MM:SS,mmm --> HH:MM:SS,mmm" 形式的起止時間。 */
 export function parseStartEndTime(startEndTime: string): {
   startMs: number;
   endMs: number;
@@ -170,12 +170,12 @@ export function parseStartEndTime(startEndTime: string): {
   };
 }
 
-/** 生成 SRT 风格的起止时间字符串（应用内部规范）。 */
+/** 生成 SRT 風格的起止時間字符串（應用內部規範）。 */
 export function toSrtTimeRange(startMs: number, endMs: number): string {
   return `${formatSrtTime(startMs)} --> ${formatSrtTime(endMs)}`;
 }
 
-// ----------------------------- 解析（导入） -----------------------------
+// ----------------------------- 解析（導入） -----------------------------
 
 const TIMING_LINE_REGEX = /-->/;
 
@@ -187,10 +187,10 @@ function normalizeLineEndings(text: string): string {
   return stripBom(text).replace(/\r\n?/g, '\n');
 }
 
-/** 解析 SRT / VTT（两者块结构一致，时间分隔符不同，统一处理）。 */
+/** 解析 SRT / VTT（兩者塊結構一致，時間分隔符不同，統一處理）。 */
 function parseSrtVtt(content: string): SubtitleCue[] {
   let text = normalizeLineEndings(content);
-  // 去除 VTT 头部（WEBVTT 行及其后元数据，直到首个空行）
+  // 去除 VTT 頭部（WEBVTT 行及其後元數據，直到首個空行）
   if (/^WEBVTT/.test(text)) {
     const firstBlank = text.indexOf('\n\n');
     text = firstBlank >= 0 ? text.slice(firstBlank + 2) : '';
@@ -200,14 +200,14 @@ function parseSrtVtt(content: string): SubtitleCue[] {
   for (const block of blocks) {
     const lines = block.split('\n').filter((l) => l.trim() !== '');
     if (lines.length === 0) continue;
-    // VTT 的 NOTE / STYLE / REGION 块跳过
+    // VTT 的 NOTE / STYLE / REGION 塊跳過
     if (/^(NOTE|STYLE|REGION)\b/.test(lines[0])) continue;
     const timingIndex = lines.findIndex((l) => TIMING_LINE_REGEX.test(l));
     if (timingIndex === -1) continue;
     const timingLine = lines[timingIndex];
     const [startPart, endPartRaw] = timingLine.split('-->');
     if (endPartRaw === undefined) continue;
-    // VTT 时间行尾部可能带 cue setting（如 align:start position:50%），取第一个时间 token
+    // VTT 時間行尾部可能帶 cue setting（如 align:start position:50%），取第一個時間 token
     const endPart = endPartRaw.trim().split(/\s+/)[0];
     const startMs = parseTimeToMs(startPart);
     const endMs = parseTimeToMs(endPart);
@@ -218,11 +218,11 @@ function parseSrtVtt(content: string): SubtitleCue[] {
   return cues;
 }
 
-/** 清理 ASS 文本中的覆盖标签与转义。 */
+/** 清理 ASS 文本中的覆蓋標籤與轉義。 */
 function cleanAssText(raw: string): string {
   return raw
-    .replace(/\{[^}]*\}/g, '') // 覆盖标签 {\...}
-    .replace(/\\N/gi, '\n') // 硬换行
+    .replace(/\{[^}]*\}/g, '') // 覆蓋標籤 {\...}
+    .replace(/\\N/gi, '\n') // 硬換行
     .replace(/\\h/g, ' ') // 硬空格
     .trim();
 }
@@ -256,9 +256,9 @@ function parseAss(content: string): SubtitleCue[] {
     }
 
     if (/^Dialogue\s*:/i.test(trimmed)) {
-      if (idxText === -1) continue; // 没有 Format 行无法解析
+      if (idxText === -1) continue; // 沒有 Format 行無法解析
       const body = trimmed.slice(trimmed.indexOf(':') + 1);
-      // 文本字段是最后一个且可能包含逗号，因此按字段数限制切分
+      // 文本字段是最後一個且可能包含逗號，因此按字段數限制切分
       const parts = splitWithLimit(body, ',', formatFields.length);
       const startMs = parseTimeToMs(parts[idxStart] || '');
       const endMs = parseTimeToMs(parts[idxEnd] || '');
@@ -270,7 +270,7 @@ function parseAss(content: string): SubtitleCue[] {
   return cues;
 }
 
-/** 按分隔符切分为最多 limit 段，最后一段保留剩余所有内容（含分隔符）。 */
+/** 按分隔符切分為最多 limit 段，最後一段保留剩餘所有內容（含分隔符）。 */
 function splitWithLimit(str: string, sep: string, limit: number): string[] {
   if (limit <= 0) return [str];
   const result: string[] = [];
@@ -298,13 +298,13 @@ function parseLrc(content: string): SubtitleCue[] {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    // offset 元数据
+    // offset 元數據
     const offsetMatch = /^\[offset:\s*([+-]?\d+)\s*\]$/i.exec(trimmed);
     if (offsetMatch) {
       offsetMs = parseInt(offsetMatch[1], 10) || 0;
       continue;
     }
-    // 跳过其它纯元数据标签，如 [ar:] [ti:] [al:] [by:] [length:]
+    // 跳過其它純元數據標籤，如 [ar:] [ti:] [al:] [by:] [length:]
     if (/^\[[a-z]+:.*\]$/i.test(trimmed)) continue;
 
     tagRegex.lastIndex = 0;
@@ -329,14 +329,14 @@ function parseLrc(content: string): SubtitleCue[] {
     const endMs =
       i + 1 < entries.length
         ? Math.max(startMs, entries[i + 1].startMs + offsetMs)
-        : startMs + 4000; // 末行给一个默认时长
+        : startMs + 4000; // 末行給一個預設時長
     if (entries[i].text === '') continue;
     cues.push({ startMs, endMs, text: entries[i].text });
   }
   return cues;
 }
 
-/** 将字幕内容解析为时间轴 cue 列表。 */
+/** 將字幕內容解析為時間軸 cue 列表。 */
 export function parseSubtitleCues(
   content: string,
   format: SubtitleFormat,
@@ -347,7 +347,7 @@ export function parseSubtitleCues(
     case 'lrc':
       return parseLrc(content);
     case 'txt':
-      return []; // 纯文本无时间轴，不支持导入
+      return []; // 純文本無時間軸，不支持導入
     case 'srt':
     case 'vtt':
     default:
@@ -355,7 +355,7 @@ export function parseSubtitleCues(
   }
 }
 
-/** 将字幕内容解析为应用内部的 Subtitle 列表。 */
+/** 將字幕內容解析為應用內部的 Subtitle 列表。 */
 export function parseSubtitleEntries(
   content: string,
   format: SubtitleFormat,
@@ -368,7 +368,7 @@ export function parseSubtitleEntries(
   }));
 }
 
-// ----------------------------- 序列化（导出） -----------------------------
+// ----------------------------- 序列化（導出） -----------------------------
 
 const ASS_HEADER = `[Script Info]
 ScriptType: v4.00+
@@ -386,14 +386,14 @@ Style: Default,Arial,72,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 `;
 
-/** 文件头（仅 vtt/ass 需要），用于流式追加写入前先写头部。 */
+/** 文件頭（僅 vtt/ass 需要），用於流式追加寫入前先寫頭部。 */
 export function getSubtitleFileHeader(format: SubtitleFormat): string {
   if (format === 'vtt') return 'WEBVTT\n\n';
   if (format === 'ass') return ASS_HEADER;
   return '';
 }
 
-/** 序列化单条 cue（用于流式追加写入）。 */
+/** 序列化單條 cue（用於流式追加寫入）。 */
 export function serializeCue(
   cue: { id?: string; startMs: number; endMs: number; text: string },
   format: SubtitleFormat,
@@ -433,8 +433,8 @@ export function serializeSubtitleCues(
 }
 
 /**
- * 将「已渲染好文本」的条目列表序列化为目标格式整文件。
- * 用于导出已合并好的（含双语）字幕。
+ * 將「已渲染好文本」的條目列表序列化為目標格式整文件。
+ * 用於導出已合併好的（含雙語）字幕。
  */
 export function serializeSubtitleEntries(
   entries: { id?: string; startEndTime: string; text: string }[],
@@ -453,7 +453,7 @@ export function serializeSubtitleEntries(
   return header + body;
 }
 
-/** 在不同字幕格式之间转换整文件内容。 */
+/** 在不同字幕格式之間轉換整文件內容。 */
 export function convertSubtitleContent(
   content: string,
   fromFormat: SubtitleFormat,

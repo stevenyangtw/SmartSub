@@ -56,10 +56,10 @@ const AdvancedSheet: React.FC<AdvancedSheetProps> = ({
   const { t: tHome } = useTranslation('home');
 
   const isMediaTask = typeDef.accepts === 'media';
-  const showFormatHere = typeDef.hasTranslate; // generateOnly 已在配置条展示
+  const showFormatHere = typeDef.hasTranslate; // generateOnly 已在配置條展示
 
-  // VAD 是全局设置（settings.useVAD），与设置页同源；这里只是任务高级选项里的便捷入口。
-  // 不进 react-hook-form，避免与逐任务的 userConfig 混淆。
+  // VAD 是全局設置（settings.useVAD），與設置頁同源；這裡只是任務高級選項裡的便捷入口。
+  // 不進 react-hook-form，避免與逐任務的 userConfig 混淆。
   const [vadEnabled, setVadEnabled] = useState(true);
   const [reduceRepetition, setReduceRepetition] = useState(false);
   useEffect(() => {
@@ -93,7 +93,7 @@ const AdvancedSheet: React.FC<AdvancedSheetProps> = ({
             <SheetTitle>{t('advanced')}</SheetTitle>
             <SheetDescription>{t('advancedDesc')}</SheetDescription>
           </SheetHeader>
-          {/* 内边距放在视口内部：避免输入框 focus ring 被 ScrollArea 视口横向裁剪 */}
+          {/* 內邊距放在視口內部：避免輸入框 focus ring 被 ScrollArea 視口橫向裁剪 */}
           <ScrollArea className="flex-1">
             <div className="px-6 pb-6">
               <Form {...form}>
@@ -225,8 +225,8 @@ const AdvancedSheet: React.FC<AdvancedSheetProps> = ({
                         control={form.control}
                         name="sourceSrtSaveOption"
                         render={({ field }) => {
-                          // generateOnly 任务的源字幕即交付物，noSave 选项被隐藏；
-                          // 若残留 noSave/空值会让下拉框显示为空且任务结束后删除字幕，这里回退为 fileName
+                          // generateOnly 任務的源字幕即交付物，noSave 選項被隱藏；
+                          // 若殘留 noSave/空值會讓下拉框顯示為空且任務結束後刪除字幕，這裡回退為 fileName
                           const isGenerateOnly =
                             typeDef.taskType === 'generateOnly';
                           const sourceSaveValue =

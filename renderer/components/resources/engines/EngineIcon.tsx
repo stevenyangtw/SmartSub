@@ -2,19 +2,19 @@ import React from 'react';
 import type { TranscriptionEngine } from '../../../../types/engine';
 
 interface EngineIconProps {
-  /** 真实引擎 id，或合并展示组 'sherpa'（FunASR · Qwen · FireRed）。 */
+  /** 真實引擎 id，或合併展示組 'sherpa'（FunASR · Qwen · FireRed）。 */
   engine: TranscriptionEngine | 'sherpa';
   className?: string;
 }
 
 /**
- * 各转写引擎的品牌化图标。优先用能代表该引擎特性的彩色标记，
- * 而非通用单色图标，便于在引擎列表里一眼区分：
- * - builtin（whisper.cpp，内置本地）：芯片内的声波
- * - fasterWhisper（主打速度）：闪电
- * - funasr（阿里达摩院）：橙色声波（语音识别）
- * - sherpa（FunASR · Qwen · FireRed 合并组）：堆叠的声波层，示意「多模型共用一套运行库」
- * - localCli（本地命令行）：终端提示符
+ * 各轉寫引擎的品牌化圖標。優先用能代表該引擎特性的彩色標記，
+ * 而非通用單色圖標，便於在引擎列表裡一眼區分：
+ * - builtin（whisper.cpp，內置本地）：芯片內的聲波
+ * - fasterWhisper（主打速度）：閃電
+ * - funasr（阿里達摩院）：橙色聲波（語音識別）
+ * - sherpa（FunASR · Qwen · FireRed 合併組）：堆疊的聲波層，示意「多模型共用一套運行庫」
+ * - localCli（本地命令行）：終端提示符
  */
 const EngineIcon: React.FC<EngineIconProps> = ({ engine, className }) => {
   if (engine === 'sherpa') {

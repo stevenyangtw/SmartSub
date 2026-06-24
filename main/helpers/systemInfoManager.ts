@@ -85,20 +85,20 @@ import { getBuildInfo } from './buildInfo';
 
 let downloadingModels = new Set<string>();
 
-/** 可文件夹导入的引擎类型（builtin 走单文件导入，不在此列）。 */
+/** 可資料夾導入的引擎類型（builtin 走單文件導入，不在此列）。 */
 type FolderImportEngine = 'funasr' | 'qwen' | 'fireRedAsr' | 'fasterWhisper';
 
 interface ImportPlan {
-  /** 目标模型必需文件（相对源/目的目录），用于导入前后布局校验。 */
+  /** 目標模型必需文件（相對源/目的目錄），用於導入前後佈局校驗。 */
   requiredFiles: string[];
-  /** 拷贝目的地（绝对路径）。 */
+  /** 拷貝目的地（絕對路徑）。 */
   destDir: string;
 }
 
 /**
- * 解析「从文件夹导入」的校验集与目的地（按指定引擎+模型槽消歧）。
- * - sherpa 三引擎：落 `<engine root>/<dirName>`，校验集取 catalog requiredFiles；
- * - fasterWhisper：落合成快照目录，使 resolveCt2ModelSnapshotDir 命中，校验集为 CT2 关键文件。
+ * 解析「從資料夾導入」的校驗集與目的地（按指定引擎+模型槽消歧）。
+ * - sherpa 三引擎：落 `<engine root>/<dirName>`，校驗集取 catalog requiredFiles；
+ * - fasterWhisper：落合成快照目錄，使 resolveCt2ModelSnapshotDir 命中，校驗集為 CT2 關鍵文件。
  * 返回 null 表示模型 id 非法/缺失。
  */
 function resolveImportPlan(
@@ -152,8 +152,8 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
   const fireRedModelDownloader = getFireRedModelDownloader(mainWindow);
 
   ipcMain.handle('getSystemInfo', async () => {
-    // faster-whisper 自包含运行时：已落盘 → ready（附 manifest 版本）；
-    // 否则 not_installed（资源中心可下载）。运行时探活推迟到真正转写时进行。
+    // faster-whisper 自包含運行時：已落盤 → ready（附 manifest 版本）；
+    // 否則 not_installed（資源中心可下載）。運行時探活推遲到真正轉寫時進行。
     const pythonEngineStatus: EngineStatus = isRuntimeInstalled(
       'faster-whisper',
     )
@@ -322,8 +322,8 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
 
   ipcMain.handle('deleteQwenModel', async (_event, modelId: QwenModelId) => {
     try {
-      // Qwen 与 funasr 共享同一 sherpa worker：删除前先释放 worker，避免 Windows 上
-      // 大模型文件被加载占用导致 rm 失败（worker 会在下次转写/预热时自动重建）。
+      // Qwen 與 funasr 共享同一 sherpa worker：刪除前先釋放 worker，避免 Windows 上
+      // 大模型文件被加載佔用導致 rm 失敗（worker 會在下次轉寫/預熱時自動重建）。
       getSherpaAsrRuntime().dispose();
       deleteQwenModel(modelId);
       return { success: true };
@@ -370,8 +370,8 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
     'deleteFireRedModel',
     async (_event, modelId: FireRedModelId) => {
       try {
-        // fireRed 与 funasr/qwen 共享同一 sherpa worker：删除前先释放 worker，避免 Windows 上
-        // 大模型文件被加载占用导致 rm 失败（worker 会在下次转写/预热时自动重建）。
+        // fireRed 與 funasr/qwen 共享同一 sherpa worker：刪除前先釋放 worker，避免 Windows 上
+        // 大模型文件被加載佔用導致 rm 失敗（worker 會在下次轉寫/預熱時自動重建）。
         getSherpaAsrRuntime().dispose();
         deleteFireRedModel(modelId);
         return { success: true };
@@ -381,11 +381,11 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
     },
   );
 
-  // 「复制下载链接」专用：按引擎域 + 模型 + 当前选中源解析一个可复制的下载/仓库链接。
-  // 复用各 catalog 既有的 URL 构造，避免 renderer 重复实现导致与真实下载链接漂移。
-  // - funasr（HF 仓库逐文件）/ qwen·firered（modelscope 逐文件）无单一直链 → 复制仓库页地址；
-  // - qwen·firered 的 ghproxy/github 源为整包 → 复制 tar.bz2 直链；
-  // - pyEngine 为本平台运行时整包 → 复制 release 资产直链。
+  // 「複製下載鏈接」專用：按引擎域 + 模型 + 當前選中源解析一個可複製的下載/倉庫鏈接。
+  // 複用各 catalog 既有的 URL 構造，避免 renderer 重複實現導致與真實下載鏈接漂移。
+  // - funasr（HF 倉庫逐文件）/ qwen·firered（modelscope 逐文件）無單一直鏈 → 複製倉庫頁地址；
+  // - qwen·firered 的 ghproxy/github 源為整包 → 複製 tar.bz2 直鏈；
+  // - pyEngine 為本平臺運行時整包 → 複製 release 資產直鏈。
   ipcMain.handle(
     'resolveModelDownloadUrl',
     async (
@@ -482,7 +482,7 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
     ) => {
       const engine = options?.engine;
 
-      // builtin（默认/无参）：维持单文件导入（.bin / .mlmodelc → builtin 模型目录）
+      // builtin（預設/無參）：維持單文件導入（.bin / .mlmodelc → builtin 模型目錄）
       if (!engine || engine === 'builtin') {
         const result = await dialog.showOpenDialog(mainWindow, {
           properties: ['openFile'],
@@ -498,7 +498,7 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
             await fse.copy(sourcePath, destPath);
             return { success: true };
           } catch (error) {
-            console.error('导入模型失败:', error);
+            console.error('導入模型失敗:', error);
             return { success: false, error: String(error) };
           }
         }
@@ -506,7 +506,7 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
         return { success: false, canceled: true };
       }
 
-      // 其它引擎：从本地文件夹按指定模型槽导入
+      // 其它引擎：從本地資料夾按指定模型槽導入
       const plan = resolveImportPlan(engine, options?.modelId);
       if (!plan) {
         return { success: false, reason: 'invalid-model' };
@@ -520,7 +520,7 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
       }
       const srcDir = picked.filePaths[0];
 
-      // 导入前校验布局：缺关键文件直接拒绝，不写盘
+      // 導入前校驗佈局：缺關鍵文件直接拒絕，不寫盤
       const pre = validateModelLayout(srcDir, plan.requiredFiles);
       if (!pre.ok) {
         return {
@@ -531,8 +531,8 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
       }
 
       try {
-        // sherpa 三引擎共享同一 worker：覆盖模型目录前先释放，避免 Windows 文件锁
-        // （worker 会在下次转写/预热时自动重建）。fasterWhisper 不走此 worker。
+        // sherpa 三引擎共享同一 worker：覆蓋模型目錄前先釋放，避免 Windows 文件鎖
+        // （worker 會在下次轉寫/預熱時自動重建）。fasterWhisper 不走此 worker。
         if (engine !== 'fasterWhisper') {
           getSherpaAsrRuntime().dispose();
         }
@@ -543,7 +543,7 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
         return { success: false, error: String(error) };
       }
 
-      // 导入后复校验：拷贝后目的地必须齐备
+      // 導入後覆校驗：拷貝後目的地必須齊備
       const post = validateModelLayout(plan.destDir, plan.requiredFiles);
       if (!post.ok) {
         return {
@@ -588,18 +588,18 @@ export function setupSystemInfoManager(mainWindow: BrowserWindow) {
     },
   );
 
-  // 获取临时目录路径
+  // 獲取臨時目錄路徑
   ipcMain.handle('getTempDir', async () => {
     return getTempDir();
   });
 
-  // 清除缓存
+  // 清除緩存
   ipcMain.handle('clearCache', async () => {
     try {
       const tempDir = getTempDir();
       const files = await fse.readdir(tempDir);
 
-      // 删除临时音频/字幕缓存与字幕保存备份，保留目录结构
+      // 刪除臨時音頻/字幕緩存與字幕保存備份，保留目錄結構
       for (const file of files) {
         if (
           file.endsWith('.wav') ||

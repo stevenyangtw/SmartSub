@@ -21,12 +21,12 @@ interface UpdateDialogProps {
   releaseNotes: string;
 }
 
-// 解析 releaseNotes，提取 "下载" 之前的内容
+// 解析 releaseNotes，提取 "下載" 之前的內容
 function parseReleaseNotes(html: string): string {
   if (!html) return '';
 
-  // 查找 "下载" 或 "Download" 标题的位置
-  const downloadIndex = html.indexOf('<h2>下载');
+  // 查找 "下載" 或 "Download" 標題的位置
+  const downloadIndex = html.indexOf('<h2>下載');
   if (downloadIndex !== -1) {
     return html.substring(0, downloadIndex).trim();
   }
@@ -39,8 +39,8 @@ function parseReleaseNotes(html: string): string {
   return html;
 }
 
-// 平台判断：preload 注入的 process.platform，避免 userAgent 嗅探
-// typeof 守卫：SSR 阶段 window 标识符不存在，可选链救不了 ReferenceError
+// 平臺判斷：preload 注入的 process.platform，避免 userAgent 嗅探
+// typeof 守衛：SSR 階段 window 標識符不存在，可選鏈救不了 ReferenceError
 function isMacPlatform(): boolean {
   return typeof window !== 'undefined' && window.ipc?.platform === 'darwin';
 }
@@ -81,10 +81,10 @@ export function UpdateDialog({
       const result = await window?.ipc?.invoke('download-update');
       if (result?.success) {
         if (result.manualDownload) {
-          // Mac 平台会打开 GitHub 页面
+          // Mac 平臺會打開 GitHub 頁面
           onOpenChange(false);
         } else {
-          // Windows 平台开始下载
+          // Windows 平臺開始下載
           toast.success(t('downloadingUpdate'));
           onOpenChange(false);
         }

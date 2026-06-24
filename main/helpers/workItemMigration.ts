@@ -15,7 +15,7 @@ const STAGE_KEYS = [
 
 type StageKey = (typeof STAGE_KEYS)[number];
 
-/** 默认任务名：时间 + 第一个文件名 */
+/** 預設任務名：時間 + 第一個文件名 */
 export function buildTaskName(files: IFiles[], at = new Date()): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   const time = `${pad(at.getMonth() + 1)}-${pad(at.getDate())} ${pad(at.getHours())}:${pad(at.getMinutes())}`;
@@ -29,7 +29,7 @@ function getStageError(file: IFiles, key: StageKey): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-/** 从流水线文件列表推导 WorkItem 状态（不依赖 renderer stageUtils） */
+/** 從流水線文件列表推導 WorkItem 狀態（不依賴 renderer stageUtils） */
 export function derivePipelineWorkItemStatus(files: IFiles[]): WorkItemStatus {
   if (!files?.length) return 'waiting';
 
@@ -106,7 +106,7 @@ export interface WorkItemMigrationResult {
   fromProofreadTasks: number;
 }
 
-/** 将 legacy 存储一次性转换为 WorkItem 列表（保留原 id） */
+/** 將 legacy 存儲一次性轉換為 WorkItem 列表（保留原 id） */
 export function migrateLegacyStoresToWorkItems(
   input: WorkItemMigrationInput,
 ): WorkItemMigrationResult {

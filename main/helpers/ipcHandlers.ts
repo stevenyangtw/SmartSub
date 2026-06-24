@@ -15,9 +15,9 @@ import {
   convertSubtitleContent,
 } from './subtitleFormats';
 
-// 定义支持的文件扩展名常量
+// 定義支持的文件擴展名常量
 export const MEDIA_EXTENSIONS = [
-  // 视频格式
+  // 影片格式
   '.mp4',
   '.avi',
   '.mov',
@@ -25,7 +25,7 @@ export const MEDIA_EXTENSIONS = [
   '.flv',
   '.wmv',
   '.webm',
-  // 音频格式
+  // 音頻格式
   '.mp3',
   '.wav',
   '.ogg',
@@ -40,7 +40,7 @@ export const MEDIA_EXTENSIONS = [
   '.amr',
   '.au',
   '.mid',
-  // 其他常见视频格式
+  // 其他常見影片格式
   '.3gp',
   '.asf',
   '.rm',
@@ -60,24 +60,24 @@ export const SUBTITLE_EXTENSIONS = [
   '.lrc',
 ];
 
-// 判断文件是否为媒体文件
+// 判斷文件是否為媒體文件
 export function isMediaFile(filePath: string): boolean {
   const ext = path.extname(filePath).toLowerCase();
   return MEDIA_EXTENSIONS.includes(ext);
 }
 
-// 判断文件是否为字幕文件
+// 判斷文件是否為字幕文件
 export function isSubtitleFile(filePath: string): boolean {
   const ext = path.extname(filePath).toLowerCase();
   return SUBTITLE_EXTENSIONS.includes(ext);
 }
 
-// 递归获取文件夹中的符合任务类型的文件
+// 遞歸獲取資料夾中的符合任務類型的文件
 async function getMediaFilesFromDirectory(
   directoryPath: string,
   taskType: string,
 ): Promise<string[]> {
-  // 根据任务类型选择扩展名
+  // 根據任務類型選擇擴展名
   const supportedExtensions =
     taskType === 'translate' ? SUBTITLE_EXTENSIONS : MEDIA_EXTENSIONS;
 
@@ -92,14 +92,14 @@ async function getMediaFilesFromDirectory(
       const fullPath = path.join(directoryPath, entry.name);
 
       if (entry.isDirectory()) {
-        // 递归处理子目录
+        // 遞歸處理子目錄
         const subDirFiles = await getMediaFilesFromDirectory(
           fullPath,
           taskType,
         );
         files.push(...subDirFiles);
       } else if (entry.isFile()) {
-        // 检查文件扩展名是否受支持
+        // 檢查文件擴展名是否受支持
         const ext = path.extname(entry.name).toLowerCase();
         if (supportedExtensions.includes(ext)) {
           files.push(fullPath);
@@ -107,7 +107,7 @@ async function getMediaFilesFromDirectory(
       }
     }
   } catch (error) {
-    console.error(`读取目录 ${directoryPath} 时出错:`, error);
+    console.error(`讀取目錄 ${directoryPath} 時出錯:`, error);
   }
 
   return files;
@@ -129,7 +129,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
         ? SUBTITLE_EXTENSIONS.map((ext) => ext.substring(1))
         : MEDIA_EXTENSIONS.map((ext) => ext.substring(1));
 
-    // macOS 支持同时选择文件和文件夹；Windows/Linux 两者互斥，仅支持选择文件
+    // macOS 支持同時選擇文件和資料夾；Windows/Linux 兩者互斥，僅支持選擇文件
     const properties: Electron.OpenDialogOptions['properties'] =
       process.platform === 'darwin'
         ? ['openFile', 'openDirectory', 'multiSelections']
@@ -166,8 +166,8 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
     shell.openExternal(url);
   });
 
-  // 引导「试一试」示例音频:复制到用户数据目录后返回——打包态 resources 目录只读,
-  // 转写输出会写在媒体文件同目录,必须给它一个可写的家
+  // 引導「試一試」示例音頻:複製到用戶數據目錄後返回——打包態 resources 目錄只讀,
+  // 轉寫輸出會寫在媒體文件同目錄,必須給它一個可寫的家
   ipcMain.handle('getOnboardingSamplePath', async () => {
     const bundled = path.join(getExtraResourcesPath(), 'sample-onboarding.mp3');
     const sampleDir = path.join(app.getPath('userData'), 'sample');
@@ -178,7 +178,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
   });
 
   ipcMain.handle('getDroppedFiles', async (event, { files, taskType }) => {
-    // 处理文件和文件夹
+    // 處理文件和資料夾
     const allValidPaths: string[] = [];
 
     for (const filePath of files) {
@@ -186,15 +186,15 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
         const stats = await fs.promises.stat(filePath);
 
         if (stats.isDirectory()) {
-          // 如果是文件夹，递归获取所有符合任务类型的文件
+          // 如果是資料夾，遞歸獲取所有符合任務類型的文件
           const filteredFiles = await getMediaFilesFromDirectory(
             filePath,
             taskType,
           );
           allValidPaths.push(...filteredFiles);
         } else if (stats.isFile()) {
-          // 如果是文件，根据任务类型过滤
-          // 根据任务类型决定添加哪种文件
+          // 如果是文件，根據任務類型過濾
+          // 根據任務類型決定添加哪種文件
           if (
             (taskType === 'translate' && isSubtitleFile(filePath)) ||
             (taskType !== 'translate' && isMediaFile(filePath))
@@ -203,7 +203,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
           }
         }
       } catch {
-        // 如果访问失败，跳过此路径
+        // 如果訪問失敗，跳過此路徑
         continue;
       }
     }
@@ -211,23 +211,23 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
     return allValidPaths.map(wrapFileObject);
   });
 
-  // 读取字幕文件（按扩展名自动识别 srt/vtt/ass/lrc 格式）
+  // 讀取字幕文件（按擴展名自動識別 srt/vtt/ass/lrc 格式）
   ipcMain.handle('readSubtitleFile', async (event, { filePath }) => {
     try {
       if (!fs.existsSync(filePath)) {
-        logMessage(`读取字幕文件失败: 文件不存在 ${filePath}`, 'error');
+        logMessage(`讀取字幕文件失敗: 文件不存在 ${filePath}`, 'error');
         return [];
       }
       const content = await fs.promises.readFile(filePath, 'utf-8');
       const format = detectSubtitleFormat(filePath);
       return parseSubtitleEntries(content, format);
     } catch (error) {
-      logMessage(`读取字幕文件错误: ${error.message}`, 'error');
+      logMessage(`讀取字幕文件錯誤: ${error.message}`, 'error');
       return [];
     }
   });
 
-  // 读取任意字幕文件并转换为 WebVTT 文本（供播放器内嵌字幕轨道使用）
+  // 讀取任意字幕文件並轉換為 WebVTT 文本（供播放器內嵌字幕軌道使用）
   ipcMain.handle('getSubtitleAsVtt', async (event, { filePath }) => {
     try {
       if (!fs.existsSync(filePath)) {
@@ -238,33 +238,33 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
       const vtt = convertSubtitleContent(content, format, 'vtt');
       return { content: vtt };
     } catch (error) {
-      logMessage(`转换字幕为 VTT 失败: ${error.message}`, 'error');
+      logMessage(`轉換字幕為 VTT 失敗: ${error.message}`, 'error');
       return { error: `Error converting subtitle: ${error.message}` };
     }
   });
 
-  // 读取文件原始内容
+  // 讀取文件原始內容
   ipcMain.handle('readRawFileContent', async (event, { filePath }) => {
     try {
       if (!fs.existsSync(filePath)) {
-        logMessage(`读取文件失败: 文件不存在 ${filePath}`, 'error');
+        logMessage(`讀取文件失敗: 文件不存在 ${filePath}`, 'error');
         return { error: `File not found: ${filePath}` };
       }
       const content = await fs.promises.readFile(filePath, 'utf-8');
       return { content };
     } catch (error) {
-      logMessage(`读取文件错误: ${error.message}`, 'error');
+      logMessage(`讀取文件錯誤: ${error.message}`, 'error');
       return { error: `Error reading file: ${error.message}` };
     }
   });
 
-  // 保存字幕文件（按目标文件扩展名序列化为对应格式）
+  // 保存字幕文件（按目標文件擴展名序列化為對應格式）
   ipcMain.handle(
     'saveSubtitleFile',
     async (event, { filePath, subtitles, contentType = 'source' }) => {
       try {
         const format = detectSubtitleFormat(filePath);
-        // 计算每条字幕实际要写入的可见文本（去掉模板带来的尾部空行，分隔交给序列化器处理）
+        // 計算每條字幕實際要寫入的可見文本（去掉模板帶來的尾部空行，分隔交給序列化器處理）
         const buildText = (subtitle): string => {
           if (contentType === 'source') {
             return subtitle.sourceContent ?? '';
@@ -293,7 +293,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
               );
             })
             .join('');
-        // 覆盖前滚动备份一份到临时目录（避免污染用户视频目录；失败不阻断保存）
+        // 覆蓋前滾動備份一份到臨時目錄（避免汙染用戶影片目錄；失敗不阻斷保存）
         try {
           if (fs.existsSync(filePath)) {
             const backupPath = path.join(
@@ -304,7 +304,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
           }
         } catch (backupError) {
           logMessage(
-            `备份字幕文件失败（继续保存）: ${backupError.message}`,
+            `備份字幕文件失敗（繼續保存）: ${backupError.message}`,
             'warning',
           );
         }
@@ -312,32 +312,32 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
         logMessage(`保存字幕文件成功: ${filePath}`, 'info');
         return { success: true };
       } catch (error) {
-        logMessage(`保存字幕文件错误: ${error.message}`, 'error');
+        logMessage(`保存字幕文件錯誤: ${error.message}`, 'error');
         return {
-          error: `保存字幕文件错误: ${error.message}`,
+          error: `保存字幕文件錯誤: ${error.message}`,
         };
       }
     },
   );
 
-  // 检查文件是否存在
+  // 檢查文件是否存在
   ipcMain.handle('checkFileExists', async (event, { filePath }) => {
     try {
       const exists = fs.existsSync(filePath);
       return { exists };
     } catch (error) {
-      logMessage(`检查文件是否存在错误: ${error.message}`, 'error');
+      logMessage(`檢查文件是否存在錯誤: ${error.message}`, 'error');
       return { exists: false, error: error.message };
     }
   });
 
-  // 获取目录中的文件列表
+  // 獲取目錄中的文件列表
   ipcMain.handle('getDirectoryFiles', async (event, { directoryPath }) => {
     try {
       const files = await fs.promises.readdir(directoryPath);
       return { files };
     } catch (error) {
-      logMessage(`获取目录文件列表错误: ${error.message}`, 'error');
+      logMessage(`獲取目錄文件列表錯誤: ${error.message}`, 'error');
       return { files: [], error: error.message };
     }
   });
@@ -356,7 +356,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
     },
   );
 
-  // 选择单个文件
+  // 選擇單個文件
   ipcMain.handle(
     'selectFile',
     async (
@@ -396,7 +396,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
     },
   );
 
-  // 选择多个文件
+  // 選擇多個文件
   ipcMain.handle(
     'selectFiles',
     async (

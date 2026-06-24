@@ -8,10 +8,10 @@ const REQUEST_LINE = 'POST /v2/ots HTTP/1.1';
 const API_URL = `https://${HOST}/v2/ots`;
 
 /**
- * 讯飞机器翻译（机器翻译 niutrans 版 /v2/ots）
- * 文档：https://www.xfyun.cn/doc/nlp/niutrans/API.html
- * 鉴权：使用 APIKey/APISecret 对 host/date/request-line/digest 做 HMAC-SHA256 签名。
- * 单次请求翻译一段文本，默认 batchSize=1，对数组逐条翻译返回等长数组。
+ * 訊飛機器翻譯（機器翻譯 niutrans 版 /v2/ots）
+ * 文檔：https://www.xfyun.cn/doc/nlp/niutrans/API.html
+ * 鑑權：使用 APIKey/APISecret 對 host/date/request-line/digest 做 HMAC-SHA256 簽名。
+ * 單次請求翻譯一段文本，預設 batchSize=1，對數組逐條翻譯返回等長數組。
  */
 export default async function xunfei(
   query: string | string[],
@@ -21,14 +21,14 @@ export default async function xunfei(
 ): Promise<string | string[]> {
   const { appId, apiKey, apiSecret } = proof || {};
   if (!appId || !apiKey || !apiSecret) {
-    console.log('请先配置讯飞 APPID、APIKey 和 APISecret');
+    console.log('請先配置訊飛 APPID、APIKey 和 APISecret');
     throw new Error('missingKeyOrSecret');
   }
 
   const from = convertLanguageCode(sourceLanguage, 'xunfei') || 'auto';
   const to = convertLanguageCode(targetLanguage, 'xunfei');
   if (!to) {
-    console.log('不支持的语言');
+    console.log('不支持的語言');
     throw new Error('not supported language');
   }
 

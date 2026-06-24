@@ -3,7 +3,7 @@ import { isProviderConfigured } from './providerUtils';
 
 export const LAST_PROVIDER_STORAGE_KEY = 'resourcesProvidersSelectedId';
 
-/** AI / 批量类表单项，折叠到「高级选项」 */
+/** AI / 批量類表單項，摺疊到「高級選項」 */
 export const PROVIDER_ADVANCED_FIELD_KEYS = new Set([
   'systemPrompt',
   'prompt',

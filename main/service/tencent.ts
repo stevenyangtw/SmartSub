@@ -18,8 +18,8 @@ function hmac(key: Buffer | string, message: string): Buffer {
 }
 
 /**
- * 生成腾讯云 API 3.0 TC3-HMAC-SHA256 鉴权头
- * 文档：https://cloud.tencent.com/document/product/551/30636
+ * 生成騰訊雲 API 3.0 TC3-HMAC-SHA256 鑑權頭
+ * 文檔：https://cloud.tencent.com/document/product/551/30636
  */
 function buildAuthHeaders(
   secretId: string,
@@ -31,7 +31,7 @@ function buildAuthHeaders(
   const date = new Date(timestamp * 1000).toISOString().slice(0, 10);
   const contentType = 'application/json; charset=utf-8';
 
-  // 1. 拼接规范请求串
+  // 1. 拼接規範請求串
   const canonicalHeaders = `content-type:${contentType}\nhost:${HOST}\nx-tc-action:${ACTION.toLowerCase()}\n`;
   const signedHeaders = 'content-type;host;x-tc-action';
   const hashedPayload = sha256hex(payload);
@@ -44,7 +44,7 @@ function buildAuthHeaders(
     hashedPayload,
   ].join('\n');
 
-  // 2. 拼接待签名字符串
+  // 2. 拼接待簽名字符串
   const credentialScope = `${date}/${SERVICE}/tc3_request`;
   const stringToSign = [
     'TC3-HMAC-SHA256',
@@ -53,7 +53,7 @@ function buildAuthHeaders(
     sha256hex(canonicalRequest),
   ].join('\n');
 
-  // 3. 计算签名
+  // 3. 計算簽名
   const secretDate = hmac(`TC3${secretKey}`, date);
   const secretService = hmac(secretDate, SERVICE);
   const secretSigning = hmac(secretService, 'tc3_request');
@@ -77,10 +77,10 @@ function buildAuthHeaders(
 }
 
 /**
- * 腾讯云机器翻译（TMT）
- * 文档：https://cloud.tencent.com/document/product/551/15619
- * 使用 TextTranslate 单条接口（支持源语言 auto），逐条翻译返回等长数组，
- * 保证译文与时间轴一一对应。
+ * 騰訊雲機器翻譯（TMT）
+ * 文檔：https://cloud.tencent.com/document/product/551/15619
+ * 使用 TextTranslate 單條接口（支持源語言 auto），逐條翻譯返回等長數組，
+ * 保證譯文與時間軸一一對應。
  */
 export default async function tencent(
   query: string | string[],
@@ -94,14 +94,14 @@ export default async function tencent(
     region = 'ap-guangzhou',
   } = proof || {};
   if (!secretId || !secretKey) {
-    console.log('请先配置腾讯云 SecretId 和 SecretKey');
+    console.log('請先配置騰訊雲 SecretId 和 SecretKey');
     throw new Error('missingKeyOrSecret');
   }
 
   const source = convertLanguageCode(sourceLanguage, 'tencent') || 'auto';
   const target = convertLanguageCode(targetLanguage, 'tencent');
   if (!target) {
-    console.log('不支持的语言');
+    console.log('不支持的語言');
     throw new Error('not supported language');
   }
 
@@ -122,11 +122,11 @@ export default async function tencent(
       throw new Error(
         response?.Error?.Message ||
           response?.Error?.Code ||
-          '腾讯云翻译返回错误',
+          '騰訊雲翻譯返回錯誤',
       );
     }
     if (typeof response.TargetText !== 'string') {
-      throw new Error('腾讯云翻译返回结果异常');
+      throw new Error('騰訊雲翻譯返回結果異常');
     }
     return response.TargetText;
   };

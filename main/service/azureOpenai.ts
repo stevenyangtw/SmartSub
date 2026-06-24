@@ -15,7 +15,7 @@ export async function translateWithAzureOpenAI(
   provider: AzureOpenAIProvider,
 ) {
   try {
-    // 处理Azure OpenAI的endpoint URL
+    // 處理Azure OpenAI的endpoint URL
     const url = new URL(provider.apiUrl);
     const pathParts = url.pathname.split('/');
     const deploymentName = pathParts[pathParts.indexOf('deployments') + 1];
@@ -34,7 +34,7 @@ export async function translateWithAzureOpenAI(
       'You are a professional subtitle translation tool';
     const userPrompt = Array.isArray(text) ? text.join('\n') : text;
 
-    // 创建请求参数
+    // 創建請求參數
     const requestParams: any = {
       model: undefined,
       messages: [
@@ -44,11 +44,11 @@ export async function translateWithAzureOpenAI(
       temperature: 0.3,
     };
 
-    // 如果启用了JSON模式，添加相关参数
+    // 如果啟用了JSON模式，添加相關參數
     if (provider.useJsonMode !== false) {
-      // 确保apiVersion支持JSON模式
+      // 確保apiVersion支持JSON模式
       if (parseFloat(apiVersion) >= 2023.12) {
-        // Azure OpenAI API支持的JSON模式参数
+        // Azure OpenAI API支持的JSON模式參數
         requestParams.response_format = { type: 'json_object' };
 
         requestParams.response_format.schema = TRANSLATION_JSON_SCHEMA;

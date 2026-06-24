@@ -6,7 +6,7 @@ type MessageType = {
   message: string;
 };
 
-// 统一的消息发送函数
+// 統一的消息發送函數
 export function sendMessage(
   sender: WebContents,
   message: string | MessageType,
@@ -22,14 +22,14 @@ export function sendMessage(
     messageObj = message;
   }
 
-  // 记录到日志系统
+  // 記錄到日誌系統
   logMessage(messageObj.message, messageObj.type);
 
-  // 发送给渲染进程
+  // 發送給渲染進程
   sender.send('message', messageObj.message);
 }
 
-// 用于替换原有的 event.sender.send('message', error)
+// 用於替換原有的 event.sender.send('message', error)
 export function createMessageSender(sender: WebContents) {
   return {
     send: (channel: string, message: string | MessageType) => {

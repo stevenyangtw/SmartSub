@@ -46,13 +46,13 @@ import type { WorkItem } from '../../../types/workItem';
 interface CardDef {
   key: string;
   icon: React.ComponentType<{ className?: string }>;
-  /** 图标 chip 配色 */
+  /** 圖標 chip 配色 */
   chip: string;
-  /** 角落线条装饰配色 */
+  /** 角落線條裝飾配色 */
   decor: string;
   /** /tasks/[slug] 卡片 */
   slug?: string;
-  /** 直达页面卡片 */
+  /** 直達頁面卡片 */
   href?: string;
   needsModel?: boolean;
 }
@@ -135,7 +135,7 @@ export default function LaunchpadPage() {
           window?.ipc?.invoke('getTranslationProviders'),
           window?.ipc?.invoke('getWorkItems'),
         ]);
-        // 跨引擎就绪判断：任一引擎装有任一模型即视为已就绪（逐任务引擎下不再假设全局引擎）
+        // 跨引擎就緒判斷：任一引擎裝有任一模型即視為已就緒（逐任務引擎下不再假設全局引擎）
         setHasModels(hasAnyModelAnyEngine(systemInfo));
         setHasProvider(
           (providers || []).some((p: any) => isProviderConfigured(p)),
@@ -171,7 +171,7 @@ export default function LaunchpadPage() {
     const paths: string[] = [];
     const droppedFiles = e.dataTransfer.files;
     for (let i = 0; i < droppedFiles.length; i++) {
-      // Electron 32+ 移除 File.path，优先 webUtils；旧 preload 场景回退 .path
+      // Electron 32+ 移除 File.path，優先 webUtils；舊 preload 場景回退 .path
       const filePath =
         window?.ipc?.getPathForFile?.(droppedFiles[i]) ??
         (droppedFiles[i] as any).path;
@@ -192,7 +192,7 @@ export default function LaunchpadPage() {
       router.push(cardTarget(card));
       return;
     }
-    // 拖放即开新任务工程
+    // 拖放即開新任務工程
     const id = uuidv4();
     await window?.ipc?.invoke('saveTaskProject', {
       id,

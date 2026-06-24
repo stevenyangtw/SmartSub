@@ -43,9 +43,9 @@ import type {
   PyEngineUpdateInfo,
 } from '../../../../../types/engine';
 
-// 自包含运行时（内嵌 Python 解释器 + site-packages + main.py）的近似下载体积；
-// 仅用于下载按钮/选择项提示，真实字节数以下载进度 total 为准。
-// CPU = 默认包；GPU = Full GPU(CUDA12) 包，额外捆绑 cuBLAS/cuDNN，体积大很多。
+// 自包含運行時（內嵌 Python 解釋器 + site-packages + main.py）的近似下載體積；
+// 僅用於下載按鈕/選擇項提示，真實字節數以下載進度 total 為準。
+// CPU = 預設包；GPU = Full GPU(CUDA12) 包，額外捆綁 cuBLAS/cuDNN，體積大很多。
 const PY_ENGINE_SIZE_CPU = '210MB';
 const PY_ENGINE_SIZE_GPU = '1.4GB';
 const variantSize = (v: 'cpu' | 'cuda') =>
@@ -73,18 +73,18 @@ interface FasterWhisperPanelProps {
   computeType: string;
   deviceOptions: string[];
   updateInfo: PyEngineUpdateInfo | null;
-  /** 引擎二进制下载源配置：点击下载/升级时于气泡内选择。 */
+  /** 引擎二進制下載源配置：點擊下載/升級時於氣泡內選擇。 */
   binarySourceConfig: DownloadSourceConfig;
-  /** 安装前选择的运行时变体（cpu 默认包 / cuda Full GPU 包）。 */
+  /** 安裝前選擇的運行時變體（cpu 預設包 / cuda Full GPU 包）。 */
   selectedVariant: 'cpu' | 'cuda';
   onSelectedVariantChange: (v: 'cpu' | 'cuda') => void;
-  /** 已安装变体（manifest 来源），未安装为 undefined。 */
+  /** 已安裝變體（manifest 來源），未安裝為 undefined。 */
   installedVariant?: 'cpu' | 'cuda';
-  /** 当前平台是否提供 GPU 包（仅 Win/Linux）。 */
+  /** 當前平臺是否提供 GPU 包（僅 Win/Linux）。 */
   gpuVariantAvailable: boolean;
-  /** 是否检测到可用的 NVIDIA(CUDA) 显卡。 */
+  /** 是否檢測到可用的 NVIDIA(CUDA) 顯卡。 */
   nvidiaSupported: boolean;
-  /** 已安装情况下切换到另一变体（触发下载目标变体）。 */
+  /** 已安裝情況下切換到另一變體（觸發下載目標變體）。 */
   onSwitchVariant: (target: 'cpu' | 'cuda') => void;
   onDownload: () => void;
   onRepair: () => void;
@@ -125,7 +125,7 @@ const FasterWhisperPanel: React.FC<FasterWhisperPanelProps> = ({
   onComputeTypeChange,
 }) => {
   const { t } = useTranslation('resources');
-  // 下载/修复 与 升级 各自的「下载源」气泡开关（点击对应按钮时弹出选源）。
+  // 下載/修復 與 升級 各自的「下載源」氣泡開關（點擊對應按鈕時彈出選源）。
   const [installPickerOpen, setInstallPickerOpen] = React.useState(false);
   const [upgradePickerOpen, setUpgradePickerOpen] = React.useState(false);
 
@@ -135,7 +135,7 @@ const FasterWhisperPanel: React.FC<FasterWhisperPanelProps> = ({
   const computeLabel = (opt: string) =>
     opt === 'auto' ? t('engines.fasterWhisper.computeTypeOptions.auto') : opt;
 
-  // 卸载按钮（带二次确认由父级处理）：随状态内联到「修复行」或「版本/检查更新行」，不单独占一行。
+  // 卸載按鈕（帶二次確認由父級處理）：隨狀態內聯到「修復行」或「版本/檢查更新行」，不單獨佔一行。
   const uninstallButton = (
     <Button
       size="sm"
@@ -182,7 +182,7 @@ const FasterWhisperPanel: React.FC<FasterWhisperPanelProps> = ({
         <p className="text-sm text-destructive">{status.message}</p>
       )}
 
-      {/* 安装前：CPU / GPU 变体选择（GPU 包仅 Win/Linux 提供）。 */}
+      {/* 安裝前：CPU / GPU 變體選擇（GPU 包僅 Win/Linux 提供）。 */}
       {!fasterInstalled &&
         !isDownloading &&
         !fasterBroken &&
@@ -346,7 +346,7 @@ const FasterWhisperPanel: React.FC<FasterWhisperPanelProps> = ({
         </div>
       )}
 
-      {/* 已安装：展示当前运行时变体并提供切换（GPU 仅 Win/Linux 可切）。 */}
+      {/* 已安裝：展示當前運行時變體並提供切換（GPU 僅 Win/Linux 可切）。 */}
       {fasterInstalled && !isDownloading && !showVerifying && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2">
           <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -369,7 +369,7 @@ const FasterWhisperPanel: React.FC<FasterWhisperPanelProps> = ({
           </Badge>
           {(() => {
             const target = installedVariant === 'cuda' ? 'cpu' : 'cuda';
-            // 切到 GPU 仅在提供 GPU 包的平台展示；切到 CPU 始终可用。
+            // 切到 GPU 僅在提供 GPU 包的平臺展示；切到 CPU 始終可用。
             if (target === 'cuda' && !gpuVariantAvailable) return null;
             return (
               <Button

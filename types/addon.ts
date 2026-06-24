@@ -1,5 +1,5 @@
 /**
- * CUDA 加速包相关类型定义
+ * CUDA 加速包相關類型定義
  */
 
 /**
@@ -15,7 +15,7 @@ export const AVAILABLE_CUDA_VERSIONS = [
 export type CudaVersion = (typeof AVAILABLE_CUDA_VERSIONS)[number];
 
 /**
- * 全部加速包变体：CUDA 各版本 + Vulkan
+ * 全部加速包變體：CUDA 各版本 + Vulkan
  */
 export const ALL_ADDON_VARIANTS = [
   ...AVAILABLE_CUDA_VERSIONS,
@@ -25,12 +25,12 @@ export const ALL_ADDON_VARIANTS = [
 export type AddonVariant = (typeof ALL_ADDON_VARIANTS)[number];
 
 /**
- * GPU 加速模式（取代 useCuda 布尔开关）
+ * GPU 加速模式（取代 useCuda 布爾開關）
  */
 export type GpuMode = 'auto' | 'gpu-only' | 'cpu-only';
 
 /**
- * GPU 厂商
+ * GPU 廠商
  */
 export type GpuVendor = 'nvidia' | 'amd' | 'intel' | 'apple' | 'unknown';
 
@@ -40,7 +40,7 @@ export interface GpuInfo {
 }
 
 /**
- * 实际加载的 whisper 后端
+ * 實際加載的 whisper 後端
  */
 export type WhisperBackend =
   | 'cuda'
@@ -53,7 +53,7 @@ export type WhisperBackend =
 export type AddonSource = 'custom' | 'userData' | 'builtin';
 
 /**
- * 单次候选加载失败记录
+ * 單次候選加載失敗記錄
  */
 export interface AddonLoadAttempt {
   backend: WhisperBackend;
@@ -63,21 +63,21 @@ export interface AddonLoadAttempt {
 }
 
 /**
- * 一次成功加载的结果（不含函数本体，可持久化/IPC 传输）
+ * 一次成功加載的結果（不含函數本體，可持久化/IPC 傳輸）
  */
 export interface AddonLoadResultInfo {
   backend: WhisperBackend;
   variant: AddonVariant | null;
   source: AddonSource;
   path: string;
-  /** 是否非首选候选（发生过降级） */
+  /** 是否非首選候選（發生過降級） */
   fallback: boolean;
   failedAttempts: AddonLoadAttempt[];
   loadedAt: string;
 }
 
 /**
- * 加载历史条目（环形缓冲 10 条，诊断面板数据源）
+ * 加載歷史條目（環形緩衝 10 條，診斷面板數據源）
  */
 export interface AddonLoadHistoryEntry {
   backend: WhisperBackend;
@@ -88,7 +88,7 @@ export interface AddonLoadHistoryEntry {
 }
 
 /**
- * 降级事件（主进程 → 渲染层推送）
+ * 降級事件（主進程 → 渲染層推送）
  */
 export interface AddonFallbackEvent {
   expected: WhisperBackend;
@@ -97,44 +97,44 @@ export interface AddonFallbackEvent {
 }
 
 /**
- * CUDA Toolkit 检测结果
+ * CUDA Toolkit 檢測結果
  */
 export interface CudaToolkitInfo {
-  /** 是否已安装 CUDA Toolkit */
+  /** 是否已安裝 CUDA Toolkit */
   installed: boolean;
-  /** CUDA Toolkit 版本号 (如 "12.4.0") */
+  /** CUDA Toolkit 版本號 (如 "12.4.0") */
   version: string | null;
 }
 
 /**
- * GPU CUDA 支持检测结果
+ * GPU CUDA 支持檢測結果
  */
 export interface GpuCudaSupport {
-  /** 显卡是否支持 CUDA */
+  /** 顯卡是否支持 CUDA */
   supported: boolean;
-  /** 显卡驱动版本 */
+  /** 顯卡驅動版本 */
   driverVersion: string | null;
-  /** 显卡支持的最高 CUDA 版本 */
+  /** 顯卡支持的最高 CUDA 版本 */
   maxCudaVersion: string | null;
-  /** 显卡名称 */
+  /** 顯卡名稱 */
   gpuName?: string;
 }
 
 /**
- * 加速包推荐信息
+ * 加速包推薦信息
  */
 export interface AddonRecommendation {
   /** 是否可以使用 CUDA 加速 */
   canUseCuda: boolean;
-  /** 推荐的加速包版本 */
+  /** 推薦的加速包版本 */
   recommendedVersion: CudaVersion | null;
-  /** 是否需要下载包含 DLLs 的完整包 */
+  /** 是否需要下載包含 DLLs 的完整包 */
   needsDlls: boolean;
-  /** 推荐的下载包类型 */
+  /** 推薦的下載包類型 */
   downloadType: 'node.gz' | 'tar.gz' | null;
-  /** 推荐原因说明（日志/诊断，UI 请用 reasonKey） */
+  /** 推薦原因說明（日誌/診斷，UI 請用 reasonKey） */
   reason?: string;
-  /** 推荐原因 i18n 键 */
+  /** 推薦原因 i18n 鍵 */
   reasonKey?:
     | 'cudaNotSupported'
     | 'cudaVersionTooOld'
@@ -144,46 +144,46 @@ export interface AddonRecommendation {
 }
 
 /**
- * CUDA 环境完整检测结果
+ * CUDA 環境完整檢測結果
  */
 export interface CudaEnvironment {
   /** CUDA Toolkit 信息 */
   cudaToolkit: CudaToolkitInfo;
   /** GPU CUDA 支持信息 */
   gpuSupport: GpuCudaSupport;
-  /** 加速包推荐 */
+  /** 加速包推薦 */
   recommendation: AddonRecommendation;
 }
 
 /**
- * GPU 环境完整检测结果（跨厂商）
+ * GPU 環境完整檢測結果（跨廠商）
  */
 export interface GpuEnvironment {
-  /** 有效平台（含 dev 模拟） */
+  /** 有效平臺（含 dev 模擬） */
   platform: string;
-  /** systeminformation 枚举的显卡列表 */
+  /** systeminformation 枚舉的顯卡列表 */
   gpus: GpuInfo[];
-  /** Vulkan 运行库是否存在（仅 win/linux 有意义） */
+  /** Vulkan 運行庫是否存在（僅 win/linux 有意義） */
   vulkanRuntime: boolean;
-  /** 内置 vulkan addon 是否随包分发 */
+  /** 內置 vulkan addon 是否隨包分發 */
   builtinVulkanAvailable: boolean;
-  /** NVIDIA 完整检测结果（未检测到 N 卡时为 null） */
+  /** NVIDIA 完整檢測結果（未檢測到 N 卡時為 null） */
   nvidia: CudaEnvironment | null;
 }
 
 /**
- * 已安装的加速包信息
+ * 已安裝的加速包信息
  */
 export interface InstalledAddon {
-  /** 安装时间 */
+  /** 安裝時間 */
   installedAt: string;
-  /** 下载时的远程版本号 (用于更新检测) */
+  /** 下載時的遠程版本號 (用於更新檢測) */
   remoteVersion: string;
   /** 是否包含 DLLs/SO 文件 */
   hasDlls: boolean;
-  /** 文件大小 (字节) */
+  /** 文件大小 (字節) */
   size: number;
-  /** 文件校验和 */
+  /** 文件校驗和 */
   checksum?: string;
 }
 
@@ -191,30 +191,30 @@ export interface InstalledAddon {
  * 加速包配置
  */
 export interface AddonConfig {
-  /** 当前选中的版本 */
+  /** 當前選中的版本 */
   selectedVersion: AddonVariant | null;
-  /** 已安装的加速包 */
+  /** 已安裝的加速包 */
   installed: Record<string, InstalledAddon>;
-  /** 自定义 addon.node 文件路径 */
+  /** 自定義 addon.node 文件路徑 */
   customAddonPath?: string | null;
 }
 
 /**
- * 远程加速包版本信息
+ * 遠程加速包版本信息
  */
 export interface RemoteAddonVersion {
-  /** 版本日期 (用于更新检测) */
+  /** 版本日期 (用於更新檢測) */
   version: string;
-  /** 更新说明 */
+  /** 更新說明 */
   updateNotes: string;
-  /** 校验和信息 */
+  /** 校驗和信息 */
   checksum?: {
     'windows-tar'?: string;
     'windows-node'?: string;
     'linux-tar'?: string;
     'linux-node'?: string;
   };
-  /** 各平台包体积（字节），来自 addon-versions.json */
+  /** 各平臺包體積（字節），來自 addon-versions.json */
   sizes?: {
     'windows-tar'?: number;
     'windows-node'?: number;
@@ -224,14 +224,14 @@ export interface RemoteAddonVersion {
 }
 
 /**
- * 远程版本文件结构
+ * 遠程版本文件結構
  */
 export type RemoteAddonVersions = Partial<
   Record<AddonVariant, RemoteAddonVersion>
 >;
 
 /**
- * 下载状态
+ * 下載狀態
  */
 export type DownloadStatus =
   | 'idle'
@@ -243,96 +243,96 @@ export type DownloadStatus =
   | 'error';
 
 /**
- * 下载进度信息
+ * 下載進度信息
  */
 export interface DownloadProgress {
-  /** 下载状态 */
+  /** 下載狀態 */
   status: DownloadStatus;
-  /** 下载进度百分比 (0-100) */
+  /** 下載進度百分比 (0-100) */
   progress: number;
-  /** 已下载字节数 */
+  /** 已下載字節數 */
   downloaded: number;
-  /** 总字节数 */
+  /** 總字節數 */
   total: number;
-  /** 下载速度 (字节/秒) */
+  /** 下載速度 (字節/秒) */
   speed: number;
-  /** 预计剩余时间 (秒) */
+  /** 預計剩餘時間 (秒) */
   eta: number;
-  /** 错误信息 */
+  /** 錯誤信息 */
   error?: string;
 }
 
 /**
- * 下载源类型
+ * 下載源類型
  */
 export type DownloadSource = 'github' | 'ghproxy' | 'gitcode';
 
 /**
- * 下载配置
+ * 下載配置
  */
 export interface DownloadConfig {
-  /** 下载源 */
+  /** 下載源 */
   source: DownloadSource;
-  /** 加速包变体 */
+  /** 加速包變體 */
   variant: AddonVariant;
-  /** 下载类型 */
+  /** 下載類型 */
   type: 'node.gz' | 'tar.gz';
 }
 
 /**
- * 更新检测结果
+ * 更新檢測結果
  */
 export interface AddonUpdateInfo {
-  /** 加速包变体 */
+  /** 加速包變體 */
   variant: AddonVariant;
   /** 是否有更新 */
   hasUpdate: boolean;
-  /** 当前本地版本 */
+  /** 當前本地版本 */
   localVersion: string;
-  /** 远程最新版本 */
+  /** 遠程最新版本 */
   remoteVersion: string;
-  /** 更新说明 */
+  /** 更新說明 */
   updateNotes?: string;
 }
 
 /**
- * 下载状态持久化信息 (用于断点续传)
+ * 下載狀態持久化信息 (用於斷點續傳)
  */
 export interface DownloadState {
-  /** 下载 URL */
+  /** 下載 URL */
   url: string;
-  /** 目标路径 */
+  /** 目標路徑 */
   destPath: string;
-  /** 临时文件路径 */
+  /** 臨時文件路徑 */
   tempPath: string;
-  /** 已下载字节数 */
+  /** 已下載字節數 */
   downloaded: number;
-  /** 总字节数 */
+  /** 總字節數 */
   total: number;
-  /** 加速包变体 */
+  /** 加速包變體 */
   variant: AddonVariant;
-  /** 下载类型 */
+  /** 下載類型 */
   downloadType: 'node.gz' | 'tar.gz';
-  /** 开始时间 */
+  /** 開始時間 */
   startedAt: string;
-  /** 最后更新时间 */
+  /** 最後更新時間 */
   lastUpdatedAt: string;
 }
 
 /**
- * 开发模式模拟配置
+ * 開發模式模擬配置
  */
 export interface DevSimulationConfig {
-  /** 是否启用模拟 */
+  /** 是否啟用模擬 */
   enabled: boolean;
-  /** 模拟平台 */
+  /** 模擬平臺 */
   platform: 'win32' | 'linux';
-  /** 是否安装了 CUDA Toolkit */
+  /** 是否安裝了 CUDA Toolkit */
   hasToolkit: boolean;
   /** CUDA Toolkit 版本 */
   toolkitVersion: string | null;
   /** GPU 支持的最高 CUDA 版本 */
   gpuCudaVersion: string;
-  /** 显卡名称 */
+  /** 顯卡名稱 */
   gpuName: string;
 }

@@ -3,13 +3,13 @@ import { AsyncLocalStorage } from 'async_hooks';
 export interface TaskRunContext {
   projectId?: string;
   fileUuid?: string;
-  /** 取消信号：翻译批次边界与阶段边界检查 */
+  /** 取消信號：翻譯批次邊界與階段邊界檢查 */
   signal?: AbortSignal;
 }
 
 const storage = new AsyncLocalStorage<TaskRunContext>();
 
-/** 在任务上下文中执行：logMessage 自动打 projectId 标，取消检查可感知 signal */
+/** 在任務上下文中執行：logMessage 自動打 projectId 標，取消檢查可感知 signal */
 export function runWithTaskContext<T>(
   context: TaskRunContext,
   fn: () => Promise<T>,
@@ -45,7 +45,7 @@ export function throwIfTaskCancelled(): void {
   if (isTaskCancelled()) throw new TaskCancelledError();
 }
 
-/** whisper addon 因 AbortSignal 中断时抛出的错误（与 TaskCancelledError 统一处理） */
+/** whisper addon 因 AbortSignal 中斷時拋出的錯誤（與 TaskCancelledError 統一處理） */
 export function isWhisperAbortError(error: unknown): boolean {
   if (isTaskCancelledError(error)) return true;
   if (error instanceof Error) {

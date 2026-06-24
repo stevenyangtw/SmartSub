@@ -41,9 +41,9 @@ import type { CudaDownloadSheetState, InstalledAddonInfo } from './gpu/types';
 
 interface GpuAccelerationCardProps {
   /**
-   * 'standalone'（默认）：原资源中心「加速」Tab 的完整布局（mode/backend 常驻 + 更多选项折叠）。
-   * 'embedded'：折叠进 builtin 引擎面板——lead 仅紧凑 hero + 进度，其余（mode/backend/已装/
-   * 自定义/诊断）统一收进单个「管理 / 高级」折叠区（默认收起），避免挤占 builtin 面板首屏。
+   * 'standalone'（預設）：原資源中心「加速」Tab 的完整佈局（mode/backend 常駐 + 更多選項摺疊）。
+   * 'embedded'：摺疊進 builtin 引擎面板——lead 僅緊湊 hero + 進度，其餘（mode/backend/已裝/
+   * 自定義/診斷）統一收進單個「管理 / 高級」摺疊區（預設收起），避免擠佔 builtin 面板首屏。
    */
   variant?: 'standalone' | 'embedded';
 }
@@ -189,8 +189,8 @@ const GpuAccelerationCard: React.FC<GpuAccelerationCardProps> = ({
             failedCudaVersionRef.current = isCudaFailure;
           }
 
-          // 主进程下载已内建多源回退（github/ghproxy/gitcode 按序自动尝试），
-          // 错误到此说明所有源均失败，无需再提供手动切源重试。
+          // 主進程下載已內建多源回退（github/ghproxy/gitcode 按序自動嘗試），
+          // 錯誤到此說明所有源均失敗，無需再提供手動切源重試。
           toast.error(progress.error || t('gpuAcceleration.downloadFailed'));
           lastToastStatus.current = 'error';
         }
@@ -411,8 +411,8 @@ const GpuAccelerationCard: React.FC<GpuAccelerationCardProps> = ({
     );
   }
 
-  // 各子区块抽为元素变量：standalone 与 embedded 仅「排布」不同（embedded 全部收进单个折叠区），
-  // 共享同一组 props，避免两套布局重复书写导致漂移。
+  // 各子區塊抽為元素變量：standalone 與 embedded 僅「排布」不同（embedded 全部收進單個摺疊區），
+  // 共享同一組 props，避免兩套佈局重複書寫導致漂移。
   const heroEl = (
     <GpuStatusHero
       gpuEnv={gpuEnv}
@@ -517,8 +517,8 @@ const GpuAccelerationCard: React.FC<GpuAccelerationCardProps> = ({
     />
   ) : null;
 
-  // embedded：lead = hero + 进度；其余统一收进单个「管理 / 高级」折叠区（默认收起）。
-  // CudaDownloadSheet 仍由页面内（hero / 已装列表）触发，不在任何 Dialog 内——杜绝弹窗内再开抽屉。
+  // embedded：lead = hero + 進度；其餘統一收進單個「管理 / 高級」摺疊區（預設收起）。
+  // CudaDownloadSheet 仍由頁面內（hero / 已裝列表）觸發，不在任何 Dialog 內——杜絕彈窗內再開抽屜。
   if (embedded) {
     return (
       <div id="gpu-acceleration" className="space-y-4">

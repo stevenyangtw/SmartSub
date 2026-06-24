@@ -12,11 +12,11 @@ import { resolveProxyEnv, type ProxySettings } from './proxyEnv';
 export type { ProxySettings, ProxyEnv } from './proxyEnv';
 export { resolveProxyEnv } from './proxyEnv';
 
-// 原始（直连）globalAgent，切回 none 时还原
+// 原始（直連）globalAgent，切回 none 時還原
 const ORIGINAL_HTTP_AGENT = http.globalAgent;
 const ORIGINAL_HTTPS_AGENT = https.globalAgent;
 
-/** host 是否命中 NO_PROXY 列表（精确或子域匹配），命中则直连绕过代理。 */
+/** host 是否命中 NO_PROXY 列表（精確或子域匹配），命中則直連繞過代理。 */
 function hostInNoProxy(host: string | undefined, noProxy: string): boolean {
   if (!host || !noProxy) return false;
   const list = noProxy
@@ -27,7 +27,7 @@ function hostInNoProxy(host: string | undefined, noProxy: string): boolean {
   return list.some((e) => h === e || h.endsWith('.' + e));
 }
 
-// 复用库的精确类型，保证 override 签名与父类一致
+// 複用庫的精確類型，保證 override 簽名與父類一致
 type HttpsConnect = HttpsProxyAgent<string>['connect'];
 type HttpsConnectReq = Parameters<HttpsConnect>[0];
 type HttpsConnectOpts = Parameters<HttpsConnect>[1];
@@ -42,8 +42,8 @@ interface ConnectTarget {
 }
 
 /**
- * https 目标的代理 Agent：子类化 HttpsProxyAgent，仅在 NO_PROXY 命中时直连，
- * 其余沿用库的 CONNECT 隧道 + TLS 升级逻辑（避免重新实现易错的隧道）。
+ * https 目標的代理 Agent：子類化 HttpsProxyAgent，僅在 NO_PROXY 命中時直連，
+ * 其餘沿用庫的 CONNECT 隧道 + TLS 升級邏輯（避免重新實現易錯的隧道）。
  */
 class NoProxyHttpsAgent extends HttpsProxyAgent<string> {
   private noProxy: string;
@@ -69,8 +69,8 @@ class NoProxyHttpsAgent extends HttpsProxyAgent<string> {
 }
 
 /**
- * http 目标的代理 Agent：子类化 HttpProxyAgent。NO_PROXY 命中时退回普通
- * http.Agent 行为（不改写 req.path 为绝对 URL，直连目标）。
+ * http 目標的代理 Agent：子類化 HttpProxyAgent。NO_PROXY 命中時退回普通
+ * http.Agent 行為（不改寫 req.path 為絕對 URL，直連目標）。
  */
 class NoProxyHttpAgent extends HttpProxyAgent<string> {
   private noProxy: string;
@@ -110,16 +110,16 @@ class NoProxyHttpAgent extends HttpProxyAgent<string> {
 
 let activeProxyUrl = '';
 
-/** 当前生效的代理地址（空串=直连）。用于诊断/日志。 */
+/** 當前生效的代理地址（空串=直連）。用於診斷/日誌。 */
 export function getActiveProxyUrl(): string {
   return activeProxyUrl;
 }
 
 /**
- * 按当前 settings 重建并安装全局 Agent。
- * - custom 且有 url：http/https.globalAgent 切换为带 NO_PROXY 绕过的代理 Agent。
- * - none/空：还原为原始直连 Agent。
- * 改完即时生效（下次请求读取 globalAgent）。
+ * 按當前 settings 重建並安裝全局 Agent。
+ * - custom 且有 url：http/https.globalAgent 切換為帶 NO_PROXY 繞過的代理 Agent。
+ * - none/空：還原為原始直連 Agent。
+ * 改完即時生效（下次請求讀取 globalAgent）。
  */
 export function applyProxyFromSettings(): void {
   const settings = store.get('settings') as ProxySettings | undefined;
@@ -153,7 +153,7 @@ export interface ProxyTestResult {
   error?: string;
 }
 
-/** 经当前 global agent 向轻量端点发请求，回报连通性。 */
+/** 經當前 global agent 向輕量端點發請求，回報連通性。 */
 export function testProxyConnectivity(
   testUrl = 'https://www.gstatic.com/generate_204',
 ): Promise<ProxyTestResult> {
@@ -164,7 +164,7 @@ export function testProxyConnectivity(
       { headers: { 'User-Agent': 'SmartSub-Electron' }, timeout: 8000 },
       (res) => {
         const ms = Date.now() - startedAt;
-        res.resume(); // 释放 socket
+        res.resume(); // 釋放 socket
         resolve({ ok: true, ms, status: res.statusCode });
       },
     );

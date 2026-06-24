@@ -3,7 +3,7 @@ import { cn } from 'lib/utils';
 import type { LucideIcon } from 'lucide-react';
 
 /**
- * 空态四要素：图标 + 主文案 + 副文案 + 可选操作。
+ * 空態四要素：圖標 + 主文案 + 副文案 + 可選操作。
  */
 export function EmptyState({
   icon: Icon,

@@ -8,9 +8,9 @@ import {
 import { cn } from 'lib/utils';
 
 /**
- * 可聚焦的帮助提示图标。
- * 替代此前「TooltipTrigger 直接包裸 HelpCircle」的写法——那种写法非 button、
- * 键盘与读屏无法触达。这里用真正的 button 承载，并补 aria-label。
+ * 可聚焦的幫助提示圖標。
+ * 替代此前「TooltipTrigger 直接包裸 HelpCircle」的寫法——那種寫法非 button、
+ * 鍵盤與讀屏無法觸達。這裡用真正的 button 承載，並補 aria-label。
  * 需在祖先存在 TooltipProvider。
  */
 export function HelpHint({

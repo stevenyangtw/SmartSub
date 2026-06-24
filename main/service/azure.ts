@@ -25,19 +25,19 @@ const azureTranslator = async (
     const endpoint = 'https://api.cognitive.microsofttranslator.com';
     const route = '/translate';
 
-    // 构建请求参数
+    // 構建請求參數
     const params = new URLSearchParams({
       'api-version': '3.0',
       from: sourceLanguage || 'auto',
       to: targetLanguage || 'en',
     });
 
-    // 构建请求体
+    // 構建請求體
     const requestBody: AzureTranslateRequest[] = Array.isArray(texts)
       ? texts.map((text) => ({ text }))
       : [{ text: texts as string }];
 
-    // 发送请求
+    // 發送請求
     const response = await axios({
       baseURL: endpoint,
       url: route,
@@ -54,17 +54,17 @@ const azureTranslator = async (
     });
     console.log(response, 'response');
 
-    // 处理响应
+    // 處理響應
     const results = response.data as AzureTranslateResponse[];
     const translations = results.map((result) => result.translations[0].text);
 
-    // 根据输入类型返回对应格式
+    // 根據輸入類型返回對應格式
     return Array.isArray(texts) ? translations : translations[0];
   } catch (error) {
     console.log(error, 'error');
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.error?.message || error.message;
-      throw new Error(`Azure翻译服务错误: ${message}`);
+      throw new Error(`Azure翻譯服務錯誤: ${message}`);
     }
     throw error;
   }

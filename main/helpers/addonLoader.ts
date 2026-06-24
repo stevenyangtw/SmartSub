@@ -39,7 +39,7 @@ export interface AddonLoadResult extends AddonLoadResultInfo {
 
 export interface LoadContext {
   gpuMode: GpuMode;
-  /** Apple Silicon 且当前模型存在 encoder（CoreML 可用） */
+  /** Apple Silicon 且當前模型存在 encoder（CoreML 可用） */
   coremlEligible: boolean;
 }
 
@@ -78,7 +78,7 @@ function builtinAddonPath(file: string): string {
 }
 
 /**
- * 设置动态链接库搜索路径（必须在 dlopen 之前调用）
+ * 設置動態鏈接庫搜索路徑（必須在 dlopen 之前調用）
  */
 function setupLibraryPath(addonDir: string): void {
   const platform = getEffectivePlatform();
@@ -103,12 +103,12 @@ function setupLibraryPath(addonDir: string): void {
 }
 
 /**
- * 按推荐矩阵生成加载候选列表
+ * 按推薦矩陣生成加載候選列表
  *
- * win/linux auto：custom → selected（CUDA 需 N 卡驱动可用）→ userData vulkan → 内置 vulkan → 内置 CPU
- * win/linux gpu-only：同 auto 但去掉内置 CPU
- * win/linux cpu-only：仅内置 CPU
- * darwin：custom → CoreML（可用时）→ 内置（arm64 为 Metal，intel 为 CPU），不受 gpuMode 影响
+ * win/linux auto：custom → selected（CUDA 需 N 卡驅動可用）→ userData vulkan → 內置 vulkan → 內置 CPU
+ * win/linux gpu-only：同 auto 但去掉內置 CPU
+ * win/linux cpu-only：僅內置 CPU
+ * darwin：custom → CoreML（可用時）→ 內置（arm64 為 Metal，intel 為 CPU），不受 gpuMode 影響
  */
 async function resolveCandidates(ctx: LoadContext): Promise<AddonCandidate[]> {
   const platform = getEffectivePlatform();
@@ -146,7 +146,7 @@ async function resolveCandidates(ctx: LoadContext): Promise<AddonCandidate[]> {
     return [builtinDefault];
   }
 
-  // custom 无条件最高优先级（修复旧版非 NVIDIA 环境忽略自定义路径的问题）
+  // custom 無條件最高優先級（修復舊版非 NVIDIA 環境忽略自定義路徑的問題）
   const customPath = getCustomAddonPath();
   if (customPath) {
     candidates.push({
@@ -183,7 +183,7 @@ async function resolveCandidates(ctx: LoadContext): Promise<AddonCandidate[]> {
     }
   }
 
-  // 已下载到 userData 的 Vulkan（比内置新），未被 selected 命中时作为次级候选
+  // 已下載到 userData 的 Vulkan（比內置新），未被 selected 命中時作為次級候選
   if (selected !== 'vulkan' && isAddonInstalled('vulkan')) {
     candidates.push({
       backend: 'vulkan',
@@ -193,7 +193,7 @@ async function resolveCandidates(ctx: LoadContext): Promise<AddonCandidate[]> {
     });
   }
 
-  // 内置 Vulkan：不预过滤 vulkanRuntime（检测仅供 UI 诊断），由 dlopen try/catch 兜底
+  // 內置 Vulkan：不預過濾 vulkanRuntime（檢測僅供 UI 診斷），由 dlopen try/catch 兜底
   const builtinVulkan = getBuiltinVulkanAddonPath();
   if (fs.existsSync(builtinVulkan)) {
     candidates.push({
@@ -212,7 +212,7 @@ async function resolveCandidates(ctx: LoadContext): Promise<AddonCandidate[]> {
 }
 
 /**
- * 尝试加载单个候选（调用方负责 try/catch）
+ * 嘗試加載單個候選（調用方負責 try/catch）
  */
 function tryLoadCandidate(candidate: AddonCandidate): WhisperFn {
   if (!fs.existsSync(candidate.path)) {
@@ -257,10 +257,10 @@ function notifyFallback(
 }
 
 /**
- * 加载最优可用 addon（核心入口）
+ * 加載最優可用 addon（核心入口）
  *
- * 候选逐个 try/catch dlopen；成功结果会话级缓存（缓存 key 覆盖全部决策输入，
- * 设置变更后 key 变化自动重新解析，无需手动失效）。
+ * 候選逐個 try/catch dlopen；成功結果會話級緩存（緩存 key 覆蓋全部決策輸入，
+ * 設置變更後 key 變化自動重新解析，無需手動失效）。
  */
 export async function loadBestAddon(
   ctx: LoadContext,
@@ -355,7 +355,7 @@ export async function loadBestAddon(
 }
 
 /**
- * 当前生效的后端（无内存缓存时回退到持久化的最近一次结果）
+ * 當前生效的後端（無內存緩存時回退到持久化的最近一次結果）
  */
 export function getActiveBackend(): AddonLoadResultInfo | null {
   if (cachedResult) {

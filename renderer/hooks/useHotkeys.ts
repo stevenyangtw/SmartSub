@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react';
 
 export interface HotkeyBinding {
-  /** 组合键：'mod+s' / 'shift+mod+z' / 'space' / 'arrowup' / '?' / 'escape' / 'mod+enter' */
+  /** 組合鍵：'mod+s' / 'shift+mod+z' / 'space' / 'arrowup' / '?' / 'escape' / 'mod+enter' */
   combo: string;
   handler: (e: KeyboardEvent) => void;
-  /** 焦点在输入框/文本域/可编辑元素时是否仍生效（默认 false，带修饰键的组合建议开启） */
+  /** 焦點在輸入框/文本域/可編輯元素時是否仍生效（預設 false，帶修飾鍵的組合建議開啟） */
   allowInInput?: boolean;
-  /** 匹配后是否阻止默认行为（默认 true） */
+  /** 匹配後是否阻止預設行為（預設 true） */
   preventDefault?: boolean;
 }
 
-/** mod 键平台适配：macOS 用 Cmd，其余用 Ctrl（供 UI 显示 ⌘/Ctrl 时也用它判断） */
+/** mod 鍵平臺適配：macOS 用 Cmd，其餘用 Ctrl（供 UI 顯示 ⌘/Ctrl 時也用它判斷） */
 export const isMacPlatform = (): boolean =>
   typeof navigator !== 'undefined' &&
   /mac/i.test(navigator.platform || navigator.userAgent);
@@ -55,15 +55,15 @@ const comboMatches = (
   const otherMod = isMac ? e.ctrlKey : e.metaKey;
   if (p.mod !== modPressed) return false;
   if (!p.mod && otherMod) return false;
-  // '?' 这类必须借助 shift 才能输入的键，按 e.key 匹配即可，不再校验 shift
+  // '?' 這類必須藉助 shift 才能輸入的鍵，按 e.key 匹配即可，不再校驗 shift
   if (p.key !== '?' && p.shift !== e.shiftKey) return false;
   if (p.alt !== e.altKey) return false;
   return true;
 };
 
 /**
- * 注册一组快捷键，组件卸载自动清理。
- * 绑定表通过 ref 每次事件时读取，handler 可安全闭包最新 state。
+ * 註冊一組快捷鍵，組件卸載自動清理。
+ * 綁定表通過 ref 每次事件時讀取，handler 可安全閉包最新 state。
  */
 export function useHotkeys(bindings: HotkeyBinding[]): void {
   const bindingsRef = useRef(bindings);

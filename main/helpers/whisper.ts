@@ -16,7 +16,7 @@ export const getPath = (key?: string) => {
   const settings = store.get('settings') || {
     modelsPath: path.join(userDataPath, 'whisper-models'),
   };
-  // 使用用户自定义的模型路径或默认路径
+  // 使用用戶自定義的模型路徑或預設路徑
   const modelsPath =
     settings.modelsPath || path.join(userDataPath, 'whisper-models');
   if (!fs.existsSync(modelsPath)) {
@@ -58,11 +58,11 @@ export const deleteModel = async (model) => {
         fs.unlinkSync(modelPath);
       }
       if (fs.existsSync(coreMLModelPath)) {
-        fs.removeSync(coreMLModelPath); // 递归删除目录
+        fs.removeSync(coreMLModelPath); // 遞歸刪除目錄
       }
       resolve('ok');
     } catch (error) {
-      console.error('删除模型失败:', error);
+      console.error('刪除模型失敗:', error);
       reject(error);
     }
   });
@@ -81,9 +81,9 @@ export const downloadModelSync = async (
     `ggml-${model}-encoder.mlmodelc`,
   );
 
-  // 检查模型文件是否已存在
+  // 檢查模型文件是否已存在
   if (fs.existsSync(modelPath)) {
-    // 如果不需要CoreML支持，或者不是Apple Silicon，或者CoreML文件已存在，则直接返回
+    // 如果不需要CoreML支持，或者不是Apple Silicon，或者CoreML文件已存在，則直接返回
     if (!needsCoreML || !isAppleSilicon() || fs.existsSync(coreMLModelPath)) {
       return;
     }
@@ -92,7 +92,7 @@ export const downloadModelSync = async (
   const baseUrl = `${getHfHost(source)}/ggerganov/whisper.cpp/resolve/main`;
   const url = `${baseUrl}/ggml-${model}.bin`;
 
-  // 只有在需要CoreML支持且是Apple Silicon时才下载CoreML模型
+  // 只有在需要CoreML支持且是Apple Silicon時才下載CoreML模型
   const needDownloadCoreML = needsCoreML && isAppleSilicon();
   const coreMLUrl = needDownloadCoreML
     ? `${baseUrl}/ggml-${model}-encoder.mlmodelc.zip`
@@ -108,12 +108,12 @@ export const downloadModelSync = async (
     const willDownloadHandler = (event, item: DownloadItem) => {
       const isCoreML = item.getFilename().includes('-encoder.mlmodelc');
 
-      // 检查是否为当前模型的下载项
+      // 檢查是否為當前模型的下載項
       if (!item.getFilename().includes(`ggml-${model}`)) {
-        return; // 忽略不匹配的下载项
+        return; // 忽略不匹配的下載項
       }
 
-      // 如果是CoreML文件但不需要下载CoreML，则取消下载
+      // 如果是CoreML文件但不需要下載CoreML，則取消下載
       if (isCoreML && !needDownloadCoreML) {
         item.cancel();
         return;
@@ -149,16 +149,16 @@ export const downloadModelSync = async (
                 `ggml-${model}-encoder.mlmodelc.zip`,
               );
               await decompress(zipPath, modelsPath);
-              fs.unlinkSync(zipPath); // 删除zip文件
-              onProcess(1, `Core ML ${model} 解压完成`);
+              fs.unlinkSync(zipPath); // 刪除zip文件
+              onProcess(1, `Core ML ${model} 解壓完成`);
             } catch (error) {
-              console.error('解压Core ML模型失败:', error);
-              reject(new Error(`解压Core ML模型失败: ${error.message}`));
+              console.error('解壓Core ML模型失敗:', error);
+              reject(new Error(`解壓Core ML模型失敗: ${error.message}`));
             }
           }
 
           if (downloadCount === totalDownloads) {
-            onProcess(1, `${model} 下载完成`);
+            onProcess(1, `${model} 下載完成`);
             cleanup();
             resolve(1);
           }
@@ -180,7 +180,7 @@ export const downloadModelSync = async (
     win.webContents.session.on('will-download', willDownloadHandler);
     win.webContents.downloadURL(url);
 
-    // 只有在需要时才下载CoreML模型
+    // 只有在需要時才下載CoreML模型
     if (needDownloadCoreML) {
       win.webContents.downloadURL(coreMLUrl);
     }
@@ -215,22 +215,22 @@ export async function checkOpenAiWhisper(): Promise<boolean> {
 export const reinstallWhisper = async () => {
   const whisperPath = getPath('whisperPath');
 
-  // 删除现有的 whisper.cpp 目录
+  // 刪除現有的 whisper.cpp 目錄
   try {
     await fs.remove(whisperPath);
     return true;
   } catch (error) {
-    console.error('删除 whisper.cpp 目录失败:', error);
-    throw new Error('删除 whisper.cpp 目录失败');
+    console.error('刪除 whisper.cpp 目錄失敗:', error);
+    throw new Error('刪除 whisper.cpp 目錄失敗');
   }
 };
 
-// 判断模型是否是量化模型
+// 判斷模型是否是量化模型
 export const isQuantizedModel = (model) => {
   return model.includes('-q5_') || model.includes('-q8_');
 };
 
-// 判断 encoder 模型是否存在
+// 判斷 encoder 模型是否存在
 export const hasEncoderModel = (model) => {
   const encoderModelPath = path.join(
     getPath('modelsPath'),
@@ -240,10 +240,10 @@ export const hasEncoderModel = (model) => {
 };
 
 /**
- * 加载适合当前系统的 Whisper Addon
+ * 加載適合當前系統的 Whisper Addon
  *
- * 实际决策与降级链见 addonLoader.resolveCandidates；
- * 此处仅负责组装 LoadContext（gpuMode + CoreML 可用性）。
+ * 實際決策與降級鏈見 addonLoader.resolveCandidates；
+ * 此處僅負責組裝 LoadContext（gpuMode + CoreML 可用性）。
  */
 export async function loadWhisperAddon(model: string) {
   const settings = store.get('settings');

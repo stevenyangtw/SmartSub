@@ -8,9 +8,9 @@ export interface SherpaRuntime {
 }
 
 /**
- * FunASR / Qwen / FireRed 共用的 sherpa-onnx 原生运行库已随安装包内置（不再运行时下载）。
- * 此 hook 仅查询内置状态（installed + 内置版本），供各引擎面板展示「已随应用内置」。
- * 状态上提到常驻挂载的父组件（EngineModelTab）统一持有，避免各面板重复查询。
+ * FunASR / Qwen / FireRed 共用的 sherpa-onnx 原生運行庫已隨安裝包內置（不再運行時下載）。
+ * 此 hook 僅查詢內置狀態（installed + 內置版本），供各引擎面板展示「已隨應用內置」。
+ * 狀態上提到常駐掛載的父組件（EngineModelTab）統一持有，避免各面板重複查詢。
  */
 export function useSherpaRuntime(): SherpaRuntime {
   const [libStatus, setLibStatus] = useState<SherpaLibStatus | null>(null);
@@ -20,7 +20,7 @@ export function useSherpaRuntime(): SherpaRuntime {
       const r = await window?.ipc?.invoke('sherpa-lib-status');
       if (r) setLibStatus(r as SherpaLibStatus);
     } catch {
-      // 忽略：保持上次状态
+      // 忽略：保持上次狀態
     }
   }, []);
 

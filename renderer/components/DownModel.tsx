@@ -25,7 +25,7 @@ interface IProps {
   needsCoreML?: boolean;
   globalDownloading?: boolean;
   format?: ModelDownloadFormat;
-  /** 气泡内「复制链接」：按当前所选源返回本模型可复制的下载链接（不提供则不显示复制）。 */
+  /** 氣泡內「複製鏈接」：按當前所選源返回本模型可複製的下載鏈接（不提供則不顯示覆制）。 */
   getCopyUrl?: (source: string) => string | null | undefined;
 }
 
@@ -36,8 +36,8 @@ function getProgressKey(
   return format === 'ct2' ? `ct2:${modelName}` : modelName;
 }
 
-// 代理/VPN 拦截国内镜像时的典型底层报错特征（TLS 握手中途 socket 被断、连接重置等）。
-// 命中即在失败提示里追加一句中文引导，避免用户对着英文一头雾水。
+// 代理/VPN 攔截國內鏡像時的典型底層報錯特徵（TLS 握手中途 socket 被斷、連接重置等）。
+// 命中即在失敗提示裡追加一句中文引導，避免用戶對著英文一頭霧水。
 const PROXY_ERROR_PATTERNS = [
   'socket disconnected',
   'econnreset',
@@ -124,8 +124,8 @@ const DownModel: FC<IProps> = ({
         result?.error &&
         !String(result.error).toLowerCase().includes('cancelled')
       ) {
-        // 用户主动取消时 download promise 以 "Download cancelled" reject，
-        // 主进程同样返回 success:false，但不应视为失败提示
+        // 用戶主動取消時 download promise 以 "Download cancelled" reject，
+        // 主進程同樣返回 success:false，但不應視為失敗提示
         toast.error(
           t('downloadFailedToast', { error: result.error }),
           isLikelyProxyError(result.error)
@@ -149,8 +149,8 @@ const DownModel: FC<IProps> = ({
 
   const isDisabled = globalDownloading && !loading;
 
-  // 下载源在「点击下载时」才选择：上层通过 DownloadSourceProvider 注入源配置时，
-  // 点击下载先弹气泡选源，确认后再真正下载；无配置时（设置页 / 引导页）保持直接下载。
+  // 下載源在「點擊下載時」才選擇：上層通過 DownloadSourceProvider 注入源配置時，
+  // 點擊下載先彈氣泡選源，確認後再真正下載；無配置時（設置頁 / 引導頁）保持直接下載。
   const sourceConfig = useDownloadSource();
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const triggerDownload = sourceConfig

@@ -19,14 +19,14 @@ import { normalizePyEngineVariant } from './pythonRuntime/paths';
 
 let mainWindow: BrowserWindow | null = null;
 
-/** 仅 faster-whisper 走 Python 运行时下载（funasr/qwen/firered 已迁移内置 sherpa 原生库）。 */
+/** 僅 faster-whisper 走 Python 運行時下載（funasr/qwen/firered 已遷移內置 sherpa 原生庫）。 */
 function coerceEngineId(_value: unknown): PyEngineId {
   return 'faster-whisper';
 }
 
 export function setMainWindowForEngine(window: BrowserWindow): void {
   mainWindow = window;
-  // 预绑定运行时下载器的 mainWindow，保证后台（自动更新）触发的下载进度也能上报。
+  // 預綁定運行時下載器的 mainWindow，保證後臺（自動更新）觸發的下載進度也能上報。
   getPyEngineDownloader('faster-whisper', window);
 }
 
@@ -51,8 +51,8 @@ export function registerEngineIpcHandlers(): void {
     }
   });
 
-  // --- sherpa-onnx 原生运行库（funasr / qwen / fireRed 引擎共用）：随安装包内置 ---
-  // 库随 App 固定发布、整体随版本升级，故无下载/升级/卸载通道，仅暴露内置状态。
+  // --- sherpa-onnx 原生運行庫（funasr / qwen / fireRed 引擎共用）：隨安裝包內置 ---
+  // 庫隨 App 固定發佈、整體隨版本升級，故無下載/升級/卸載通道，僅暴露內置狀態。
   ipcMain.handle('sherpa-lib-status', async () => {
     const { getSherpaLibStatus } = await import(
       './sherpaOnnx/sherpaLibManager'
@@ -75,7 +75,7 @@ export function registerEngineIpcHandlers(): void {
       },
     ) => {
       try {
-        // 运行中禁止安装/升级：避免替换 current/ 时的 Windows 文件锁与转写中断。
+        // 運行中禁止安裝/升級：避免替換 current/ 時的 Windows 文件鎖與轉寫中斷。
         if (isTranscriptionBusy()) {
           return { success: false, error: 'engine_busy' };
         }
@@ -83,7 +83,7 @@ export function registerEngineIpcHandlers(): void {
           coerceEngineId(engineId),
           mainWindow || undefined,
         );
-        // 不支持 cuda 的平台（macOS）会被 normalize 收敛为 cpu，避免下载不存在的产物。
+        // 不支持 cuda 的平臺（macOS）會被 normalize 收斂為 cpu，避免下載不存在的產物。
         downloader
           .download(source, normalizePyEngineVariant(variant))
           .catch((error) => {
@@ -170,7 +170,7 @@ export function registerEngineIpcHandlers(): void {
         }
         await shutdownPythonRuntime();
 
-        // 整个引擎包目录（含内部 manifest.json）一并删除即回到未安装态
+        // 整個引擎包目錄（含內部 manifest.json）一併刪除即回到未安裝態
         const engineDir = getEngineDir(coerceEngineId(payload?.engineId));
         if (fs.existsSync(engineDir)) {
           fs.rmSync(engineDir, { recursive: true, force: true });
@@ -304,7 +304,7 @@ export function registerEngineIpcHandlers(): void {
     async (_event, payload?: { engineId?: PyEngineId }) => {
       try {
         const manager = getPythonRuntimeManager();
-        // 唯一的 Python 引擎是 faster-whisper（coerceEngineId 恒返回它），按显式 engineId 预热。
+        // 唯一的 Python 引擎是 faster-whisper（coerceEngineId 恆返回它），按顯式 engineId 預熱。
         const engineId = coerceEngineId(payload?.engineId);
         await manager.ensureStarted(engineId);
         return { success: true };

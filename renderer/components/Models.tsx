@@ -24,36 +24,36 @@ interface IProps {
   fasterWhisperModelsInstalled?: string[];
   funasrVadInstalled?: boolean;
   funasrAsrModelsInstalled?: string[];
-  /** faster-whisper 运行时状态（用于过滤未装引擎的模型，state==='ready' 方可选） */
+  /** faster-whisper 運行時狀態（用於過濾未裝引擎的模型，state==='ready' 方可選） */
   pythonEngineStatus?: EngineStatus;
-  /** funasr 运行库是否已安装（用于过滤未装引擎的模型） */
+  /** funasr 運行庫是否已安裝（用於過濾未裝引擎的模型） */
   funasrEngineInstalled?: boolean;
-  /** qwen 共享 silero VAD 是否就绪 */
+  /** qwen 共享 silero VAD 是否就緒 */
   qwenVadInstalled?: boolean;
-  /** qwen 已安装模型 id 列表 */
+  /** qwen 已安裝模型 id 列表 */
   qwenModelsInstalled?: string[];
-  /** qwen 运行库（与 funasr 同库）是否已安装 */
+  /** qwen 運行庫（與 funasr 同庫）是否已安裝 */
   qwenEngineInstalled?: boolean;
-  /** fireRed 共享 silero VAD 是否就绪 */
+  /** fireRed 共享 silero VAD 是否就緒 */
   fireRedVadInstalled?: boolean;
-  /** fireRed 已安装模型 id 列表 */
+  /** fireRed 已安裝模型 id 列表 */
   fireRedModelsInstalled?: string[];
-  /** fireRed 运行库（与 funasr 同库）是否已安装 */
+  /** fireRed 運行庫（與 funasr 同庫）是否已安裝 */
   fireRedEngineInstalled?: boolean;
-  /** 是否把 localCli 作为独立分组列出（内置规范模型名，保 `${whisperModel}` 替换）。 */
+  /** 是否把 localCli 作為獨立分組列出（內置規範模型名，保 `${whisperModel}` 替換）。 */
   includeLocalCli?: boolean;
-  /** 当前选中的引擎与模型（二者共同决定选中项；任一缺失或不在分组内则视为未选）。 */
+  /** 當前選中的引擎與模型（二者共同決定選中項；任一缺失或不在分組內則視為未選）。 */
   engine?: TranscriptionEngine;
   model?: string;
-  /** 选中某分组下某模型：同时回传 (引擎, 模型)。 */
+  /** 選中某分組下某模型：同時回傳 (引擎, 模型)。 */
   onChange?: (engine: TranscriptionEngine, model: string) => void;
   className?: string;
   disabled?: boolean;
 }
 
 /**
- * 「引擎 ▸ 模型」分组选择器（逐任务引擎）。
- * 选项按引擎分组，每项 value 编码 (引擎, 模型)；选中后同时确定二者，消除同名模型歧义。
+ * 「引擎 ▸ 模型」分組選擇器（逐任務引擎）。
+ * 選項按引擎分組，每項 value 編碼 (引擎, 模型)；選中後同時確定二者，消除同名模型歧義。
  */
 const Models = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -102,7 +102,7 @@ const Models = React.forwardRef<
   const engineLabel = (e: TranscriptionEngine) =>
     t(`engineBadge.${e}`, { defaultValue: e });
 
-  // 仅当 (引擎,模型) 确实存在于分组中才视为有效选中，避免残留旧选择悬空显示
+  // 僅當 (引擎,模型) 確實存在於分組中才視為有效選中，避免殘留舊選擇懸空顯示
   const selected =
     engine &&
     model &&
@@ -130,8 +130,8 @@ const Models = React.forwardRef<
     >
       <SelectTrigger className={className} id="model" ref={ref}>
         {selected ? (
-          // 用 div 承载（而非 span）：SelectTrigger 的 `[&>span]:line-clamp-1`
-          // 会把直接子 span 设为竖排 -webkit-box，导致图标/徽标/模型名换行竖排。
+          // 用 div 承載（而非 span）：SelectTrigger 的 `[&>span]:line-clamp-1`
+          // 會把直接子 span 設為豎排 -webkit-box，導致圖標/徽標/模型名換行豎排。
           <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden whitespace-nowrap">
             <EngineIcon engine={selected.engine} className="h-4 w-4 shrink-0" />
             <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium leading-none text-muted-foreground">

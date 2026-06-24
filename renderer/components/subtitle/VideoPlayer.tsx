@@ -36,7 +36,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
   const { t } = useTranslation('home');
 
-  // 纯音频：渲染紧凑播放条（无黑色视频框/空白占位），使左侧首元素与右侧列表顶部对齐
+  // 純音頻：渲染緊湊播放條（無黑色影片框/空白佔位），使左側首元素與右側列表頂部對齊
   if (isAudioPath(videoPath)) {
     return (
       <div className="flex flex-col flex-shrink-0">
@@ -90,7 +90,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         )}
       </div>
 
-      {/* 视频控制按钮区域 */}
+      {/* 影片控制按鈕區域 */}
       {/* <div className="p-2 border rounded-md bg-muted/30">
         <div className="text-sm mb-2">{t('playbackControls')}</div>
         <div className="flex justify-between items-center gap-1">

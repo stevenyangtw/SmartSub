@@ -1,12 +1,12 @@
 /**
- * 字幕合并功能常量和预设样式
+ * 字幕合併功能常量和預設樣式
  */
 
 import type { SubtitleStyle, StylePreset } from '../../../types/subtitleMerge';
 
 /**
- * 按平台返回 CJK 友好的默认字体。
- * Arial 不含 CJK 字形，中文字幕烧录时会退化到 libass 的随机回退字体。
+ * 按平臺返回 CJK 友好的預設字體。
+ * Arial 不含 CJK 字形，中文字幕燒錄時會退化到 libass 的隨機回退字體。
  */
 export const getPlatformDefaultFont = (): string => {
   if (typeof navigator === 'undefined') return 'Arial';
@@ -17,7 +17,7 @@ export const getPlatformDefaultFont = (): string => {
 };
 
 /**
- * 默认字幕样式
+ * 預設字幕樣式
  */
 export const DEFAULT_STYLE: SubtitleStyle = {
   fontName: 'Arial',
@@ -38,7 +38,7 @@ export const DEFAULT_STYLE: SubtitleStyle = {
 };
 
 /**
- * 默认字幕样式（字体按运行平台动态决定）
+ * 預設字幕樣式（字體按運行平臺動態決定）
  */
 export const getDefaultStyle = (): SubtitleStyle => ({
   ...DEFAULT_STYLE,
@@ -46,12 +46,12 @@ export const getDefaultStyle = (): SubtitleStyle => ({
 });
 
 /**
- * 预设样式列表
+ * 預設樣式列表
  */
 export const STYLE_PRESETS: StylePreset[] = [
   {
     id: 'classic',
-    name: '经典白字黑边',
+    name: '經典白字黑邊',
     nameKey: 'presetClassic',
     style: {
       fontName: 'Arial',
@@ -73,7 +73,7 @@ export const STYLE_PRESETS: StylePreset[] = [
   },
   {
     id: 'movie',
-    name: '电影字幕',
+    name: '電影字幕',
     nameKey: 'presetMovie',
     style: {
       fontName: 'Georgia',
@@ -95,7 +95,7 @@ export const STYLE_PRESETS: StylePreset[] = [
   },
   {
     id: 'youtube',
-    name: 'YouTube风格',
+    name: 'YouTube風格',
     nameKey: 'presetYoutube',
     style: {
       fontName: 'Roboto',
@@ -117,7 +117,7 @@ export const STYLE_PRESETS: StylePreset[] = [
   },
   {
     id: 'clean',
-    name: '清新简约',
+    name: '清新簡約',
     nameKey: 'presetClean',
     style: {
       fontName: 'Helvetica Neue',
@@ -162,10 +162,10 @@ export const STYLE_PRESETS: StylePreset[] = [
 ];
 
 /**
- * 常用字体列表
+ * 常用字體列表
  */
 export const FONT_LIST = [
-  // 系统通用字体
+  // 系統通用字體
   { value: 'Arial', label: 'Arial' },
   { value: 'Helvetica', label: 'Helvetica' },
   { value: 'Helvetica Neue', label: 'Helvetica Neue' },
@@ -174,19 +174,19 @@ export const FONT_LIST = [
   { value: 'Verdana', label: 'Verdana' },
   { value: 'Roboto', label: 'Roboto' },
   { value: 'Impact', label: 'Impact' },
-  // 中文字体
-  { value: 'Microsoft YaHei', label: '微软雅黑' },
-  { value: 'SimHei', label: '黑体' },
-  { value: 'SimSun', label: '宋体' },
-  { value: 'KaiTi', label: '楷体' },
-  { value: 'PingFang SC', label: '苹方' },
+  // 中文字體
+  { value: 'Microsoft YaHei', label: '微軟雅黑' },
+  { value: 'SimHei', label: '黑體' },
+  { value: 'SimSun', label: '宋體' },
+  { value: 'KaiTi', label: '楷體' },
+  { value: 'PingFang SC', label: '蘋方' },
   { value: 'Noto Sans SC', label: 'Noto Sans SC' },
   { value: 'Noto Sans CJK SC', label: 'Noto Sans CJK SC' },
-  { value: 'Source Han Sans SC', label: '思源黑体' },
+  { value: 'Source Han Sans SC', label: '思源黑體' },
 ];
 
 /**
- * 字号范围
+ * 字號範圍
  */
 export const FONT_SIZE_RANGE = {
   min: 12,
@@ -195,7 +195,7 @@ export const FONT_SIZE_RANGE = {
 };
 
 /**
- * 边框宽度范围
+ * 邊框寬度範圍
  */
 export const OUTLINE_RANGE = {
   min: 0,
@@ -204,7 +204,7 @@ export const OUTLINE_RANGE = {
 };
 
 /**
- * 阴影距离范围
+ * 陰影距離範圍
  */
 export const SHADOW_RANGE = {
   min: 0,
@@ -213,7 +213,7 @@ export const SHADOW_RANGE = {
 };
 
 /**
- * 边距范围
+ * 邊距範圍
  */
 export const MARGIN_RANGE = {
   min: 0,
@@ -222,9 +222,9 @@ export const MARGIN_RANGE = {
 };
 
 /**
- * 边框样式选项
+ * 邊框樣式選項
  */
 export const BORDER_STYLE_OPTIONS = [
-  { value: 1, label: '边框+阴影', labelKey: 'borderStyleOutline' },
+  { value: 1, label: '邊框+陰影', labelKey: 'borderStyleOutline' },
   { value: 3, label: '背景框', labelKey: 'borderStyleBox' },
 ];

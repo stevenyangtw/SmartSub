@@ -23,7 +23,7 @@ export interface SubtitleStats {
   percent: number;
 }
 
-// 新增：播放器字幕轨道接口
+// 新增：播放器字幕軌道接口
 export interface PlayerSubtitleTrack {
   kind: string;
   src: string;
@@ -32,9 +32,9 @@ export interface PlayerSubtitleTrack {
   default?: boolean;
 }
 
-// 将时间字符串转换为秒
+// 將時間字符串轉換為秒
 const timeToSeconds = (timeStr: string): number => {
-  // 处理 "00:00:00,000" 或 "00:00:00.000" 格式
+  // 處理 "00:00:00,000" 或 "00:00:00.000" 格式
   const parts = timeStr.replace(',', '.').split(':');
   if (parts.length !== 3) return 0;
 
@@ -45,9 +45,9 @@ const timeToSeconds = (timeStr: string): number => {
   return hours * 3600 + minutes * 60 + seconds;
 };
 
-// 从时间范围字符串中提取开始和结束时间（秒）
+// 從時間範圍字符串中提取開始和結束時間（秒）
 const parseTimeRange = (timeRange: string): { start: number; end: number } => {
-  // 处理 "00:00:00,000 --> 00:00:00,000" 格式
+  // 處理 "00:00:00,000 --> 00:00:00,000" 格式
   const times = timeRange.split(' --> ');
   if (times.length !== 2) return { start: 0, end: 0 };
 
@@ -74,18 +74,18 @@ export const useSubtitles = (
     PlayerSubtitleTrack[]
   >([]);
 
-  // 撤销/重做历史
+  // 撤銷/重做歷史
   const [history, setHistory] = useState<Subtitle[][]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const maxHistoryLength = 50;
 
-  // 记录编辑前的快照（用于失焦记录）
+  // 記錄編輯前的快照（用於失焦記錄）
   const [editSnapshot, setEditSnapshot] = useState<Subtitle[] | null>(null);
 
-  // 光标位置（用于拆分功能）
+  // 光標位置（用於拆分功能）
   const cursorPositionRef = useRef(0);
 
-  // 是否需要显示翻译内容
+  // 是否需要顯示翻譯內容
   const shouldShowTranslation = taskType !== 'generateOnly';
 
   useEffect(() => {
@@ -93,18 +93,18 @@ export const useSubtitles = (
       loadFiles();
     }
 
-    // 4. 管理 Object URL 的生命周期
+    // 4. 管理 Object URL 的生命週期
     return () => {
       subtitleTracksForPlayer.forEach((track) => {
         if (track.src && track.src.startsWith('blob:')) {
           URL.revokeObjectURL(track.src);
         }
       });
-      setSubtitleTracksForPlayer([]); // 清空轨道信息
+      setSubtitleTracksForPlayer([]); // 清空軌道信息
     };
   }, [file, open]);
 
-  // 获取视频文件信息
+  // 獲取影片文件信息
   useEffect(() => {
     if (videoPath) {
       const fileName = path.basename(videoPath, path.extname(videoPath));
@@ -113,7 +113,7 @@ export const useSubtitles = (
     }
   }, [videoPath]);
 
-  // 读取字幕文件
+  // 讀取字幕文件
   const readSubtitleFile = async (filePath: string): Promise<Subtitle[]> => {
     try {
       const result: Subtitle[] = await window.ipc.invoke('readSubtitleFile', {
@@ -126,10 +126,10 @@ export const useSubtitles = (
     }
   };
 
-  // 加载文件
+  // 加載文件
   const loadFiles = async () => {
     try {
-      // 获取文件路径
+      // 獲取文件路徑
       const {
         filePath,
         srtFile,
@@ -140,25 +140,25 @@ export const useSubtitles = (
       const directory = path.dirname(filePath);
       const fileName = path.basename(filePath, path.extname(filePath));
 
-      // 如果不是字幕文件，直接使用作为视频文件
+      // 如果不是字幕文件，直接使用作為影片文件
       if (!isSubtitleFile(filePath)) {
         setVideoPath(filePath);
       }
 
-      // 确定原始字幕文件路径
+      // 確定原始字幕文件路徑
       let originalSrtPath: string | null | undefined = null;
       let translatedSrtPath: string | null | undefined = null;
 
-      // 根据任务类型确定使用哪个原始字幕文件
+      // 根據任務類型確定使用哪個原始字幕文件
       if (taskType === 'generateOnly') {
         originalSrtPath = srtFile || path.join(directory, `${fileName}.srt`);
         setHasTranslationFile(false);
       } else {
-        // 对于需要翻译的任务，优先使用临时原始字幕文件
+        // 對於需要翻譯的任務，優先使用臨時原始字幕文件
         originalSrtPath =
           tempSrtFile || srtFile || path.join(directory, `${fileName}.srt`);
 
-        // 翻译字幕直接使用tempTranslatedSrtFile
+        // 翻譯字幕直接使用tempTranslatedSrtFile
         if (tempTranslatedSrtFile) {
           translatedSrtPath = tempTranslatedSrtFile;
           setHasTranslationFile(true);
@@ -168,11 +168,11 @@ export const useSubtitles = (
         }
       }
 
-      // 读取原始字幕文件
+      // 讀取原始字幕文件
       let originalSubtitles = [];
       let translatedSubtitles = [];
 
-      // 用于播放器的字幕轨道
+      // 用於播放器的字幕軌道
       const playerTracks: PlayerSubtitleTrack[] = [];
 
       const createPlayerTrack = async (
@@ -186,7 +186,7 @@ export const useSubtitles = (
             filePath: srtPath,
           });
           if (result.error || !result.content) {
-            console.error(`无法读取字幕文件 ${srtPath}:`, result.error);
+            console.error(`無法讀取字幕文件 ${srtPath}:`, result.error);
             toast.error(
               t('errorReadSubtitle', { file: path.basename(srtPath) }),
             );
@@ -202,7 +202,7 @@ export const useSubtitles = (
             default: isDefault,
           };
         } catch (error) {
-          console.error(`转换字幕 ${srtPath} 到 VTT 失败:`, error);
+          console.error(`轉換字幕 ${srtPath} 到 VTT 失敗:`, error);
           toast.error(t('errorConvertToVTT', { file: path.basename(srtPath) }));
           return null;
         }
@@ -220,7 +220,7 @@ export const useSubtitles = (
         }
       }
 
-      // 读取翻译字幕文件（如果存在）
+      // 讀取翻譯字幕文件（如果存在）
       if (shouldShowTranslation && translatedSrtPath) {
         translatedSubtitles = await readSubtitleFile(translatedSrtPath);
         if (formData.targetLanguage) {
@@ -235,24 +235,24 @@ export const useSubtitles = (
 
       setSubtitleTracksForPlayer(playerTracks);
 
-      // 合并字幕，匹配相同的时间码
+      // 合併字幕，匹配相同的時間碼
       if (originalSubtitles.length > 0) {
-        // 创建翻译字幕的时间码映射，提高查找效率
+        // 創建翻譯字幕的時間碼映射，提高查找效率
         const translatedMap = new Map();
         translatedSubtitles.forEach((sub) => {
           translatedMap.set(sub.startEndTime, sub);
         });
 
-        // 创建合并的字幕数据
+        // 創建合併的字幕數據
         const merged = originalSubtitles.map((sub, index) => {
-          // 直接从Map中获取对应时间码的翻译字幕
+          // 直接從Map中獲取對應時間碼的翻譯字幕
           const translated =
             translatedMap.get(sub.startEndTime) ||
             (index < translatedSubtitles.length
               ? translatedSubtitles[index]
               : null);
 
-          // 从startEndTime解析出开始和结束时间（秒）
+          // 從startEndTime解析出開始和結束時間（秒）
           const { start, end } = parseTimeRange(sub.startEndTime);
 
           return {
@@ -260,7 +260,7 @@ export const useSubtitles = (
             sourceContent: sub.content.join('\n'),
             targetContent: translated ? translated.content.join('\n') : '',
             isEditing: false,
-            // 添加计算出的开始和结束时间（秒）
+            // 添加計算出的開始和結束時間（秒）
             startTimeInSeconds: start,
             endTimeInSeconds: end,
           };
@@ -273,20 +273,20 @@ export const useSubtitles = (
     }
   };
 
-  // 更新字幕内容（带失焦记录支持）
+  // 更新字幕內容（帶失焦記錄支持）
   const handleSubtitleChange = (
     index: number,
     field: 'sourceContent' | 'targetContent',
     value: string,
   ) => {
-    // 首次编辑时保存快照
+    // 首次編輯時保存快照
     if (!editSnapshot) {
       setEditSnapshot(JSON.parse(JSON.stringify(mergedSubtitles)));
     }
 
     const newSubtitles = [...mergedSubtitles];
     newSubtitles[index][field] = value;
-    // 更新content数组
+    // 更新content數組
     newSubtitles[index].content =
       field === 'sourceContent'
         ? value.split('\n')
@@ -297,7 +297,7 @@ export const useSubtitles = (
   // 保存字幕文件
   const handleSave = async () => {
     try {
-      // 获取文件路径
+      // 獲取文件路徑
       const { srtFile, tempSrtFile, translatedSrtFile, tempTranslatedSrtFile } =
         file;
 
@@ -317,9 +317,9 @@ export const useSubtitles = (
         });
       }
 
-      // 保存翻译字幕（只在需要显示翻译内容且有翻译内容时）
+      // 保存翻譯字幕（只在需要顯示翻譯內容且有翻譯內容時）
       if (shouldShowTranslation) {
-        // 保存到翻译字幕文件
+        // 保存到翻譯字幕文件
         if (translatedSrtFile) {
           window.ipc.invoke('saveSubtitleFile', {
             filePath: translatedSrtFile,
@@ -328,7 +328,7 @@ export const useSubtitles = (
           });
         }
 
-        // 如果有指定的临时翻译文件且不同于主翻译文件，也保存一份
+        // 如果有指定的臨時翻譯文件且不同於主翻譯文件，也保存一份
         if (tempTranslatedSrtFile) {
           window.ipc.invoke('saveSubtitleFile', {
             filePath: tempTranslatedSrtFile,
@@ -344,7 +344,7 @@ export const useSubtitles = (
     }
   };
 
-  // 计算字幕统计信息
+  // 計算字幕統計信息
   const getSubtitleStats = (): SubtitleStats => {
     const total = mergedSubtitles.length;
     const withTranslation = shouldShowTranslation
@@ -360,7 +360,7 @@ export const useSubtitles = (
     return { total, withTranslation, percent };
   };
 
-  // 检查字幕是否翻译失败
+  // 檢查字幕是否翻譯失敗
   const isTranslationFailed = (subtitle: Subtitle): boolean => {
     if (!shouldShowTranslation) return false;
     return (
@@ -370,7 +370,7 @@ export const useSubtitles = (
     );
   };
 
-  // 获取所有翻译失败的字幕索引
+  // 獲取所有翻譯失敗的字幕索引
   const getFailedTranslationIndices = (): number[] => {
     if (!shouldShowTranslation) return [];
     return mergedSubtitles
@@ -378,7 +378,7 @@ export const useSubtitles = (
       .filter((index) => index !== -1);
   };
 
-  // 导航到下一条翻译失败的字幕
+  // 導航到下一條翻譯失敗的字幕
   const goToNextFailedTranslation = (): void => {
     const failedIndices = getFailedTranslationIndices();
     if (failedIndices.length === 0) return;
@@ -389,17 +389,17 @@ export const useSubtitles = (
     if (nextIndex !== undefined) {
       setCurrentSubtitleIndex(nextIndex);
     } else {
-      // 如果没有更后面的失败项，跳转到第一个失败项
+      // 如果沒有更後面的失敗項，跳轉到第一個失敗項
       setCurrentSubtitleIndex(failedIndices[0]);
     }
   };
 
-  // 导航到上一条翻译失败的字幕
+  // 導航到上一條翻譯失敗的字幕
   const goToPreviousFailedTranslation = (): void => {
     const failedIndices = getFailedTranslationIndices();
     if (failedIndices.length === 0) return;
 
-    // 反向查找比当前索引小的失败项
+    // 反向查找比當前索引小的失敗項
     const previousIndex = failedIndices
       .slice()
       .reverse()
@@ -408,14 +408,14 @@ export const useSubtitles = (
     if (previousIndex !== undefined) {
       setCurrentSubtitleIndex(previousIndex);
     } else {
-      // 如果没有更前面的失败项，跳转到最后一个失败项
+      // 如果沒有更前面的失敗項，跳轉到最後一個失敗項
       setCurrentSubtitleIndex(failedIndices[failedIndices.length - 1]);
     }
   };
 
-  // ============ 编辑增强功能 ============
+  // ============ 編輯增強功能 ============
 
-  // 秒数转时间戳字符串
+  // 秒數轉時間戳字符串
   const secondsToTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -423,7 +423,7 @@ export const useSubtitles = (
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.padStart(6, '0').replace('.', ',')}`;
   };
 
-  // 保存到历史记录（用于撤销/重做）
+  // 保存到歷史記錄（用於撤銷/重做）
   const pushToHistory = useCallback(
     (oldState: Subtitle[], newState: Subtitle[]) => {
       setHistory((prev) => {
@@ -445,7 +445,7 @@ export const useSubtitles = (
     [historyIndex],
   );
 
-  // 更新字幕（带历史记录）
+  // 更新字幕（帶歷史記錄）
   const updateSubtitles = useCallback(
     (newSubtitles: Subtitle[]) => {
       pushToHistory(mergedSubtitles, newSubtitles);
@@ -454,7 +454,7 @@ export const useSubtitles = (
     [mergedSubtitles, pushToHistory],
   );
 
-  // 撤销
+  // 撤銷
   const handleUndo = useCallback(() => {
     if (historyIndex > 0 && history.length > 0) {
       const newIndex = historyIndex - 1;
@@ -474,11 +474,11 @@ export const useSubtitles = (
     }
   }, [historyIndex, history]);
 
-  // 是否可以撤销/重做
+  // 是否可以撤銷/重做
   const canUndo = historyIndex > 0 && history.length > 1;
   const canRedo = historyIndex < history.length - 1 && historyIndex >= 0;
 
-  // 失焦记录：当切换字幕时，如果有编辑过，保存到历史
+  // 失焦記錄：當切換字幕時，如果有編輯過，保存到歷史
   useEffect(() => {
     if (
       previousSubtitleIndex !== -1 &&
@@ -495,7 +495,7 @@ export const useSubtitles = (
     setPreviousSubtitleIndex(currentSubtitleIndex);
   }, [currentSubtitleIndex, editSnapshot, mergedSubtitles, pushToHistory]);
 
-  // 合并字幕
+  // 合併字幕
   const handleMergeSubtitles = useCallback(
     (startIndex: number, endIndex: number) => {
       if (
@@ -546,7 +546,7 @@ export const useSubtitles = (
     [mergedSubtitles, updateSubtitles, t],
   );
 
-  // 拆分字幕（支持自定义时间拆分点）
+  // 拆分字幕（支持自定義時間拆分點）
   const handleSplitSubtitle = useCallback(
     (index: number, splitPoint: number, splitTime?: number) => {
       if (index < 0 || index >= mergedSubtitles.length) return;
@@ -608,12 +608,12 @@ export const useSubtitles = (
     [mergedSubtitles, updateSubtitles, t],
   );
 
-  // 更新光标位置
+  // 更新光標位置
   const handleCursorPositionChange = useCallback((position: number) => {
     cursorPositionRef.current = position;
   }, []);
 
-  // 获取当前光标位置
+  // 獲取當前光標位置
   const getCursorPosition = useCallback(() => {
     return cursorPositionRef.current;
   }, []);
@@ -632,12 +632,12 @@ export const useSubtitles = (
     handleSubtitleChange,
     handleSave,
     getSubtitleStats,
-    // 翻译失败相关功能
+    // 翻譯失敗相關功能
     isTranslationFailed,
     getFailedTranslationIndices,
     goToNextFailedTranslation,
     goToPreviousFailedTranslation,
-    // 编辑增强功能
+    // 編輯增強功能
     handleUndo,
     handleRedo,
     canUndo,

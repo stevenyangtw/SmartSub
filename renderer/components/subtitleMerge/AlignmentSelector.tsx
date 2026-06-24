@@ -1,6 +1,6 @@
 /**
- * 对齐位置选择器组件
- * 9宫格形式选择字幕位置
+ * 對齊位置選擇器組件
+ * 9宮格形式選擇字幕位置
  */
 
 import React from 'react';
@@ -13,13 +13,13 @@ interface AlignmentSelectorProps {
   disabled?: boolean;
 }
 
-// 对齐位置映射 (ASS 标准)
-// 7 8 9  顶部
-// 4 5 6  中间
+// 對齊位置映射 (ASS 標準)
+// 7 8 9  頂部
+// 4 5 6  中間
 // 1 2 3  底部
 const ALIGNMENT_GRID: SubtitleAlignment[][] = [
-  [7, 8, 9], // 顶部行
-  [4, 5, 6], // 中间行
+  [7, 8, 9], // 頂部行
+  [4, 5, 6], // 中間行
   [1, 2, 3], // 底部行
 ];
 
@@ -64,7 +64,7 @@ export default function AlignmentSelector({
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
-              {/* 使用小圆点指示位置 */}
+              {/* 使用小圓點指示位置 */}
               <span
                 className={`w-2 h-2 rounded-full ${
                   value === alignment

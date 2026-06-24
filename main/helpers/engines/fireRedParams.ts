@@ -1,25 +1,25 @@
 import { getNumericSetting } from './transcribeShared';
 
 /**
- * FireRedASR-AED 专属参数映射：SmartSub 统一 settings → sherpa-onnx addon 参数。
+ * FireRedASR-AED 專屬參數映射：SmartSub 統一 settings → sherpa-onnx addon 參數。
  *
- * 与 qwen 的关键差异：
- * - FireRedASR-AED 走 beam search，sherpa 的 `fireRedAsr` 配置**不暴露数值解码超参**
- *   （无 max_new_tokens / temperature 等），故无 qwen 那样的 memset(0) 清零陷阱。
- * - **不接 language**：FireRedASR 内部处理中英，sherpa 配置无 language 字段。
+ * 與 qwen 的關鍵差異：
+ * - FireRedASR-AED 走 beam search，sherpa 的 `fireRedAsr` 配置**不暴露數值解碼超參**
+ *   （無 max_new_tokens / temperature 等），故無 qwen 那樣的 memset(0) 清零陷阱。
+ * - **不接 language**：FireRedASR 內部處理中英，sherpa 配置無 language 字段。
  *
- * 段长安全闸（design D8）：FireRedASR-AED 仅支持 ≤60s 输入（>60s 易幻觉、
- * >200s 触发位置编码错误）。故 fireRed **不沿用 SmartSub「0=不限制」约定**：
- * 默认 30s，且实际生效值硬钳到 (0, 60] —— 0/未设/超限均收敛到安全范围内。
+ * 段長安全閘（design D8）：FireRedASR-AED 僅支持 ≤60s 輸入（>60s 易幻覺、
+ * >200s 觸發位置編碼錯誤）。故 fireRed **不沿用 SmartSub「0=不限制」約定**：
+ * 預設 30s，且實際生效值硬鉗到 (0, 60] —— 0/未設/超限均收斂到安全範圍內。
  */
 
-/** FireRedASR-AED 默认最大语音段长（秒）：留足 60s 硬限下的安全裕度。 */
+/** FireRedASR-AED 預設最大語音段長（秒）：留足 60s 硬限下的安全裕度。 */
 export const FIRERED_DEFAULT_MAX_SPEECH_S = 30;
-/** FireRedASR-AED 最大语音段长硬上限（秒）：超过此值模型会幻觉/位置编码报错。 */
+/** FireRedASR-AED 最大語音段長硬上限（秒）：超過此值模型會幻覺/位置編碼報錯。 */
 export const FIRERED_HARD_MAX_SPEECH_S = 60;
 
 export interface FireRedEngineSettings {
-  /** sherpa-onnx provider；本期仅 cpu 落地，cuda 预留未来阶段。 */
+  /** sherpa-onnx provider；本期僅 cpu 落地，cuda 預留未來階段。 */
   fireRedProvider?: 'cpu' | 'cuda';
   fireRedNumThreads?: number;
   useVAD?: boolean;
@@ -39,10 +39,10 @@ export interface FireRedAddonParams {
 }
 
 /**
- * 段长安全闸：把任意输入收敛到 FireRedASR-AED 安全范围。
- * - 未设/非数值 → 默认 30s；
- * - 0（SmartSub「不限制」语义）或 > 60 → 硬上限 60s（绝不放行不限制）；
- * - (0, 60] → 原样采用。
+ * 段長安全閘：把任意輸入收斂到 FireRedASR-AED 安全範圍。
+ * - 未設/非數值 → 預設 30s；
+ * - 0（SmartSub「不限制」語義）或 > 60 → 硬上限 60s（絕不放行不限制）；
+ * - (0, 60] → 原樣採用。
  */
 export function clampFireRedMaxSpeech(raw: unknown): number {
   const v = getNumericSetting(raw, FIRERED_DEFAULT_MAX_SPEECH_S);
@@ -50,24 +50,24 @@ export function clampFireRedMaxSpeech(raw: unknown): number {
   return v;
 }
 
-/** 组装 fireRed 的可选参数（不含 audio_file / 模型文件，由 adapter 注入）。 */
+/** 組裝 fireRed 的可選參數（不含 audio_file / 模型文件，由 adapter 注入）。 */
 export function buildFireRedParams(
   settings: Record<string, unknown>,
 ): FireRedAddonParams {
   const s = settings as FireRedEngineSettings;
   return {
-    // 本期仅 cpu 落地（design D6）；非法/未设回退 cpu。
+    // 本期僅 cpu 落地（design D6）；非法/未設回退 cpu。
     provider: s.fireRedProvider === 'cuda' ? 'cuda' : 'cpu',
     num_threads:
       Number(s.fireRedNumThreads) > 0 ? Number(s.fireRedNumThreads) : 2,
-    // VAD 调参复用 SmartSub 统一开关（与 funasr / qwen / faster-whisper 一致）。
+    // VAD 調參複用 SmartSub 統一開關（與 funasr / qwen / faster-whisper 一致）。
     vad_threshold: getNumericSetting(s.vadThreshold, 0.5),
     vad_min_silence_duration_ms: getNumericSetting(
       s.vadMinSilenceDuration,
       100,
     ),
     vad_min_speech_duration_ms: getNumericSetting(s.vadMinSpeechDuration, 250),
-    // 段长安全闸：FireRedASR-AED 不允许「不限制」，默认 30s、硬钳 ≤60s。
+    // 段長安全閘：FireRedASR-AED 不允許「不限制」，預設 30s、硬鉗 ≤60s。
     vad_max_speech_duration_s: clampFireRedMaxSpeech(s.vadMaxSpeechDuration),
   };
 }

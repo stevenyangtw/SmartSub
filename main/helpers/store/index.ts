@@ -13,7 +13,7 @@ export const store = new Store<StoreType>({
     userConfig: defaultUserConfig,
     translationProviders: [],
     settings: {
-      language: 'zh',
+      language: 'zh-TW',
       useLocalWhisper: false,
       whisperCommand: defaultWhisperCommand,
       builtinWhisperCommand: defaultWhisperCommand,

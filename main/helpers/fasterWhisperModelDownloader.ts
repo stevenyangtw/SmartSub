@@ -318,9 +318,9 @@ export class FasterWhisperModelDownloader {
         });
 
         let usedParallel = false;
-        // 仅对「全新文件」走并行（startByte>0 为续传，交给单连接保留续传语义）。
-        // 并行直接写入 file.destPath（内部用 .par 临时文件 + 校验后改名），故并行成功
-        // 时无需再 rename tempPath。
+        // 僅對「全新文件」走並行（startByte>0 為續傳，交給單連接保留續傳語義）。
+        // 並行直接寫入 file.destPath（內部用 .par 臨時文件 + 校驗後改名），故並行成功
+        // 時無需再 rename tempPath。
         if (startByte === 0) {
           try {
             await downloadFileParallel({

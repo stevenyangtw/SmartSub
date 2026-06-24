@@ -8,7 +8,7 @@ import type { PyEngineDownloadSource, PyEngineId } from '../../../types/engine';
 
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
-/** 支持在线下载/更新的 Python 引擎运行时集合（目前仅 faster-whisper）。 */
+/** 支持在線下載/更新的 Python 引擎運行時集合（目前僅 faster-whisper）。 */
 const UPDATABLE_ENGINES: PyEngineId[] = ['faster-whisper'];
 
 function getStatePath(): string {
@@ -36,8 +36,8 @@ function writeLastCheckAt(ts: number): void {
 }
 
 /**
- * 启动后每日一次的节流静默更新检查：遍历所有已安装的 Python 引擎，发现更新时通过
- * `py-engine-update-available` 通知渲染层（携带 engineId，不自动下载）。弱网/失败静默，仅日志。
+ * 啟動後每日一次的節流靜默更新檢查：遍歷所有已安裝的 Python 引擎，發現更新時通過
+ * `py-engine-update-available` 通知渲染層（攜帶 engineId，不自動下載）。弱網/失敗靜默，僅日誌。
  */
 export async function maybeAutoCheckPyEngineUpdate(
   mainWindow: BrowserWindow,
@@ -72,7 +72,7 @@ export async function maybeAutoCheckPyEngineUpdate(
         );
       }
     } catch (error) {
-      // 单引擎失败不影响其它引擎；本轮不写 lastCheckAt，下次启动可重试
+      // 單引擎失敗不影響其它引擎；本輪不寫 lastCheckAt，下次啟動可重試
       logMessage(
         `py-engine[${engineId}] daily update-check failed: ${error}`,
         'warning',
@@ -80,6 +80,6 @@ export async function maybeAutoCheckPyEngineUpdate(
     }
   }
 
-  // 仅当至少一个引擎成功检查后才落地节流时间戳
+  // 僅當至少一個引擎成功檢查後才落地節流時間戳
   if (anyChecked) writeLastCheckAt(now);
 }

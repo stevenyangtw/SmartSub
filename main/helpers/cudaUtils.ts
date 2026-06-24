@@ -7,9 +7,9 @@ import { logMessage } from './storeManager';
 import { getExtraResourcesPath } from './utils';
 
 /**
- * 异步执行外部命令（不阻塞主进程 event loop）。
- * GPU/CUDA 探测（nvcc / nvidia-smi）首次冷启动可能耗时数秒，必须异步执行，
- * 否则同步 execSync 会卡死主进程，连带阻塞所有并发 IPC（引擎/模型状态等），UI 卡顿。
+ * 異步執行外部命令（不阻塞主進程 event loop）。
+ * GPU/CUDA 探測（nvcc / nvidia-smi）首次冷啟動可能耗時數秒，必須異步執行，
+ * 否則同步 execSync 會卡死主進程，連帶阻塞所有併發 IPC（引擎/模型狀態等），UI 卡頓。
  */
 const execAsync = promisify(exec);
 import type {
@@ -26,11 +26,11 @@ import type {
 import { AVAILABLE_CUDA_VERSIONS } from '../../types/addon';
 
 /**
- * 开发模式模拟配置
- * 通过环境变量控制，仅在开发模式下生效
+ * 開發模式模擬配置
+ * 通過環境變量控制，僅在開發模式下生效
  */
 export function getDevSimulationConfig(): DevSimulationConfig | null {
-  // 仅在开发模式下启用模拟
+  // 僅在開發模式下啟用模擬
   if (process.env.NODE_ENV === 'production') {
     return null;
   }
@@ -53,11 +53,11 @@ export function getDevSimulationConfig(): DevSimulationConfig | null {
 }
 
 /**
- * 检测 CUDA Toolkit 安装情况
- * 通过检测 nvcc 命令来判断
+ * 檢測 CUDA Toolkit 安裝情況
+ * 通過檢測 nvcc 命令來判斷
  */
 export async function getCudaToolkitInfo(): Promise<CudaToolkitInfo> {
-  // 检查开发模式模拟
+  // 檢查開發模式模擬
   const simConfig = getDevSimulationConfig();
   if (simConfig?.enabled) {
     logMessage('[Dev Simulation] Using simulated CUDA Toolkit info', 'info');
@@ -67,7 +67,7 @@ export async function getCudaToolkitInfo(): Promise<CudaToolkitInfo> {
     };
   }
 
-  // 仅支持 Windows 和 Linux 平台
+  // 僅支持 Windows 和 Linux 平臺
   if (process.platform !== 'win32' && process.platform !== 'linux') {
     return { installed: false, version: null };
   }
@@ -78,12 +78,12 @@ export async function getCudaToolkitInfo(): Promise<CudaToolkitInfo> {
       timeout: 5000,
     });
 
-    // 解析 nvcc 输出获取版本号
-    // 示例输出: "Cuda compilation tools, release 12.4, V12.4.99"
+    // 解析 nvcc 輸出獲取版本號
+    // 示例輸出: "Cuda compilation tools, release 12.4, V12.4.99"
     const versionMatch = nvccOutput.match(/release (\d+\.\d+)/i);
     if (versionMatch) {
       const majorMinor = versionMatch[1];
-      // 补充完整版本号
+      // 補充完整版本號
       const fullVersionMatch = nvccOutput.match(/V(\d+\.\d+\.\d+)/);
       const version = fullVersionMatch
         ? fullVersionMatch[1]
@@ -101,11 +101,11 @@ export async function getCudaToolkitInfo(): Promise<CudaToolkitInfo> {
 }
 
 /**
- * 检测 GPU CUDA 支持情况
- * 通过 nvidia-smi 命令来判断
+ * 檢測 GPU CUDA 支持情況
+ * 通過 nvidia-smi 命令來判斷
  */
 export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
-  // 检查开发模式模拟
+  // 檢查開發模式模擬
   const simConfig = getDevSimulationConfig();
   if (simConfig?.enabled) {
     logMessage('[Dev Simulation] Using simulated GPU CUDA support', 'info');
@@ -117,13 +117,13 @@ export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
     };
   }
 
-  // 仅支持 Windows 和 Linux 平台
+  // 僅支持 Windows 和 Linux 平臺
   if (process.platform !== 'win32' && process.platform !== 'linux') {
     return { supported: false, driverVersion: null, maxCudaVersion: null };
   }
 
-  // 优先使用机器可读查询获取显卡名与驱动版本：
-  // 跨驱动版本、跨语言环境最稳定，且不会像解析表格那样误匹配到进程行
+  // 優先使用機器可讀查詢獲取顯卡名與驅動版本：
+  // 跨驅動版本、跨語言環境最穩定，且不會像解析表格那樣誤匹配到進程行
   let gpuName: string | undefined;
   let driverVersion: string | null = null;
   try {
@@ -142,10 +142,10 @@ export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
       driverVersion = queriedDriver || null;
     }
   } catch {
-    // 查询接口不可用时，下面回退到解析 nvidia-smi 文本输出
+    // 查詢接口不可用時，下面回退到解析 nvidia-smi 文本輸出
   }
 
-  // 解析显卡支持的最高 CUDA 版本（--query-gpu 无此字段，只能从 nvidia-smi 表头读取）
+  // 解析顯卡支持的最高 CUDA 版本（--query-gpu 無此字段，只能從 nvidia-smi 表頭讀取）
   let maxCudaVersion: string | null = null;
   try {
     const { stdout: nsmiResult } = await execAsync('nvidia-smi', {
@@ -153,14 +153,14 @@ export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
       timeout: 10000,
     });
 
-    // 600 系列及以上驱动已将 "CUDA Version" 更名为 "CUDA UMD Version"，需同时兼容
+    // 600 系列及以上驅動已將 "CUDA Version" 更名為 "CUDA UMD Version"，需同時兼容
     const cudaVersionMatch = nsmiResult.match(
       /CUDA(?:\s+UMD)?\s+Version\s*:\s*(\d+(?:\.\d+)?)/i,
     );
     maxCudaVersion = cudaVersionMatch ? cudaVersionMatch[1] : null;
 
-    // 查询接口失败时从表格兜底补全驱动版本：
-    // 兼容新版 "KMD Version" 与旧版 "Driver Version"，允许 2~3 段版本号（如 610.47）
+    // 查詢接口失敗時從表格兜底補全驅動版本：
+    // 兼容新版 "KMD Version" 與舊版 "Driver Version"，允許 2~3 段版本號（如 610.47）
     if (!driverVersion) {
       const driverVersionMatch = nsmiResult.match(
         /(?:KMD|Driver)\s+Version\s*:\s*(\d+(?:\.\d+)+)/i,
@@ -168,7 +168,7 @@ export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
       driverVersion = driverVersionMatch ? driverVersionMatch[1] : null;
     }
 
-    // 查询接口失败时从表格兜底补全显卡名称：限定 NVIDIA 开头，避免误匹配进程行
+    // 查詢接口失敗時從表格兜底補全顯卡名稱：限定 NVIDIA 開頭，避免誤匹配進程行
     if (!gpuName) {
       const gpuNameMatch = nsmiResult.match(
         /\|\s*\d+\s+(NVIDIA[^|]+?)\s+(?:On|Off|N\/A)/i,
@@ -176,11 +176,11 @@ export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
       gpuName = gpuNameMatch ? gpuNameMatch[1].trim() : undefined;
     }
   } catch {
-    // bare nvidia-smi 不可用时，maxCudaVersion 保持 null
+    // bare nvidia-smi 不可用時，maxCudaVersion 保持 null
   }
 
-  // 只要检测到 NVIDIA 显卡（拿到名称或驱动版本）即视为支持 CUDA，
-  // 即使因输出格式变化导致 CUDA 版本解析失败，也不再误判为"不支持"
+  // 只要檢測到 NVIDIA 顯卡（拿到名稱或驅動版本）即視為支持 CUDA，
+  // 即使因輸出格式變化導致 CUDA 版本解析失敗，也不再誤判為"不支持"
   const hasNvidiaGpu = !!gpuName || !!driverVersion;
   const supported = !!maxCudaVersion || hasNvidiaGpu;
 
@@ -206,8 +206,8 @@ export async function getGpuCudaSupport(): Promise<GpuCudaSupport> {
 }
 
 /**
- * 比较版本号
- * @returns 负数表示 v1 < v2, 0 表示相等, 正数表示 v1 > v2
+ * 比較版本號
+ * @returns 負數表示 v1 < v2, 0 表示相等, 正數表示 v1 > v2
  */
 function compareVersions(v1: string, v2: string): number {
   const parts1 = v1.split('.').map(Number);
@@ -224,7 +224,7 @@ function compareVersions(v1: string, v2: string): number {
 }
 
 /**
- * 提取版本号的 major.minor 部分
+ * 提取版本號的 major.minor 部分
  * 例如 "13.0.2" -> "13.0", "12.4.0" -> "12.4"
  */
 function getMajorMinor(version: string): string {
@@ -233,25 +233,25 @@ function getMajorMinor(version: string): string {
 }
 
 /**
- * 获取推荐的加速包版本
- * 根据用户的 CUDA 版本，找到最合适的可用版本
+ * 獲取推薦的加速包版本
+ * 根據用戶的 CUDA 版本，找到最合適的可用版本
  *
- * nvidia-smi 报告的 CUDA 版本 (如 "13.0") 表示驱动支持的最高 CUDA 运行时版本族，
- * 即 13.0.x 系列的补丁版本都是兼容的。因此匹配时只比较 major.minor，忽略 patch。
+ * nvidia-smi 報告的 CUDA 版本 (如 "13.0") 表示驅動支持的最高 CUDA 運行時版本族，
+ * 即 13.0.x 系列的補丁版本都是兼容的。因此匹配時只比較 major.minor，忽略 patch。
  *
- * 同时，新架构的 GPU（如 Blackwell）可能不被旧版 CUDA toolkit 支持，
- * 所以在兼容范围内优先推荐最高版本。
+ * 同時，新架構的 GPU（如 Blackwell）可能不被舊版 CUDA toolkit 支持，
+ * 所以在兼容範圍內優先推薦最高版本。
  *
- * @param userCudaVersion 用户的 CUDA 版本 (如 "12.6" 或 "13.0")
- * @returns 推荐的加速包版本，如果没有合适的则返回 null
+ * @param userCudaVersion 用戶的 CUDA 版本 (如 "12.6" 或 "13.0")
+ * @returns 推薦的加速包版本，如果沒有合適的則返回 null
  */
 export function getRecommendedAddonVersion(
   userCudaVersion: string,
 ): CudaVersion | null {
   const userMajorMinor = getMajorMinor(userCudaVersion);
 
-  // 从高到低遍历可用版本，找到第一个 major.minor 不超过用户版本的
-  // 这样同系列的 patch 版本（如 13.0.2 对应驱动 13.0）也能正确匹配
+  // 從高到低遍歷可用版本，找到第一個 major.minor 不超過用戶版本的
+  // 這樣同系列的 patch 版本（如 13.0.2 對應驅動 13.0）也能正確匹配
   for (const version of [...AVAILABLE_CUDA_VERSIONS].reverse()) {
     const addonMajorMinor = getMajorMinor(version);
     if (compareVersions(addonMajorMinor, userMajorMinor) <= 0) {
@@ -263,31 +263,31 @@ export function getRecommendedAddonVersion(
 }
 
 /**
- * 获取加速包推荐信息
+ * 獲取加速包推薦信息
  */
 function getAddonRecommendation(
   toolkit: CudaToolkitInfo,
   gpuSupport: GpuCudaSupport,
 ): AddonRecommendation {
-  // 未检测到 NVIDIA 显卡时无法使用加速
+  // 未檢測到 NVIDIA 顯卡時無法使用加速
   if (!gpuSupport.supported) {
     return {
       canUseCuda: false,
       recommendedVersion: null,
       needsDlls: false,
       downloadType: null,
-      reason: 'GPU 不支持 CUDA 或未检测到 NVIDIA 显卡',
+      reason: 'GPU 不支持 CUDA 或未檢測到 NVIDIA 顯卡',
       reasonKey: 'cudaNotSupported',
     };
   }
 
-  // 兜底：检测到 N 卡但未能解析出最高 CUDA 版本时（如新版驱动输出格式变化），
-  // 按可用加速包的最高版本推荐，避免误判为不可用；用户可在异常时手动改选更低版本
+  // 兜底：檢測到 N 卡但未能解析出最高 CUDA 版本時（如新版驅動輸出格式變化），
+  // 按可用加速包的最高版本推薦，避免誤判為不可用；用戶可在異常時手動改選更低版本
   const effectiveCudaVersion =
     gpuSupport.maxCudaVersion ||
     AVAILABLE_CUDA_VERSIONS[AVAILABLE_CUDA_VERSIONS.length - 1];
 
-  // 获取推荐版本
+  // 獲取推薦版本
   const recommendedVersion = getRecommendedAddonVersion(effectiveCudaVersion);
 
   if (!recommendedVersion) {
@@ -296,27 +296,27 @@ function getAddonRecommendation(
       recommendedVersion: null,
       needsDlls: false,
       downloadType: null,
-      reason: `显卡支持的 CUDA 版本 (${gpuSupport.maxCudaVersion}) 低于最低要求 (11.8.0)`,
+      reason: `顯卡支持的 CUDA 版本 (${gpuSupport.maxCudaVersion}) 低於最低要求 (11.8.0)`,
       reasonKey: 'cudaVersionTooOld',
     };
   }
 
-  // 判断是否需要下载带 DLLs 的包
-  // 如果用户已安装 CUDA Toolkit，只需下载 addon.node
-  // 如果未安装，需要下载包含运行时库的完整包
+  // 判斷是否需要下載帶 DLLs 的包
+  // 如果用戶已安裝 CUDA Toolkit，只需下載 addon.node
+  // 如果未安裝，需要下載包含運行時庫的完整包
   const needsDlls = !toolkit.installed;
   const downloadType = needsDlls ? 'tar.gz' : 'node.gz';
 
   let reason: string;
   let reasonKey: AddonRecommendation['reasonKey'];
   if (!gpuSupport.maxCudaVersion) {
-    reason = `未能识别显卡支持的最高 CUDA 版本，已按最高加速包版本推荐；若运行异常请手动选择更低版本`;
+    reason = `未能識別顯卡支持的最高 CUDA 版本，已按最高加速包版本推薦；若運行異常請手動選擇更低版本`;
     reasonKey = 'maxCudaUnknown';
   } else if (toolkit.installed) {
-    reason = `已检测到 CUDA Toolkit ${toolkit.version}，推荐下载轻量版加速包`;
+    reason = `已檢測到 CUDA Toolkit ${toolkit.version}，推薦下載輕量版加速包`;
     reasonKey = 'toolkitInstalled';
   } else {
-    reason = `未检测到 CUDA Toolkit，推荐下载包含运行时库的完整加速包`;
+    reason = `未檢測到 CUDA Toolkit，推薦下載包含運行時庫的完整加速包`;
     reasonKey = 'toolkitMissing';
   }
 
@@ -331,8 +331,8 @@ function getAddonRecommendation(
 }
 
 /**
- * 获取完整的 CUDA 环境信息
- * 这是主要的对外接口
+ * 獲取完整的 CUDA 環境信息
+ * 這是主要的對外接口
  */
 export async function getCudaEnvironment(): Promise<CudaEnvironment> {
   const cudaToolkit = await getCudaToolkitInfo();
@@ -352,8 +352,8 @@ export async function getCudaEnvironment(): Promise<CudaEnvironment> {
 }
 
 /**
- * 检查系统是否支持 CUDA 并返回支持的版本
- * @deprecated 请使用 getCudaEnvironment() 获取更详细的信息
+ * 檢查系統是否支持 CUDA 並返回支持的版本
+ * @deprecated 請使用 getCudaEnvironment() 獲取更詳細的信息
  */
 export async function checkCudaSupport(): Promise<string | false> {
   const env = await getCudaEnvironment();
@@ -366,10 +366,10 @@ export async function checkCudaSupport(): Promise<string | false> {
 }
 
 /**
- * 检查当前平台是否可能支持 CUDA
+ * 檢查當前平臺是否可能支持 CUDA
  */
 export function isPlatformCudaCapable(): boolean {
-  // 检查开发模式模拟
+  // 檢查開發模式模擬
   const simConfig = getDevSimulationConfig();
   if (simConfig?.enabled) {
     return simConfig.platform === 'win32' || simConfig.platform === 'linux';
@@ -379,8 +379,8 @@ export function isPlatformCudaCapable(): boolean {
 }
 
 /**
- * 获取当前有效的平台
- * 在开发模式模拟时返回模拟平台
+ * 獲取當前有效的平臺
+ * 在開發模式模擬時返回模擬平臺
  */
 export function getEffectivePlatform(): NodeJS.Platform {
   const simConfig = getDevSimulationConfig();
@@ -391,7 +391,7 @@ export function getEffectivePlatform(): NodeJS.Platform {
 }
 
 /**
- * 归一化 GPU 厂商
+ * 歸一化 GPU 廠商
  */
 function normalizeGpuVendor(vendor: string, model: string): GpuVendor {
   const s = `${vendor} ${model}`.toLowerCase();
@@ -420,7 +420,7 @@ function normalizeGpuVendor(vendor: string, model: string): GpuVendor {
 }
 
 /**
- * 枚举显卡（systeminformation，跨平台），带 10s 超时与 dev 模拟
+ * 枚舉顯卡（systeminformation，跨平臺），帶 10s 超時與 dev 模擬
  */
 async function detectGpus(): Promise<GpuInfo[]> {
   const simConfig = getDevSimulationConfig();
@@ -456,7 +456,7 @@ async function detectGpus(): Promise<GpuInfo[]> {
 }
 
 /**
- * 检测 Vulkan 运行库是否存在（纯文件检查，毫秒级，不调用 vulkaninfo）
+ * 檢測 Vulkan 運行庫是否存在（純文件檢查，毫秒級，不調用 vulkaninfo）
  */
 export function detectVulkanRuntime(): boolean {
   if (
@@ -465,7 +465,7 @@ export function detectVulkanRuntime(): boolean {
   ) {
     return process.env.DEV_SIMULATE_VULKAN === 'true';
   }
-  // dev 平台模拟时本机文件检查无意义，默认按可用处理（可用 DEV_SIMULATE_VULKAN=false 覆盖）
+  // dev 平臺模擬時本機文件檢查無意義，預設按可用處理（可用 DEV_SIMULATE_VULKAN=false 覆蓋）
   if (getDevSimulationConfig()?.enabled) {
     return true;
   }
@@ -495,7 +495,7 @@ export function detectVulkanRuntime(): boolean {
 }
 
 /**
- * 内置 Vulkan addon 路径（CI 预置；macOS / 开发环境通常不存在）
+ * 內置 Vulkan addon 路徑（CI 預置；macOS / 開發環境通常不存在）
  */
 export function getBuiltinVulkanAddonPath(): string {
   return path.join(getExtraResourcesPath(), 'addons', 'addon.vulkan.node');
@@ -504,7 +504,7 @@ export function getBuiltinVulkanAddonPath(): string {
 let cachedGpuEnvironment: GpuEnvironment | null = null;
 
 /**
- * 获取完整 GPU 环境（跨厂商）。结果会话级缓存，forceRefresh 重新检测。
+ * 獲取完整 GPU 環境（跨廠商）。結果會話級緩存，forceRefresh 重新檢測。
  */
 export async function getGpuEnvironment(
   forceRefresh = false,
@@ -519,7 +519,7 @@ export async function getGpuEnvironment(
   const builtinVulkanAvailable =
     isPlatformCudaCapable() && fs.existsSync(getBuiltinVulkanAddonPath());
 
-  // NVIDIA 详细检测：检测到 N 卡、枚举失败（空列表，nvidia-smi 兜底）或 dev 模拟时执行
+  // NVIDIA 詳細檢測：檢測到 N 卡、枚舉失敗（空列表，nvidia-smi 兜底）或 dev 模擬時執行
   const hasNvidia = gpus.some((g) => g.vendor === 'nvidia');
   const shouldProbeNvidia =
     isPlatformCudaCapable() &&

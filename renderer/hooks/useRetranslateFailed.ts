@@ -1,6 +1,6 @@
 /**
- * 失败字幕批量重翻：调用主进程 retranslateSubtitles（与正式任务同翻译链路），
- * 支持进度展示与取消；完成/取消后按 id+时间戳一次性回填（一条撤销命令）。
+ * 失敗字幕批量重翻：調用主進程 retranslateSubtitles（與正式任務同翻譯鏈路），
+ * 支持進度展示與取消；完成/取消後按 id+時間戳一次性回填（一條撤銷命令）。
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -18,10 +18,10 @@ export interface RetranslateControl {
 }
 
 interface UseRetranslateFailedOptions {
-  /** 读取最新字幕数组（避免异步结束后拿过期快照） */
+  /** 讀取最新字幕數組（避免異步結束後拿過期快照） */
   getSubtitles: () => Subtitle[];
   getFailedTranslationIndices: () => number[];
-  /** 一次性应用回填（内部产生一条撤销命令） */
+  /** 一次性應用回填（內部產生一條撤銷命令） */
   updateSubtitles: (subtitles: Subtitle[]) => void;
   sourceLanguage?: string;
   targetLanguage?: string;
@@ -41,7 +41,7 @@ export function useRetranslateFailed({
   const [total, setTotal] = useState(0);
   const batchIdRef = useRef<string | null>(null);
 
-  // 最新依赖引用，保持 start/cancel 引用稳定
+  // 最新依賴引用，保持 start/cancel 引用穩定
   const latestRef = useRef({
     getSubtitles,
     getFailedTranslationIndices,
@@ -57,7 +57,7 @@ export function useRetranslateFailed({
     targetLanguage,
   };
 
-  // 进度事件（按 batchId 过滤）
+  // 進度事件（按 batchId 過濾）
   useEffect(() => {
     const cleanup = window.ipc.on(
       'retranslateProgress',
@@ -123,7 +123,7 @@ export function useRetranslateFailed({
         return;
       }
 
-      // 按 id+时间戳回填；运行期间被用户改动过结构/时间的行自然匹配失败跳过
+      // 按 id+時間戳回填；運行期間被用戶改動過結構/時間的行自然匹配失敗跳過
       const resultMap = new Map<string, string>();
       results.forEach((r) => {
         if (r.targetContent && r.targetContent.trim()) {
@@ -136,7 +136,7 @@ export function useRetranslateFailed({
         const latest = latestRef.current.getSubtitles();
         const next = latest.map((row) => {
           const hit = resultMap.get(`${row.id}|${row.startEndTime}`);
-          // 只回填仍为空的行，避免覆盖用户在重翻期间手动填写的内容
+          // 只回填仍為空的行，避免覆蓋用戶在重翻期間手動填寫的內容
           if (hit && (!row.targetContent || !row.targetContent.trim())) {
             applied += 1;
             return { ...row, targetContent: hit };
@@ -151,12 +151,12 @@ export function useRetranslateFailed({
       if (result?.cancelled) {
         toast.info(
           t('retranslateCancelledPartial', { count: applied }) ||
-            `已取消，已回填 ${applied} 条`,
+            `已取消，已回填 ${applied} 條`,
         );
       } else if (applied > 0) {
         toast.success(
           t('retranslateDone', { count: applied }) ||
-            `重翻完成，已回填 ${applied} 条`,
+            `重翻完成，已回填 ${applied} 條`,
         );
       } else {
         toast.warning(t('retranslateNoResult'));

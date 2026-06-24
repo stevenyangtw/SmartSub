@@ -33,9 +33,9 @@ export interface ActivityDownload {
 }
 
 /**
- * 任务中枢 / 活动面板：把散落的实时状态（运行中的任务、模型下载、最近完成 / 失败）
- * 汇聚到顶栏 popover 一处可见可控。版本与更新提示落在页脚，更新可用时按钮显示提示点。
- * 仅只读消费既有信号（taskRunning / download / getWorkItems / taskComplete），不改任何后端行为。
+ * 任務中樞 / 活動面板：把散落的實時狀態（運行中的任務、模型下載、最近完成 / 失敗）
+ * 匯聚到頂欄 popover 一處可見可控。版本與更新提示落在頁腳，更新可用時按鈕顯示提示點。
+ * 僅只讀消費既有信號（taskRunning / download / getWorkItems / taskComplete），不改任何後端行為。
  */
 export default function ActivityCenter({
   locale,
@@ -75,12 +75,12 @@ export default function ActivityCenter({
     }
   }, []);
 
-  // 打开时拉取最近工程
+  // 打開時拉取最近工程
   useEffect(() => {
     if (open) loadRecent();
   }, [open, loadRecent]);
 
-  // 任务完成即时刷新「最近」
+  // 任務完成即時刷新「最近」
   useEffect(() => {
     const cleanup = window?.ipc?.on('taskComplete', () => {
       loadRecent();

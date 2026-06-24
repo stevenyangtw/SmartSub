@@ -1,5 +1,5 @@
 /**
- * 基础样式设置组件
+ * 基礎樣式設置組件
  */
 
 import React from 'react';
@@ -33,7 +33,7 @@ export default function BasicStyleSettings({
 
   return (
     <div className="space-y-4">
-      {/* 字体 + 字号 同行 */}
+      {/* 字體 + 字號 同行 */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label className="text-sm">{t('fontFamily')}</Label>
@@ -76,7 +76,7 @@ export default function BasicStyleSettings({
         </div>
       </div>
 
-      {/* 字体颜色 + 边框颜色 同行 */}
+      {/* 字體顏色 + 邊框顏色 同行 */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label className="text-sm">{t('fontColor')}</Label>
@@ -121,7 +121,7 @@ export default function BasicStyleSettings({
         </div>
       </div>
 
-      {/* 对齐位置：标题用块级标签 + mb 与九宫格拉开（space-y 对 inline 标签/inline-grid 组合无效） */}
+      {/* 對齊位置：標題用塊級標籤 + mb 與九宮格拉開（space-y 對 inline 標籤/inline-grid 組合無效） */}
       <div className="pt-2">
         <Label className="mb-3 block text-sm">{t('position')}</Label>
         <AlignmentSelector

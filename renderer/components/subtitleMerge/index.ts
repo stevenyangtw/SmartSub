@@ -1,11 +1,11 @@
 /**
- * 字幕合并模块导出
+ * 字幕合併模塊導出
  */
 
-// 主面板组件
+// 主面板組件
 export { default as SubtitleMergePanel } from './SubtitleMergePanel';
 
-// 子组件
+// 子組件
 export { default as FileSelector } from './FileSelector';
 export { default as StylePresets } from './StylePresets';
 export { default as BasicStyleSettings } from './BasicStyleSettings';
@@ -25,5 +25,5 @@ export type {
 // 常量
 export * from './constants';
 
-// 工具函数
+// 工具函數
 export * from './utils/styleUtils';

@@ -9,7 +9,7 @@
     "localCli": "本地命令行"
   },
   "currentEngine": "當前轉寫引擎",
-  "openEnginesTab": "引擎設置",
+  "openEnginesTab": "引擎設定",
   "engineModelHint": {
     "builtin": "以下為 whisper.cpp 的 ggml 模型，含 Turbo 與量化變體",
     "fasterWhisper": "以下為 faster-whisper 的 CT2 模型，含 Distil 蒸餾系列",

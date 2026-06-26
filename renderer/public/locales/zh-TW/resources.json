@@ -40,7 +40,7 @@
       "repair": "重新安裝",
       "select": "設為當前引擎",
       "selected": "當前引擎",
-      "advanced": "高級設置",
+      "advanced": "高級設定",
       "device": "計算設備",
       "computeType": "精度",
       "deviceHint": "選擇推理使用的硬件",
@@ -88,7 +88,7 @@
       "builtinRuntime": "運行庫已隨應用內置（FunASR · Qwen · FireRed 共用），無需單獨下載。",
       "installedVersion": "內置 v{{version}}",
       "needsModels": "下載任一族模型即可開始使用",
-      "advanced": "高級設置",
+      "advanced": "高級設定",
       "numThreads": "推理線程數",
       "numThreadsHint": "CPU 推理使用的線程數，越大越快但佔用更多 CPU（三族共用同一運行庫，統一生效）",
       "itn": "逆文本規整（ITN）",
@@ -124,7 +124,7 @@
       "checkFailed": "檢查更新失敗，請稍後重試。",
       "protocolUnsupported": "該引擎版本需要更新版本的 SmartSub，請先升級 SmartSub 後再安裝或升級引擎。",
       "anotherDownload": "已有下載任務進行中，請等待完成後再試。",
-      "advanced": "高級設置",
+      "advanced": "高級設定",
       "itn": "逆文本規整（ITN）",
       "itnHint": "將口語化的數字、日期等轉換為標準書寫形式，並自動補全標點",
       "numThreads": "推理線程數",
@@ -174,7 +174,7 @@
       "engineBusy": "有任務正在運行，請等待任務完成後再安裝、升級或卸載引擎。",
       "checkFailed": "檢查更新失敗，請稍後重試。",
       "anotherDownload": "已有下載任務進行中，請等待完成後再試。",
-      "advanced": "高級設置",
+      "advanced": "高級設定",
       "providerNote": "當前範圍：僅 CPU（0.6B）。GPU 支持計劃在後續版本提供。",
       "numThreads": "推理線程數",
       "numThreadsHint": "CPU 推理使用的線程數，越大越快但佔用更多 CPU",
@@ -191,7 +191,7 @@
       "modelSourceHint": {
         "modelscope": "國內 CDN，速度最快，逐文件下載免解包（推薦）",
         "ghproxy": "經 gh-proxy.com 代理 GitHub，下載整包後需解包",
-        "github": "GitHub 直連，海外網絡較快，下載整包後需解包"
+        "github": "GitHub 直連，海外網路較快，下載整包後需解包"
       },
       "models": {
         "qwen3-asr-0.6b": {
@@ -226,7 +226,7 @@
       "engineBusy": "有任務正在運行，請等待任務完成後再安裝、升級或卸載引擎。",
       "checkFailed": "檢查更新失敗，請稍後重試。",
       "anotherDownload": "已有下載任務進行中，請等待完成後再試。",
-      "advanced": "高級設置",
+      "advanced": "高級設定",
       "providerNote": "當前範圍：僅 CPU。GPU 支持計劃在後續版本提供。",
       "numThreads": "推理線程數",
       "numThreadsHint": "CPU 推理使用的線程數，越大越快但佔用更多 CPU",
@@ -243,7 +243,7 @@
       "modelSourceHint": {
         "modelscope": "國內 CDN，速度最快，逐文件下載免解包（推薦）",
         "ghproxy": "經 gh-proxy.com 代理 GitHub，下載整包後需解包",
-        "github": "GitHub 直連，海外網絡較快，下載整包後需解包"
+        "github": "GitHub 直連，海外網路較快，下載整包後需解包"
       },
       "models": {
         "fire-red-asr-large-zh-en": {

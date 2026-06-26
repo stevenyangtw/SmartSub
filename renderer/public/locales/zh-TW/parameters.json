@@ -19,7 +19,7 @@
   },
   "bodyParameters": {
     "title": "請求體參數",
-    "description": "包含在 API 請求體中的自定義參數（例如：模型設置、行為控制）"
+    "description": "包含在 API 請求體中的自定義參數（例如：模型設定、行為控制）"
   },
   "search": {
     "placeholder": "搜索參數..."

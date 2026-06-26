@@ -4,7 +4,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 const GITHUB_RELEASE_BASE =
-  'https://github.com/buxuku/SmartSub/releases/download';
+  'https://github.com/stevenyangtw/SmartSub.git/releases/download';
 
 interface DownloadCardProps {
   title: string;

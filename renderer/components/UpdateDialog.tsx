@@ -102,7 +102,7 @@ export function UpdateDialog({
   };
 
   const handleViewOnGitHub = () => {
-    const releaseUrl = `https://github.com/buxuku/SmartSub/releases/tag/v${version}`;
+    const releaseUrl = `https://github.com/stevenyangtw/SmartSub.git/releases/tag/v${version}`;
     openUrl(releaseUrl);
   };
 

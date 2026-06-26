@@ -26,7 +26,7 @@ type OpenAIProvider = {
  * 因項目近期對服務商配置做了大量重構，其 PR 無法直接合並，故在此重新落地，
  * 並保留署名，向原作者的思路與付出致以誠摯的感謝與尊重。
  * Credit & sincere thanks to @nightt5879.
- * Adapted from https://github.com/buxuku/SmartSub/pull/328 (fixes #326).
+ * Adapted from https://github.com/stevenyangtw/SmartSub.git/pull/328 (fixes #326).
  */
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {

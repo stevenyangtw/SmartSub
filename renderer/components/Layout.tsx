@@ -839,7 +839,9 @@ const Layout = ({ children }) => {
                   {t('help.checkUpdates')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => openUrl('https://github.com/buxuku/SmartSub')}
+                  onClick={() =>
+                    openUrl('https://github.com/stevenyangtw/SmartSub.git')
+                  }
                 >
                   <Github className="mr-2 h-4 w-4" />
                   {t('help.github')}

@@ -53,7 +53,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/buxuku/SmartSub/tree/main/docs/',
+          editUrl: 'https://github.com/stevenyangtw/SmartSub.git/tree/main/docs/',
           routeBasePath: '/', // 将文档设置为首页
         },
         blog: false, // 不需要博客功能
@@ -101,7 +101,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://github.com/buxuku/SmartSub',
+          href: 'https://github.com/stevenyangtw/SmartSub.git',
           label: 'GitHub',
           position: 'right',
         },
@@ -136,7 +136,7 @@ const config: Config = {
             },
             {
               label: '问题反馈',
-              href: 'https://github.com/buxuku/SmartSub/issues',
+              href: 'https://github.com/stevenyangtw/SmartSub/issues',
             },
           ],
         },
@@ -145,7 +145,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/buxuku/SmartSub',
+              href: 'https://github.com/stevenyangtw/SmartSub.git',
             },
           ],
         },

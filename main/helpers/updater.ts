@@ -115,7 +115,9 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
     //       if (response === 0) {
     //         // 打開GitHub發佈頁面，讓用戶手動下載
     //         const releaseUrl =
-    //           'https://github.com/buxuku/SmartSub/releases/latest';
+    //           process.platform === 'darwin'
+    //             ? 'https://github.com/stevenyangtw/SmartSub/releases/latest'
+    //             : 'https://github.com/stevenyangtw/SmartSub/releases/latest';
     //         require('electron').shell.openExternal(releaseUrl);
     //       }
     //     });
@@ -131,7 +133,8 @@ export function setupAutoUpdater(mainWindow: BrowserWindow) {
     // 針對Mac平臺的特殊處理
     if (process.platform === 'darwin') {
       // 打開GitHub發佈頁面，讓用戶手動下載
-      const releaseUrl = 'https://github.com/buxuku/SmartSub/releases/latest';
+      const releaseUrl =
+        'https://github.com/stevenyangtw/SmartSub.git/releases/latest';
       require('electron').shell.openExternal(releaseUrl);
       return { success: true, manualDownload: true };
     }

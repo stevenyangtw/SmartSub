@@ -71,7 +71,7 @@ const LABELS: Record<MenuLanguage, Record<string, string>> = {
   },
 };
 
-const REPO_URL = 'https://github.com/buxuku/SmartSub';
+const REPO_URL = 'https://github.com/stevenyangtw/SmartSub.git';
 
 let mainWindowRef: BrowserWindow | null = null;
 

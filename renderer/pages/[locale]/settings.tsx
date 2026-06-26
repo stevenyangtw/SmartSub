@@ -1177,7 +1177,9 @@ const Settings = () => {
                 variant="ghost"
                 size="sm"
                 className="gap-1.5 text-muted-foreground hover:text-foreground"
-                onClick={() => openUrl('https://github.com/buxuku/SmartSub')}
+                onClick={() =>
+                  openUrl('https://github.com/stevenyangtw/SmartSub.git')
+                }
               >
                 <Github className="h-4 w-4" />
                 {t('common:help.github')}
@@ -1187,7 +1189,7 @@ const Settings = () => {
                 size="sm"
                 className="gap-1.5 text-muted-foreground hover:text-foreground"
                 onClick={() =>
-                  openUrl('https://github.com/buxuku/SmartSub/issues')
+                  openUrl('https://github.com/stevenyangtw/SmartSub/issues')
                 }
               >
                 <MessageSquareWarning className="h-4 w-4" />

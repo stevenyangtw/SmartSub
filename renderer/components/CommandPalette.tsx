@@ -222,7 +222,7 @@ export default function CommandPalette({
             value={`action ${t('help.github')}`}
             onSelect={() => {
               onOpenChange(false);
-              openUrl('https://github.com/buxuku/SmartSub');
+              openUrl('https://github.com/stevenyangtw/SmartSub.git');
             }}
           >
             <Github />

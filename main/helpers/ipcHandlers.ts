@@ -402,7 +402,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
     async (
       event,
       options: {
-        type: 'video' | 'subtitle' | 'any';
+        type: 'video' | 'subtitle' | 'txt' | 'any';
         title?: string;
         multiple?: boolean;
       },
@@ -423,6 +423,13 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
           {
             name: 'Subtitle Files',
             extensions: SUBTITLE_EXTENSIONS.map((ext) => ext.substring(1)),
+          },
+        ];
+      } else if (type === 'txt') {
+        filters = [
+          {
+            name: 'Text Files',
+            extensions: ['txt'],
           },
         ];
       }

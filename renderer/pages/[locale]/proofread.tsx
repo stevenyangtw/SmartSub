@@ -5,6 +5,7 @@ import { getStaticPaths, makeStaticProperties } from '../../lib/get-static';
 import ProofreadImport from '@/components/proofread/ProofreadImport';
 import ProofreadFileList from '@/components/proofread/ProofreadFileList';
 import ProofreadEditor from '@/components/proofread/ProofreadEditor';
+import Txt2SrtDialog from '@/components/proofread/Txt2SrtDialog';
 import PageHeader from '@/components/PageHeader';
 import { ProofreadTask } from '../../../types/proofread';
 import {
@@ -33,6 +34,7 @@ export default function ProofreadPage() {
   const [savedTaskId, setSavedTaskId] = useState<string | null>(null);
   const [taskName, setTaskName] = useState<string>('');
   const [importType, setImportType] = useState<'video' | 'subtitle'>('video');
+  const [txt2SrtOpen, setTxt2SrtOpen] = useState(false);
 
   // 從歷史任務加載
   const handleLoadTask = useCallback(async (task: ProofreadTask) => {
@@ -83,6 +85,76 @@ export default function ProofreadPage() {
       const defaultName = files[0]?.fileName?.replace(/\.[^.]+$/, '') || '';
       setTaskName(defaultName);
       setStage('list');
+    },
+    [],
+  );
+
+  // 開始對齊任務
+  const handleAlignStart = useCallback(
+    async (videoPath: string, txtPath: string, payload: any) => {
+      import('path').then((path) => {
+        import('uuid').then(({ v4: uuidv4 }) => {
+          const fileId = uuidv4();
+          const pendingFile: PendingFile = {
+            id: fileId,
+            fileName: path.basename(videoPath),
+            videoPath,
+            detectedSubtitles: [],
+            status: 'aligning',
+          };
+
+          setPendingFiles((prev) => [...prev, pendingFile]);
+          // 如果是第一筆，則重置 taskId 等
+          setSavedTaskId((prev) => prev); // keep existing if any
+          setImportType('video');
+          setTaskName(
+            (prevName) =>
+              prevName || pendingFile.fileName.replace(/\.[^.]+$/, ''),
+          );
+          setStage('list');
+
+          // 開始背景處理
+          window.ipc
+            .invoke('python-engine:align', payload)
+            .then((res) => {
+              if (res.success && res.result?.srtPath) {
+                setPendingFiles((prev) =>
+                  prev.map((f) => {
+                    if (f.id === fileId) {
+                      return {
+                        ...f,
+                        status: 'pending',
+                        detectedSubtitles: [
+                          {
+                            filePath: res.result.srtPath,
+                            type: 'source',
+                            confidence: 100,
+                          },
+                        ],
+                        selectedSource: res.result.srtPath,
+                      };
+                    }
+                    return f;
+                  }),
+                );
+              } else {
+                setPendingFiles((prev) =>
+                  prev.map((f) =>
+                    f.id === fileId ? { ...f, status: 'error' } : f,
+                  ),
+                );
+              }
+            })
+            .catch((err) => {
+              console.error('Background align error:', err);
+              setPendingFiles((prev) =>
+                prev.map((f) =>
+                  f.id === fileId ? { ...f, status: 'error' } : f,
+                ),
+              );
+            });
+        });
+      });
     },
     [],
   );
@@ -247,7 +319,16 @@ export default function ProofreadPage() {
   const renderStage = () => {
     switch (stage) {
       case 'import':
-        return <ProofreadImport onImportComplete={handleImportComplete} />;
+        return (
+          <ProofreadImport
+            onImportComplete={handleImportComplete}
+            onAlignStart={handleAlignStart}
+            onTxt2SrtClick={() => {
+              setStage('list');
+              setTxt2SrtOpen(true);
+            }}
+          />
+        );
 
       case 'list':
         return (
@@ -263,6 +344,7 @@ export default function ProofreadPage() {
             onAddFiles={handleAddFiles}
             onSaveTask={handleSaveTask}
             onReset={handleReset}
+            onTxt2SrtClick={() => setTxt2SrtOpen(true)}
           />
         );
 
@@ -291,6 +373,12 @@ export default function ProofreadPage() {
         />
       )}
       <div className="flex-1 overflow-auto min-h-0">{renderStage()}</div>
+
+      <Txt2SrtDialog
+        open={txt2SrtOpen}
+        onOpenChange={setTxt2SrtOpen}
+        onAlignStart={handleAlignStart}
+      />
     </div>
   );
 }

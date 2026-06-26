@@ -164,14 +164,12 @@ export const useStandaloneSubtitles = (
 
       // 讀取源字幕
       const sourceSubtitles = await readSubtitleFile(config.sourceSubtitlePath);
-      if (config.sourceLanguage) {
-        const track = await createPlayerTrack(
-          config.sourceSubtitlePath,
-          config.sourceLanguage,
-          !shouldShowTranslation,
-        );
-        if (track) playerTracks.push(track);
-      }
+      const track1 = await createPlayerTrack(
+        config.sourceSubtitlePath,
+        config.sourceLanguage || 'auto',
+        !shouldShowTranslation,
+      );
+      if (track1) playerTracks.push(track1);
 
       // 讀取翻譯字幕
       let translatedSubtitles: Subtitle[] = [];
@@ -179,14 +177,12 @@ export const useStandaloneSubtitles = (
         translatedSubtitles = await readSubtitleFile(config.targetSubtitlePath);
         setHasTranslationFile(translatedSubtitles.length > 0);
 
-        if (config.targetLanguage) {
-          const track = await createPlayerTrack(
-            config.targetSubtitlePath,
-            config.targetLanguage,
-            true,
-          );
-          if (track) playerTracks.push(track);
-        }
+        const track2 = await createPlayerTrack(
+          config.targetSubtitlePath,
+          config.targetLanguage || 'auto',
+          true,
+        );
+        if (track2) playerTracks.push(track2);
       }
 
       setSubtitleTracksForPlayer(playerTracks);

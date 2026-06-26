@@ -1,7 +1,7 @@
 // 在最開始加載環境變量（僅開發模式；路徑相對 app/ 編譯產物）
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config({
-    path: require('path').join(__dirname, '../../.env.development.local'),
+    path: require('path').join(__dirname, '../.env.development.local'),
   });
 }
 

@@ -331,6 +331,23 @@ export class PythonRuntimeManager {
     return { id, result };
   }
 
+  align(
+    params: Record<string, unknown>,
+    handlers?: TranscribeHandlers,
+  ): { id: string; result: Promise<TranscribeResult> } {
+    const id = `align-${++this.seq}`;
+    const result = this.requestWithId<TranscribeResult>(id, 'align', params, {
+      onEvent: (method, eventParams) => {
+        if (method === 'progress' && handlers?.onProgress) {
+          handlers.onProgress(Number(eventParams.percent) || 0);
+        } else if (method === 'segment' && handlers?.onSegment) {
+          handlers.onSegment(eventParams as unknown as TranscribeSegment);
+        }
+      },
+    });
+    return { id, result };
+  }
+
   cancel(id: string): void {
     this.notify('cancel', { id });
   }

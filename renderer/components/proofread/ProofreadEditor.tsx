@@ -37,7 +37,7 @@ interface PendingFile {
   selectedTarget?: string;
   sourceLanguage?: string;
   targetLanguage?: string;
-  status: 'pending' | 'proofreading' | 'completed';
+  status: 'aligning' | 'error' | 'pending' | 'proofreading' | 'completed';
   finalTargetPath?: string; // 目標翻譯文件路徑（用戶配置格式）
   translateContent?: string; // 翻譯內容格式設置
 }

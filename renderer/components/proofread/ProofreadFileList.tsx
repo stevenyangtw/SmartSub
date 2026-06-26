@@ -132,6 +132,7 @@ interface ProofreadFileListProps {
   onAddFiles: (files: PendingFile[]) => void;
   onSaveTask: () => Promise<boolean>;
   onReset: () => void;
+  onTxt2SrtClick?: () => void;
 }
 
 export default function ProofreadFileList({
@@ -146,6 +147,7 @@ export default function ProofreadFileList({
   onAddFiles,
   onSaveTask,
   onReset,
+  onTxt2SrtClick,
 }: ProofreadFileListProps) {
   const { t } = useTranslation('home');
   const [saving, setSaving] = useState(false);
@@ -379,6 +381,19 @@ export default function ProofreadFileList({
             <span className="text-xs">{t('proofreading')}</span>
           </div>
         );
+      case 'aligning':
+        return (
+          <div className="flex items-center gap-1 text-primary whitespace-nowrap">
+            <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
+            <span className="text-xs">{t('aligning') || '對齊中...'}</span>
+          </div>
+        );
+      case 'error':
+        return (
+          <div className="flex items-center gap-1 text-destructive whitespace-nowrap">
+            <span className="text-xs">{t('error') || '錯誤'}</span>
+          </div>
+        );
       default:
         return (
           <div className="flex items-center gap-1 text-muted-foreground whitespace-nowrap">
@@ -479,6 +494,12 @@ export default function ProofreadFileList({
             <Plus className="w-4 h-4 mr-1" />
             {importType === 'video' ? t('appendVideos') : t('appendSubtitles')}
           </Button>
+          {onTxt2SrtClick && (
+            <Button variant="outline" size="sm" onClick={onTxt2SrtClick}>
+              <Plus className="w-4 h-4 mr-1" />
+              TXT2SRT
+            </Button>
+          )}
         </div>
       </div>
 
@@ -585,6 +606,7 @@ export default function ProofreadFileList({
                             onValueChange={(v) =>
                               handleSelectFromDropdown(index, 'source', v)
                             }
+                            disabled={file.status === 'aligning'}
                           >
                             <SelectTrigger
                               className={SUBTITLE_SELECT_TRIGGER_CLASS}
@@ -633,6 +655,7 @@ export default function ProofreadFileList({
                           className="h-8 w-8"
                           onClick={() => handleSelectSourceSubtitle(index)}
                           title={t('uploadSubtitle')}
+                          disabled={file.status === 'aligning'}
                         >
                           <Upload className="w-4 h-4" />
                         </Button>
@@ -647,6 +670,7 @@ export default function ProofreadFileList({
                           onValueChange={(v) =>
                             handleSelectFromDropdown(index, 'target', v)
                           }
+                          disabled={file.status === 'aligning'}
                         >
                           <SelectTrigger
                             className={SUBTITLE_SELECT_TRIGGER_CLASS}
@@ -692,6 +716,7 @@ export default function ProofreadFileList({
                         className="h-8 w-8"
                         onClick={() => handleSelectTargetSubtitle(index)}
                         title={t('uploadSubtitle')}
+                        disabled={file.status === 'aligning'}
                       >
                         <Upload className="w-4 h-4" />
                       </Button>
@@ -703,18 +728,25 @@ export default function ProofreadFileList({
                         variant="default"
                         size="sm"
                         onClick={() => onStartProofread(index)}
-                        disabled={!file.selectedSource}
+                        disabled={
+                          !file.selectedSource || file.status === 'aligning'
+                        }
                       >
-                        <Play className="w-4 h-4 mr-1" />
+                        {file.status !== 'aligning' && (
+                          <Play className="w-4 h-4 mr-1" />
+                        )}
                         {file.status === 'completed'
                           ? t('view')
-                          : t('proofread')}
+                          : file.status === 'aligning'
+                            ? t('aligning') || '對齊中...'
+                            : t('proofread')}
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
                         onClick={() => onRemoveFile(index)}
+                        disabled={file.status === 'aligning'}
                       >
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>

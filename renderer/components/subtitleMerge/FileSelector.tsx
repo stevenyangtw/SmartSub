@@ -40,7 +40,7 @@ export default function FileSelector({
     <div className="flex flex-col sm:flex-row gap-2">
       {/* 影片文件選擇 */}
       <div
-        className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer hover:border-primary ${
+        className={`flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer hover:border-primary ${
           videoPath
             ? 'border-success bg-success/10'
             : 'border-border bg-muted/30'
@@ -48,7 +48,7 @@ export default function FileSelector({
         onClick={!disabled ? onSelectVideo : undefined}
       >
         <div
-          className={`p-1.5 rounded ${
+          className={`p-1.5 flex-shrink-0 rounded ${
             videoPath
               ? 'bg-success/15 text-success'
               : 'bg-muted text-muted-foreground'
@@ -58,18 +58,21 @@ export default function FileSelector({
         </div>
         <div className="flex-1 min-w-0">
           {videoPath ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm truncate flex-1" title={videoPath}>
+            <div className="flex items-center gap-2 min-w-0 w-full">
+              <span
+                className="text-sm truncate flex-1 min-w-0"
+                title={videoPath}
+              >
                 {videoInfo?.fileName || path.basename(videoPath)}
               </span>
               {videoInfo && (
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
                   {formatDuration(videoInfo.duration)}
                 </span>
               )}
             </div>
           ) : (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground truncate block">
               {t('clickToSelectVideo')}
             </span>
           )}
@@ -91,7 +94,7 @@ export default function FileSelector({
 
       {/* 字幕文件選擇 */}
       <div
-        className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer hover:border-primary ${
+        className={`flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer hover:border-primary ${
           subtitlePath
             ? 'border-success bg-success/10'
             : 'border-border bg-muted/30'
@@ -99,7 +102,7 @@ export default function FileSelector({
         onClick={!disabled ? onSelectSubtitle : undefined}
       >
         <div
-          className={`p-1.5 rounded ${
+          className={`p-1.5 flex-shrink-0 rounded ${
             subtitlePath
               ? 'bg-success/15 text-success'
               : 'bg-muted text-muted-foreground'
@@ -109,18 +112,21 @@ export default function FileSelector({
         </div>
         <div className="flex-1 min-w-0">
           {subtitlePath ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm truncate flex-1" title={subtitlePath}>
+            <div className="flex items-center gap-2 min-w-0 w-full">
+              <span
+                className="text-sm truncate flex-1 min-w-0"
+                title={subtitlePath}
+              >
                 {subtitleInfo?.fileName || path.basename(subtitlePath)}
               </span>
               {subtitleInfo && (
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
                   {subtitleInfo.count} {t('subtitleCount')}
                 </span>
               )}
             </div>
           ) : (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground truncate block">
               {t('clickToSelectSubtitle')}
             </span>
           )}

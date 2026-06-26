@@ -8,8 +8,8 @@ import type {
 } from '../../../types/engine';
 import { resolveReleaseBaseUrl } from '../download/sources';
 
-/** 獨立發佈倉庫：https://github.com/buxuku/smartsub-py-engine */
-export const PY_ENGINE_REPO = 'buxuku/smartsub-py-engine';
+/** 獨立發佈倉庫：https://github.com/stevenyangtw/smartsub-py-engine */
+export const PY_ENGINE_REPO = 'stevenyangtw/smartsub-py-engine';
 
 /** 滾動 latest Release，SmartSub 始終從此 tag 拉取最新構建 */
 export const PY_ENGINE_TAG = 'latest';

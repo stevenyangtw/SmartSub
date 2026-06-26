@@ -262,17 +262,17 @@ eq(
 );
 // --- resolveReleaseBaseUrl (py slugs) ---
 const PY = {
-  github: 'buxuku/smartsub-py-engine',
-  gitcode: 'buxuku1/smartsub-py-engine',
+  github: 'stevenyangtw/smartsub-py-engine',
+  gitcode: 'stevenyangtw/smartsub-py-engine',
 };
 eq(
   resolveReleaseBaseUrl('github', PY, 'latest'),
-  'https://github.com/buxuku/smartsub-py-engine/releases/download/latest',
+  'https://github.com/stevenyangtw/smartsub-py-engine/releases/download/latest',
   'url: py github',
 );
 eq(
   resolveReleaseBaseUrl('ghproxy', PY, 'latest'),
-  'https://gh-proxy.com/https://github.com/buxuku/smartsub-py-engine/releases/download/latest',
+  'https://gh-proxy.com/https://github.com/stevenyangtw/smartsub-py-engine/releases/download/latest',
   'url: py ghproxy',
 );
 eq(

@@ -210,27 +210,23 @@ export const useSubtitles = (
 
       if (originalSrtPath) {
         originalSubtitles = await readSubtitleFile(originalSrtPath);
-        if (formData.sourceLanguage) {
-          const track = await createPlayerTrack(
-            originalSrtPath,
-            formData.sourceLanguage,
-            !shouldShowTranslation,
-          );
-          if (track) playerTracks.push(track);
-        }
+        const track = await createPlayerTrack(
+          originalSrtPath,
+          formData.sourceLanguage || 'auto',
+          !shouldShowTranslation,
+        );
+        if (track) playerTracks.push(track);
       }
 
       // 讀取翻譯字幕文件（如果存在）
       if (shouldShowTranslation && translatedSrtPath) {
         translatedSubtitles = await readSubtitleFile(translatedSrtPath);
-        if (formData.targetLanguage) {
-          const track = await createPlayerTrack(
-            translatedSrtPath,
-            formData.targetLanguage,
-            true,
-          );
-          if (track) playerTracks.push(track);
-        }
+        const track = await createPlayerTrack(
+          translatedSrtPath,
+          formData.targetLanguage || 'auto',
+          true,
+        );
+        if (track) playerTracks.push(track);
       }
 
       setSubtitleTracksForPlayer(playerTracks);

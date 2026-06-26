@@ -24,7 +24,7 @@ export interface PendingFile {
   selectedTarget?: string;
   sourceLanguage?: string;
   targetLanguage?: string;
-  status: 'pending' | 'proofreading' | 'completed';
+  status: 'aligning' | 'error' | 'pending' | 'proofreading' | 'completed';
   isSubtitleOnlyMode?: boolean; // 字幕導入模式，源字幕不可切換
 }
 

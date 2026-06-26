@@ -50,3 +50,6 @@ export interface TranscribeHandlers {
   onProgress?: (percent: number) => void;
   onSegment?: (segment: TranscribeSegment) => void;
 }
+
+export type AlignResult = TranscribeResult;
+export type AlignHandlers = TranscribeHandlers;

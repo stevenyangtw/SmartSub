@@ -295,5 +295,17 @@
   "errorReadSubtitle": "Failed to read subtitle file: {{file}}",
   "errorConvertToVTT": "Failed to convert subtitle to VTT: {{file}}",
   "proofreadPageTitle": "Proofread Subtitles",
-  "proofreadPageDesc": "Import subtitles for line-by-line refinement with AI batch optimization"
+  "proofreadPageDesc": "Import subtitles for line-by-line refinement with AI batch optimization",
+  "importTxt2Srt": "TXT2SRT (Forced Alignment)",
+  "importTxt2SrtDesc": "Import video and plain text to automatically align and generate subtitles",
+  "txt2srtDialogTitle": "Text to Subtitle (TXT2SRT)",
+  "txt2srtDialogDesc": "Please select a video file and a plain text file (txt). The system will use the audio to automatically align with the text and generate a subtitle file (srt).",
+  "videoFile": "Video File",
+  "txtFile": "Plain Text File (TXT)",
+  "selectVideo": "Select Video",
+  "selectTxt": "Select Text File",
+  "startAlign": "Start Alignment",
+  "aligning": "Aligning...",
+  "alignSuccess": "Alignment successful",
+  "alignFailed": "Alignment failed, please try again"
 }

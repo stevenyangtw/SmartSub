@@ -19,3 +19,11 @@ sample
 extraResources/addons/addon.vulkan.node
 extraResources/py-base/
 .superpowers/
+# Agent & Init Files
+AGENTS.md
+Makefile
+openspec/
+docs/
+.codex/
+codex/
+

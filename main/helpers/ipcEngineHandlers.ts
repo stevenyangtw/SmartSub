@@ -315,5 +315,31 @@ export function registerEngineIpcHandlers(): void {
     },
   );
 
+  ipcMain.handle(
+    'python-engine:align',
+    async (
+      event,
+      payload: {
+        videoPath: string;
+        txtPath: string;
+        modelParams: any;
+      },
+    ) => {
+      try {
+        const manager = getPythonRuntimeManager();
+        await manager.ensureStarted('faster-whisper');
+        const { result } = manager.align(payload, {
+          onProgress: (percent) => {
+            event.sender.send('python-engine:align-progress', { percent });
+          },
+        });
+        return { success: true, result: await result };
+      } catch (error) {
+        logMessage(`Python engine align failed: ${error}`, 'error');
+        return { success: false, error: String(error) };
+      }
+    },
+  );
+
   logMessage('Engine IPC handlers registered', 'info');
 }

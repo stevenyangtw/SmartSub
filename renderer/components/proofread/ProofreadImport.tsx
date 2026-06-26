@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Video, FileText, FolderOpen } from 'lucide-react';
+import { Video, FileText, FolderOpen, AlignLeft } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import {
@@ -16,10 +16,14 @@ import path from 'path';
 
 interface ProofreadImportProps {
   onImportComplete: (files: PendingFile[], type: 'video' | 'subtitle') => void;
+  onAlignStart?: (videoPath: string, txtPath: string, payload: any) => void;
+  onTxt2SrtClick?: () => void;
 }
 
 export default function ProofreadImport({
   onImportComplete,
+  onAlignStart,
+  onTxt2SrtClick,
 }: ProofreadImportProps) {
   const { t } = useTranslation('home');
 
@@ -47,7 +51,7 @@ export default function ProofreadImport({
       console.error('Failed to import videos:', error);
       toast.error(t('importVideosFailed'));
     }
-  }, [onImportComplete]);
+  }, [onImportComplete, t]);
 
   // 導入字幕文件
   const handleImportSubtitles = useCallback(async () => {
@@ -73,7 +77,7 @@ export default function ProofreadImport({
       console.error('Failed to import subtitles:', error);
       toast.error(t('importSubtitlesFailed'));
     }
-  }, [onImportComplete]);
+  }, [onImportComplete, t]);
 
   // 導入資料夾（智能檢測）
   const handleImportFolder = useCallback(async () => {
@@ -206,7 +210,7 @@ export default function ProofreadImport({
         <p className="text-muted-foreground">{t('importMethodDescription')}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
         <Card
           className="cursor-pointer hover:bg-accent transition-colors border-2 hover:border-primary"
           onClick={handleImportVideos}
@@ -243,6 +247,23 @@ export default function ProofreadImport({
           </CardHeader>
           <CardContent className="text-center text-sm text-muted-foreground">
             {t('importFolderDesc')}
+          </CardContent>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:bg-accent transition-colors border-2 hover:border-primary"
+          onClick={() => {
+            if (onTxt2SrtClick) {
+              onTxt2SrtClick();
+            }
+          }}
+        >
+          <CardHeader className="text-center pb-2">
+            <AlignLeft className="w-12 h-12 mx-auto text-primary" />
+            <CardTitle className="text-lg">{t('importTxt2Srt')}</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center text-sm text-muted-foreground">
+            {t('importTxt2SrtDesc')}
           </CardContent>
         </Card>
       </div>

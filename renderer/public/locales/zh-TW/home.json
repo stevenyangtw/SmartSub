@@ -295,5 +295,17 @@
   "errorReadSubtitle": "讀取字幕文件失敗：{{file}}",
   "errorConvertToVTT": "字幕轉換 VTT 失敗：{{file}}",
   "proofreadPageTitle": "校對字幕",
-  "proofreadPageDesc": "導入字幕逐條精修，支持 AI 批量優化"
+  "proofreadPageDesc": "導入字幕逐條精修，支持 AI 批量優化",
+  "importTxt2Srt": "TXT2SRT (強制對齊)",
+  "importTxt2SrtDesc": "導入影片與純文字，自動對齊產生字幕",
+  "txt2srtDialogTitle": "純文字轉字幕 (TXT2SRT)",
+  "txt2srtDialogDesc": "請選擇影片檔案與純文字檔(txt)，系統將利用音訊自動與文字對齊並產生字幕檔(srt)。",
+  "videoFile": "影片檔案",
+  "txtFile": "純文字檔案(TXT)",
+  "selectVideo": "選擇影片",
+  "selectTxt": "選擇文字檔",
+  "startAlign": "開始對齊",
+  "aligning": "正在對齊中...",
+  "alignSuccess": "對齊成功",
+  "alignFailed": "對齊失敗，請重試"
 }
